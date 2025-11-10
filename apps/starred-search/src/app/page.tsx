@@ -3,10 +3,13 @@
 import { useState, useMemo } from 'react';
 import { IndexingUI } from '@/components/IndexingUI';
 import { SearchUI } from '@/components/SearchUI';
+import { ExportUI } from '@/components/ExportUI';
+import { ActivityAnalysisUI } from '@/components/ActivityAnalysisUI';
 import { SearchIndex } from '@/lib/search-index';
 import { IndexedRepo } from '@/lib/github-indexer';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Github, Info } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Github, Info, Star, Download, TrendingUp } from 'lucide-react';
 
 export default function Home() {
   const [indexedRepos, setIndexedRepos] = useState<IndexedRepo[]>([]);
@@ -29,12 +32,11 @@ export default function Home() {
           <div className="flex items-center justify-center gap-3">
             <Github className="w-12 h-12" />
             <h1 className="text-4xl font-bold tracking-tight">
-              GitHub README indexer
+              GitHub Insights
             </h1>
           </div>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Index and search through README files from any GitHub user's starred repositories.
-            Perfect for discovering documentation and exploring interesting projects.
+            Discover patterns in your GitHub activity, search through starred repositories, and export data for analysis.
           </p>
         </div>
 
@@ -44,7 +46,7 @@ export default function Home() {
           <AlertTitle>GitHub API rate limits</AlertTitle>
           <AlertDescription>
             <ul className="list-disc list-inside space-y-1 text-sm mt-2">
-              <li>Without token: 60 requests/hour (can index ~50 repos)</li>
+              <li>Without token: 60 requests/hour (limited data access)</li>
               <li>With personal access token: 5,000 requests/hour</li>
               <li>
                 Generate a token at{' '}
@@ -62,16 +64,47 @@ export default function Home() {
           </AlertDescription>
         </Alert>
 
-        {/* Indexing UI */}
-        <IndexingUI onIndexingComplete={handleIndexingComplete} />
+        {/* Tabs Navigation */}
+        <Tabs defaultValue="starred" className="w-full">
+          <TabsList className="grid w-full grid-cols-3 lg:w-auto lg:inline-grid">
+            <TabsTrigger value="starred" className="flex items-center gap-2">
+              <Star className="w-4 h-4" />
+              <span className="hidden sm:inline">Starred repos</span>
+              <span className="sm:hidden">Starred</span>
+            </TabsTrigger>
+            <TabsTrigger value="export" className="flex items-center gap-2">
+              <Download className="w-4 h-4" />
+              <span className="hidden sm:inline">Export</span>
+              <span className="sm:hidden">Export</span>
+            </TabsTrigger>
+            <TabsTrigger value="activity" className="flex items-center gap-2">
+              <TrendingUp className="w-4 h-4" />
+              <span className="hidden sm:inline">Activity</span>
+              <span className="sm:hidden">Activity</span>
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Search UI */}
-        <SearchUI searchIndex={searchIndex} />
+          {/* Starred Repos Tab */}
+          <TabsContent value="starred" className="space-y-6 mt-6">
+            <IndexingUI onIndexingComplete={handleIndexingComplete} />
+            <SearchUI searchIndex={searchIndex} />
+          </TabsContent>
+
+          {/* Export Tab */}
+          <TabsContent value="export" className="space-y-6 mt-6">
+            <ExportUI repos={indexedRepos} />
+          </TabsContent>
+
+          {/* Activity Analysis Tab */}
+          <TabsContent value="activity" className="space-y-6 mt-6">
+            <ActivityAnalysisUI />
+          </TabsContent>
+        </Tabs>
 
         {/* Footer */}
         <div className="text-center text-sm text-muted-foreground pt-8 pb-4">
           <p>
-            Built with Next.js, TypeScript, and shadcn/ui. All data is stored in-memory.
+            Built with Next.js, TypeScript, and shadcn/ui.
           </p>
         </div>
       </div>

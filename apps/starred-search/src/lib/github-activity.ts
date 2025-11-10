@@ -52,7 +52,8 @@ export class GitHubActivityFetcher {
 
   private getHeaders(): HeadersInit {
     const headers: HeadersInit = {
-      'Accept': 'application/vnd.github.cloak-preview+json', // Required for commit search
+      'Accept': 'application/vnd.github+json', // Use stable API, not preview
+      'X-GitHub-Api-Version': '2022-11-28',
     };
     if (this.token) {
       headers['Authorization'] = `token ${this.token}`;

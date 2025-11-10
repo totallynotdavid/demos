@@ -52,7 +52,7 @@ export class GitHubActivityFetcher {
 
   private getHeaders(): HeadersInit {
     const headers: HeadersInit = {
-      'Accept': 'application/vnd.github+json', // Use stable API, not preview
+      'Accept': 'application/vnd.github+json',
       'X-GitHub-Api-Version': '2022-11-28',
     };
     if (this.token) {
@@ -114,17 +114,35 @@ export class GitHubActivityFetcher {
         });
 
         if (!response.ok) {
+          // Get the full error response from GitHub
+          let errorData;
+          try {
+            errorData = await response.json();
+          } catch {
+            errorData = await response.text();
+          }
+
+          // Log the full error for debugging
+          console.error('GitHub API Error:', {
+            status: response.status,
+            statusText: response.statusText,
+            url: url,
+            query: query,
+            headers: Object.fromEntries(response.headers.entries()),
+            body: errorData
+          });
+
           if (response.status === 404) {
-            throw new Error('User not found');
+            throw new Error(`User not found: ${username}. Full error: ${JSON.stringify(errorData)}`);
           }
           if (response.status === 403) {
             const rateLimitReset = response.headers.get('X-RateLimit-Reset');
-            throw new Error('GitHub API rate limit exceeded. Please provide a Personal Access Token.');
+            throw new Error(`GitHub API rate limit exceeded. Reset at: ${rateLimitReset}. Full error: ${JSON.stringify(errorData)}`);
           }
           if (response.status === 422) {
-            throw new Error('Invalid username or search query');
+            throw new Error(`Invalid username or search query. GitHub says: ${JSON.stringify(errorData)}`);
           }
-          throw new Error(`Failed to fetch commit activity: ${response.statusText}`);
+          throw new Error(`Failed to fetch commit activity (${response.status}): ${JSON.stringify(errorData)}`);
         }
 
         const data: GitHubSearchCommitResponse = await response.json();

@@ -17,18 +17,29 @@ export interface ActivityStats {
 
 export type TimeRange = '3days' | '1week' | '1month' | '3months' | '6months';
 
-interface GitHubEvent {
-  type: string;
-  repo: {
-    name: string;
-  };
-  created_at: string;
-  payload: {
-    commits?: Array<{
-      sha: string;
+interface GitHubSearchCommitResponse {
+  total_count: number;
+  incomplete_results: boolean;
+  items: Array<{
+    sha: string;
+    commit: {
+      author: {
+        name: string;
+        email: string;
+        date: string;
+      };
+      committer: {
+        name: string;
+        email: string;
+        date: string;
+      };
       message: string;
-    }>;
-  };
+    };
+    repository: {
+      name: string;
+      full_name: string;
+    };
+  }>;
 }
 
 export class GitHubActivityFetcher {
@@ -41,7 +52,7 @@ export class GitHubActivityFetcher {
 
   private getHeaders(): HeadersInit {
     const headers: HeadersInit = {
-      'Accept': 'application/vnd.github.v3+json',
+      'Accept': 'application/vnd.github.cloak-preview+json', // Required for commit search
     };
     if (this.token) {
       headers['Authorization'] = `token ${this.token}`;
@@ -74,6 +85,10 @@ export class GitHubActivityFetcher {
     return threshold;
   }
 
+  private formatDateForSearch(date: Date): string {
+    return date.toISOString().split('T')[0];
+  }
+
   async fetchUserActivity(
     username: string,
     timeRange: TimeRange,
@@ -86,9 +101,13 @@ export class GitHubActivityFetcher {
     let hasMore = true;
 
     try {
-      // Fetch user events (GitHub API only provides last 90 days of events, max 300 events)
+      // Use GitHub Search API for commits
+      const dateQuery = this.formatDateForSearch(threshold);
+      
       while (hasMore && page <= 10) {
-        const url = `${this.baseUrl}/users/${username}/events?per_page=${perPage}&page=${page}`;
+        const query = `author:${username}+committer-date:>${dateQuery}`;
+        const url = `${this.baseUrl}/search/commits?q=${encodeURIComponent(query)}&per_page=${perPage}&page=${page}&sort=committer-date&order=desc`;
+        
         const response = await fetch(url, {
           headers: this.getHeaders(),
         });
@@ -98,50 +117,51 @@ export class GitHubActivityFetcher {
             throw new Error('User not found');
           }
           if (response.status === 403) {
+            const rateLimitReset = response.headers.get('X-RateLimit-Reset');
             throw new Error('GitHub API rate limit exceeded. Please provide a Personal Access Token.');
           }
-          throw new Error(`Failed to fetch user activity: ${response.statusText}`);
+          if (response.status === 422) {
+            throw new Error('Invalid username or search query');
+          }
+          throw new Error(`Failed to fetch commit activity: ${response.statusText}`);
         }
 
-        const events: GitHubEvent[] = await response.json();
+        const data: GitHubSearchCommitResponse = await response.json();
 
-        if (events.length === 0) {
+        if (data.items.length === 0) {
           hasMore = false;
           break;
         }
 
-        for (const event of events) {
-          const eventDate = new Date(event.created_at);
-
-          // Stop if we've gone past the threshold
-          if (eventDate < threshold) {
-            hasMore = false;
-            break;
-          }
-
-          // Only process PushEvents (commits)
-          if (event.type === 'PushEvent' && event.payload.commits) {
-            for (const commit of event.payload.commits) {
-              const timestamp = new Date(event.created_at);
-              commits.push({
-                repo: event.repo.name,
-                timestamp,
-                hour: timestamp.getHours(),
-                dayOfWeek: timestamp.getDay(),
-                sha: commit.sha,
-                message: commit.message,
-              });
-            }
-          }
+        for (const item of data.items) {
+          const timestamp = new Date(item.commit.committer.date);
+          
+          commits.push({
+            repo: item.repository.full_name,
+            timestamp,
+            hour: timestamp.getHours(),
+            dayOfWeek: timestamp.getDay(),
+            sha: item.sha,
+            message: item.commit.message.split('\n')[0], // First line only
+          });
         }
 
-        onProgress?.(page, 10);
+        onProgress?.(page, Math.ceil(data.total_count / perPage));
 
-        if (events.length < perPage) {
+        // If we got fewer results than requested, we've reached the end
+        if (data.items.length < perPage) {
+          hasMore = false;
+        }
+
+        // GitHub Search API has a max of 1000 results (10 pages)
+        if (page * perPage >= 1000) {
           hasMore = false;
         }
 
         page++;
+        
+        // Add a small delay to avoid rate limiting
+        await new Promise(resolve => setTimeout(resolve, 100));
       }
 
       // Calculate statistics

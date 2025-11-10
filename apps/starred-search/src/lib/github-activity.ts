@@ -17,29 +17,30 @@ export interface ActivityStats {
 
 export type TimeRange = '3days' | '1week' | '1month' | '3months' | '6months';
 
-interface GitHubSearchCommitResponse {
-  total_count: number;
-  incomplete_results: boolean;
-  items: Array<{
-    sha: string;
-    commit: {
-      author: {
-        name: string;
-        email: string;
-        date: string;
-      };
-      committer: {
-        name: string;
-        email: string;
-        date: string;
-      };
-      message: string;
-    };
-    repository: {
-      name: string;
-      full_name: string;
-    };
-  }>;
+interface GitHubEvent {
+  id: string;
+  type: string;
+  actor: {
+    id: number;
+    login: string;
+    display_login: string;
+    url: string;
+    avatar_url: string;
+  };
+  repo: {
+    id: number;
+    name: string;
+    url: string;
+  };
+  payload: any;
+  public: boolean;
+  created_at: string;
+  org?: {
+    id: number;
+    login: string;
+    url: string;
+    avatar_url: string;
+  };
 }
 
 export class GitHubActivityFetcher {
@@ -53,7 +54,6 @@ export class GitHubActivityFetcher {
   private getHeaders(): HeadersInit {
     const headers: HeadersInit = {
       'Accept': 'application/vnd.github+json',
-      'X-GitHub-Api-Version': '2022-11-28',
     };
     if (this.token) {
       headers['Authorization'] = `token ${this.token}`;
@@ -86,10 +86,6 @@ export class GitHubActivityFetcher {
     return threshold;
   }
 
-  private formatDateForSearch(date: Date): string {
-    return date.toISOString().split('T')[0];
-  }
-
   async fetchUserActivity(
     username: string,
     timeRange: TimeRange,
@@ -99,22 +95,18 @@ export class GitHubActivityFetcher {
     const commits: CommitActivity[] = [];
     let page = 1;
     const perPage = 100;
-    let hasMore = true;
 
     try {
-      // Use GitHub Search API for commits
-      const dateQuery = this.formatDateForSearch(threshold);
-      
-      while (hasMore && page <= 10) {
-        const query = `author:${username}+committer-date:>${dateQuery}`;
-        const url = `${this.baseUrl}/search/commits?q=${encodeURIComponent(query)}&per_page=${perPage}&page=${page}&sort=committer-date&order=desc`;
+      // Use GitHub Events API - simpler and more reliable
+      // Note: This API returns max 300 events and only last 90 days
+      while (page <= 10) {
+        const url = `${this.baseUrl}/users/${username}/events/public?per_page=${perPage}&page=${page}`;
         
         const response = await fetch(url, {
           headers: this.getHeaders(),
         });
 
         if (!response.ok) {
-          // Get the full error response from GitHub
           let errorData;
           try {
             errorData = await response.json();
@@ -122,59 +114,56 @@ export class GitHubActivityFetcher {
             errorData = await response.text();
           }
 
-          // Log the full error for debugging
           console.error('GitHub API Error:', {
             status: response.status,
             statusText: response.statusText,
             url: url,
-            query: query,
-            headers: Object.fromEntries(response.headers.entries()),
             body: errorData
           });
 
           if (response.status === 404) {
-            throw new Error(`User not found: ${username}. Full error: ${JSON.stringify(errorData)}`);
+            throw new Error(`User not found: ${username}`);
           }
           if (response.status === 403) {
-            const rateLimitReset = response.headers.get('X-RateLimit-Reset');
-            throw new Error(`GitHub API rate limit exceeded. Reset at: ${rateLimitReset}. Full error: ${JSON.stringify(errorData)}`);
+            throw new Error(`GitHub API rate limit exceeded`);
           }
-          if (response.status === 422) {
-            throw new Error(`Invalid username or search query. GitHub says: ${JSON.stringify(errorData)}`);
-          }
-          throw new Error(`Failed to fetch commit activity (${response.status}): ${JSON.stringify(errorData)}`);
+          throw new Error(`Failed to fetch activity (${response.status}): ${JSON.stringify(errorData)}`);
         }
 
-        const data: GitHubSearchCommitResponse = await response.json();
+        const events: GitHubEvent[] = await response.json();
 
-        if (data.items.length === 0) {
-          hasMore = false;
+        if (events.length === 0) {
           break;
         }
 
-        for (const item of data.items) {
-          const timestamp = new Date(item.commit.committer.date);
-          
-          commits.push({
-            repo: item.repository.full_name,
-            timestamp,
-            hour: timestamp.getHours(),
-            dayOfWeek: timestamp.getDay(),
-            sha: item.sha,
-            message: item.commit.message.split('\n')[0], // First line only
-          });
+        // Process PushEvents (commits)
+        for (const event of events) {
+          if (event.type === 'PushEvent') {
+            const timestamp = new Date(event.created_at);
+            
+            // Filter by time range
+            if (timestamp < threshold) {
+              continue;
+            }
+
+            // Count the push event as one commit activity
+            // (We could parse payload.commits for individual commits, but this is simpler)
+            commits.push({
+              repo: event.repo.name,
+              timestamp,
+              hour: timestamp.getHours(),
+              dayOfWeek: timestamp.getDay(),
+              sha: event.payload.head || event.id,
+              message: `Push to ${event.payload.ref || 'branch'}`,
+            });
+          }
         }
 
-        onProgress?.(page, Math.ceil(data.total_count / perPage));
+        onProgress?.(page, 10);
 
         // If we got fewer results than requested, we've reached the end
-        if (data.items.length < perPage) {
-          hasMore = false;
-        }
-
-        // GitHub Search API has a max of 1000 results (10 pages)
-        if (page * perPage >= 1000) {
-          hasMore = false;
+        if (events.length < perPage) {
+          break;
         }
 
         page++;

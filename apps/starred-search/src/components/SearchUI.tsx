@@ -4,12 +4,14 @@ import { useState, useMemo } from 'react';
 import { SearchIndex, SearchResult, SortOption } from '@/lib/search-index';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { spacing, sizing, typography, colors, effects, states, cn } from '@/config/design-tokens';
 
 interface SearchUIProps {
   searchIndex: SearchIndex;
+  className?: string;
 }
 
-export function SearchUI({ searchIndex }: SearchUIProps) {
+export function SearchUI({ searchIndex, className }: SearchUIProps) {
   const [query, setQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('relevance');
 
@@ -51,7 +53,7 @@ export function SearchUI({ searchIndex }: SearchUIProps) {
         parts.push(<span key={`text-${lastIndex}`}>{text.slice(lastIndex, match.start)}</span>);
       }
       parts.push(
-        <mark key={`mark-${match.start}`} className="bg-foreground/10 font-normal">
+        <mark key={`mark-${match.start}`} className={cn(colors.highlightBg, 'font-normal')}>
           {text.slice(match.start, match.end)}
         </mark>
       );
@@ -68,18 +70,18 @@ export function SearchUI({ searchIndex }: SearchUIProps) {
   const totalRepos = searchIndex.getRepos().length;
 
   return (
-    <div className="space-y-8">
+    <div className={className}>
       {/* Search Bar */}
-      <div className="flex gap-3">
+      <div className={cn('flex', spacing.inline)}>
         <Input
           placeholder="Search repositories and READMEs..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="flex-1 h-11 text-base"
+          className={cn('flex-1', sizing.input, typography.textBase)}
           disabled={totalRepos === 0}
         />
         <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortOption)}>
-          <SelectTrigger disabled={totalRepos === 0} className="w-40 h-11">
+          <SelectTrigger disabled={totalRepos === 0} className={cn(sizing.buttonSelect, sizing.select)}>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -92,44 +94,44 @@ export function SearchUI({ searchIndex }: SearchUIProps) {
 
       {/* Results Count */}
       {totalRepos > 0 && (
-        <p className="text-sm text-muted-foreground">
+        <p className={cn(typography.textSm, colors.secondary)}>
           {results.length} result{results.length !== 1 ? 's' : ''}
         </p>
       )}
 
       {/* Results */}
       {results.length > 0 && (
-        <div className="space-y-8">
+        <div className={spacing.resultList}>
           {results.map((result) => (
-            <div key={result.id} className="space-y-3 pb-8 border-b border-border/50 last:border-0">
+            <div key={result.id} className={cn(spacing.result, 'pb-8', effects.borderBottom, colors.border, 'last:border-0')}>
               <div>
                 <a
                   href={result.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-lg font-medium hover:underline inline-block"
+                  className={cn('text-lg font-medium inline-block', states.hoverUnderline)}
                 >
                   {highlightText(result.fullName, query)}
                 </a>
                 {result.description && (
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <p className={cn(typography.textSm, colors.secondary, 'mt-1')}>
                     {highlightText(result.description, query)}
                   </p>
                 )}
               </div>
 
-              <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
+              <div className={cn('flex flex-wrap', spacing.inline, typography.textXs, colors.secondary)}>
                 {result.language && <span>{result.language}</span>}
                 <span>★ {result.stars.toLocaleString()}</span>
                 <span>{new Date(result.updatedAt).toLocaleDateString()}</span>
               </div>
 
               {result.matchedLines.length > 0 && (
-                <div className="space-y-1.5 mt-3">
+                <div className={cn(spacing.gridTight, 'mt-3')}>
                   {result.matchedLines.slice(0, 2).map((line, idx) => (
                     <p
                       key={idx}
-                      className="text-xs font-mono text-muted-foreground bg-muted/30 p-2 rounded"
+                      className={cn(typography.mono, colors.secondary, colors.bgMutedLight, 'p-2', effects.roundedMd)}
                     >
                       {highlightText(line, query)}
                     </p>
@@ -142,7 +144,7 @@ export function SearchUI({ searchIndex }: SearchUIProps) {
       )}
 
       {totalRepos === 0 && (
-        <p className="text-sm text-muted-foreground">
+        <p className={cn(typography.textSm, colors.secondary)}>
           No repositories indexed yet
         </p>
       )}

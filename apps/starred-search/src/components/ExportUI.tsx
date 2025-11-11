@@ -5,12 +5,14 @@ import { CSVExporter, ExportOptions, defaultExportOptions } from '@/lib/csv-expo
 import { IndexedRepo } from '@/lib/github-indexer';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { spacing, sizing, typography, colors, effects, cn } from '@/config/design-tokens';
 
 interface ExportUIProps {
   repos: IndexedRepo[];
+  className?: string;
 }
 
-export function ExportUI({ repos }: ExportUIProps) {
+export function ExportUI({ repos, className }: ExportUIProps) {
   const [options, setOptions] = useState<ExportOptions>(defaultExportOptions);
   const [showOptions, setShowOptions] = useState(false);
 
@@ -41,12 +43,12 @@ export function ExportUI({ repos }: ExportUIProps) {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
+    <div className={className}>
+      <div className={cn('flex items-center', spacing.gridMedium)}>
         <Button 
           onClick={() => setShowOptions(!showOptions)}
           variant="ghost"
-          className="h-11 px-6"
+          className={cn(sizing.button, sizing.buttonWide)}
         >
           {showOptions ? 'Hide options' : 'Export to CSV'}
         </Button>
@@ -54,7 +56,7 @@ export function ExportUI({ repos }: ExportUIProps) {
           <Button 
             onClick={handleExport} 
             disabled={selectedCount === 0}
-            className="h-11 px-8"
+            className={cn(sizing.button, sizing.buttonNormal)}
           >
             Download ({repos.length} repos)
           </Button>
@@ -62,16 +64,16 @@ export function ExportUI({ repos }: ExportUIProps) {
       </div>
 
       {showOptions && (
-        <div className="grid grid-cols-2 gap-x-8 gap-y-4 pl-6 border-l-2 border-border/50">
+        <div className={cn(spacing.grid2Col, spacing.gridWideX, spacing.gridWideY, 'pl-6', effects.borderLeft, colors.border)}>
           {exportOptionsList.map((option) => (
-            <label key={option.key} className="flex items-center gap-2.5 cursor-pointer group">
+            <label key={option.key} className={cn('flex items-center gap-2.5 cursor-pointer group')}>
               <Checkbox
                 checked={options[option.key]}
                 onCheckedChange={(checked) => 
                   updateOption(option.key, checked as boolean)
                 }
               />
-              <span className="text-sm group-hover:text-foreground transition-colors">
+              <span className={cn(typography.textSm, 'group-hover:text-foreground', effects.transitionColors)}>
                 {option.label}
               </span>
             </label>

@@ -6,8 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, PieChart, Pie } from 'recharts';
+import { spacing, sizing, typography, colors, effects, layout, cn } from '@/config/design-tokens';
 
-export function ActivityAnalysisUI() {
+export function ActivityAnalysisUI({ className }: { className?: string }) {
   const [username, setUsername] = useState('');
   const [token, setToken] = useState('');
   const [timeRange, setTimeRange] = useState<TimeRange>('1month');
@@ -44,10 +45,6 @@ export function ActivityAnalysisUI() {
       setIsAnalyzing(false);
     }
   };
-
-  const avgActivitiesPerDay = stats 
-    ? (stats.totalCommits + stats.totalIssues + stats.totalPRs + stats.totalComments + stats.totalReviews) / stats.timeRangeDays 
-    : 0;
 
   const totalActivities = stats ? stats.totalCommits + stats.totalIssues + stats.totalPRs + stats.totalComments + stats.totalReviews : 0;
   
@@ -102,16 +99,16 @@ export function ActivityAnalysisUI() {
   );
 
   return (
-    <div className="space-y-12">
+    <div className={className}>
       {/* Form */}
-      <div className="space-y-6">
-        <div className="flex gap-3">
+      <div className={spacing.form}>
+        <div className={cn('flex', spacing.inline)}>
           <Input
             placeholder="GitHub username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             disabled={isAnalyzing}
-            className="flex-1 h-11 text-base"
+            className={cn('flex-1', sizing.input, typography.textBase)}
             onKeyDown={(e) => e.key === 'Enter' && !isAnalyzing && handleAnalyze()}
           />
           <Input
@@ -120,11 +117,11 @@ export function ActivityAnalysisUI() {
             value={token}
             onChange={(e) => setToken(e.target.value)}
             disabled={isAnalyzing}
-            className="flex-1 h-11 text-base"
+            className={cn('flex-1', sizing.input, typography.textBase)}
             onKeyDown={(e) => e.key === 'Enter' && !isAnalyzing && handleAnalyze()}
           />
           <Select value={timeRange} onValueChange={(value) => setTimeRange(value as TimeRange)} disabled={isAnalyzing}>
-            <SelectTrigger className="w-40 h-11">
+            <SelectTrigger className={cn(sizing.buttonSelect, sizing.select)}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -135,15 +132,15 @@ export function ActivityAnalysisUI() {
               <SelectItem value="6months">6 months</SelectItem>
             </SelectContent>
           </Select>
-          <Button onClick={handleAnalyze} disabled={isAnalyzing} className="h-11 px-8">
+          <Button onClick={handleAnalyze} disabled={isAnalyzing} className={cn(sizing.button, sizing.buttonNormal)}>
             {isAnalyzing ? 'Analyzing...' : 'Analyze'}
           </Button>
         </div>
 
-        {error && <p className="text-sm text-destructive">{error}</p>}
+        {error && <p className={cn(typography.textSm, colors.destructive)}>{error}</p>}
         
         {isAnalyzing && (
-          <p className="text-sm text-muted-foreground">
+          <p className={cn(typography.textSm, colors.secondary)}>
             Loading activity data ({progress.current}/{progress.total} pages)
           </p>
         )}
@@ -151,32 +148,32 @@ export function ActivityAnalysisUI() {
 
       {/* Results */}
       {stats && totalActivities > 0 && (
-        <div className="space-y-16">
+        <div className={spacing.page}>
           {/* Stats Grid */}
-          <div className="grid grid-cols-4 gap-8">
+          <div className={cn(layout.grid4Col, spacing.gridWide)}>
             <div>
-              <div className="text-3xl font-light tabular-nums">{totalActivities}</div>
-              <div className="text-xs text-muted-foreground mt-1">Total activities</div>
+              <div className={typography.h2}>{totalActivities}</div>
+              <div className={cn(typography.label, 'mt-1')}>Total activities</div>
             </div>
             <div>
-              <div className="text-3xl font-light tabular-nums">{stats.uniqueRepos.size}</div>
-              <div className="text-xs text-muted-foreground mt-1">Repositories</div>
+              <div className={typography.h2}>{stats.uniqueRepos.size}</div>
+              <div className={cn(typography.label, 'mt-1')}>Repositories</div>
             </div>
             <div>
-              <div className="text-3xl font-light tabular-nums">{peakHour.hour}</div>
-              <div className="text-xs text-muted-foreground mt-1">Peak hour</div>
+              <div className={typography.h2}>{peakHour.hour}</div>
+              <div className={cn(typography.label, 'mt-1')}>Peak hour</div>
             </div>
             <div>
-              <div className="text-3xl font-light tabular-nums">{peakDay.day}</div>
-              <div className="text-xs text-muted-foreground mt-1">Most active day</div>
+              <div className={typography.h2}>{peakDay.day}</div>
+              <div className={cn(typography.label, 'mt-1')}>Most active day</div>
             </div>
           </div>
 
           {/* Activity Breakdown */}
-          <div className="grid grid-cols-2 gap-12">
-            <div className="space-y-4">
-              <h3 className="text-sm font-medium">Activity breakdown</h3>
-              <ResponsiveContainer width="100%" height={200}>
+          <div className={cn(layout.grid2Col, 'gap-12')}>
+            <div className={spacing.gridMedium}>
+              <h3 className={typography.h3}>Activity breakdown</h3>
+              <ResponsiveContainer width="100%" height={sizing.chartSmall}>
                 <PieChart>
                   <Pie
                     data={activityTypeData}
@@ -195,7 +192,7 @@ export function ActivityAnalysisUI() {
                   <Tooltip contentStyle={{ background: 'hsl(var(--background))', border: '1px solid hsl(var(--border))' }} />
                 </PieChart>
               </ResponsiveContainer>
-              <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className={cn(layout.grid2Col, spacing.gridTight, typography.textXs)}>
                 <div>{stats.totalCommits} Commits</div>
                 <div>{stats.totalPRs} PRs</div>
                 <div>{stats.totalIssues} Issues</div>
@@ -205,18 +202,18 @@ export function ActivityAnalysisUI() {
             </div>
 
             {languageData.length > 0 && (
-              <div className="space-y-4">
-                <h3 className="text-sm font-medium">Top languages</h3>
-                <div className="space-y-3 pt-4">
+              <div className={spacing.gridMedium}>
+                <h3 className={typography.h3}>Top languages</h3>
+                <div className={cn(spacing.gridTight, 'pt-4')}>
                   {languageData.map((lang, index) => (
-                    <div key={index} className="space-y-1.5">
-                      <div className="flex items-center justify-between text-xs">
+                    <div key={index} className={spacing.gridTight}>
+                      <div className={cn('flex items-center justify-between', typography.textXs)}>
                         <span>{lang.language}</span>
-                        <span className="text-muted-foreground tabular-nums">{lang.percentage}%</span>
+                        <span className={cn(colors.secondary, 'tabular-nums')}>{lang.percentage}%</span>
                       </div>
-                      <div className="h-1 bg-muted rounded-full overflow-hidden">
+                      <div className={cn(sizing.progressHeight, colors.bgMuted, effects.roundedFull, 'overflow-hidden')}>
                         <div 
-                          className="h-full bg-foreground/60 rounded-full"
+                          className={cn(sizing.progressHeight, 'bg-foreground/60', effects.roundedFull)}
                           style={{ width: `${lang.percentage}%` }}
                         />
                       </div>
@@ -228,38 +225,38 @@ export function ActivityAnalysisUI() {
           </div>
 
           {/* Issues & PRs */}
-          <div className="grid grid-cols-2 gap-12">
-            <div className="space-y-4">
-              <h3 className="text-sm font-medium">Issues</h3>
-              <div className="space-y-2 text-sm">
+          <div className={cn(layout.grid2Col, 'gap-12')}>
+            <div className={spacing.gridMedium}>
+              <h3 className={typography.h3}>Issues</h3>
+              <div className={cn(spacing.gridTight, typography.textSm)}>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Opened</span>
+                  <span className={colors.secondary}>Opened</span>
                   <span className="tabular-nums">{issuesOpened}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Closed</span>
+                  <span className={colors.secondary}>Closed</span>
                   <span className="tabular-nums">{issuesClosed}</span>
                 </div>
-                <div className="flex justify-between pt-2 border-t border-border/50">
-                  <span className="text-muted-foreground">Net</span>
+                <div className={cn('flex justify-between pt-2', effects.borderTop, colors.border)}>
+                  <span className={colors.secondary}>Net</span>
                   <span className="tabular-nums">{issuesOpened - issuesClosed > 0 ? '+' : ''}{issuesOpened - issuesClosed}</span>
                 </div>
               </div>
             </div>
 
-            <div className="space-y-4">
-              <h3 className="text-sm font-medium">Pull requests</h3>
-              <div className="space-y-2 text-sm">
+            <div className={spacing.gridMedium}>
+              <h3 className={typography.h3}>Pull requests</h3>
+              <div className={cn(spacing.gridTight, typography.textSm)}>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Opened</span>
+                  <span className={colors.secondary}>Opened</span>
                   <span className="tabular-nums">{prsOpened}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Merged</span>
+                  <span className={colors.secondary}>Merged</span>
                   <span className="tabular-nums">{prsMerged}</span>
                 </div>
-                <div className="flex justify-between pt-2 border-t border-border/50">
-                  <span className="text-muted-foreground">Merge rate</span>
+                <div className={cn('flex justify-between pt-2', effects.borderTop, colors.border)}>
+                  <span className={colors.secondary}>Merge rate</span>
                   <span className="tabular-nums">{prsOpened > 0 ? ((prsMerged / prsOpened) * 100).toFixed(0) : 0}%</span>
                 </div>
               </div>
@@ -267,9 +264,9 @@ export function ActivityAnalysisUI() {
           </div>
 
           {/* Hourly Activity */}
-          <div className="space-y-4">
-            <h3 className="text-sm font-medium">Activity by hour</h3>
-            <ResponsiveContainer width="100%" height={200}>
+          <div className={spacing.gridMedium}>
+            <h3 className={typography.h3}>Activity by hour</h3>
+            <ResponsiveContainer width="100%" height={sizing.chartSmall}>
               <BarChart data={hourlyData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
                 <XAxis 
@@ -301,9 +298,9 @@ export function ActivityAnalysisUI() {
           </div>
 
           {/* Daily Activity */}
-          <div className="space-y-4">
-            <h3 className="text-sm font-medium">Activity by day</h3>
-            <ResponsiveContainer width="100%" height={200}>
+          <div className={spacing.gridMedium}>
+            <h3 className={typography.h3}>Activity by day</h3>
+            <ResponsiveContainer width="100%" height={sizing.chartSmall}>
               <BarChart data={dailyData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
                 <XAxis 
@@ -334,9 +331,9 @@ export function ActivityAnalysisUI() {
           </div>
 
           {stats.collaborationRepos.size > 0 && (
-            <div className="space-y-4">
-              <h3 className="text-sm font-medium">Collaboration</h3>
-              <p className="text-sm text-muted-foreground">
+            <div className={spacing.gridMedium}>
+              <h3 className={typography.h3}>Collaboration</h3>
+              <p className={cn(typography.textSm, colors.secondary)}>
                 {stats.collaborationRepos.size} repositories with reviews, comments, or issues (no commits)
               </p>
             </div>
@@ -345,7 +342,7 @@ export function ActivityAnalysisUI() {
       )}
 
       {stats && totalActivities === 0 && (
-        <p className="text-sm text-muted-foreground">
+        <p className={cn(typography.textSm, colors.secondary)}>
           No activity found for this time range
         </p>
       )}

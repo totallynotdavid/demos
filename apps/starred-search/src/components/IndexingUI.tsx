@@ -5,12 +5,14 @@ import { GitHubIndexer, IndexingProgress } from '@/lib/github-indexer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { IndexedRepo } from '@/lib/github-indexer';
+import { spacing, sizing, typography, colors, effects, cn } from '@/config/design-tokens';
 
 interface IndexingUIProps {
   onIndexingComplete: (repos: IndexedRepo[]) => void;
+  className?: string;
 }
 
-export function IndexingUI({ onIndexingComplete }: IndexingUIProps) {
+export function IndexingUI({ onIndexingComplete, className }: IndexingUIProps) {
   const [username, setUsername] = useState('');
   const [token, setToken] = useState('');
   const [isIndexing, setIsIndexing] = useState(false);
@@ -67,16 +69,16 @@ export function IndexingUI({ onIndexingComplete }: IndexingUIProps) {
     : 0;
 
   return (
-    <div className="space-y-8">
-      {/* Simple Form */}
-      <div className="space-y-6">
-        <div className="flex gap-3">
+    <div className={className}>
+      {/* Form */}
+      <div className={spacing.form}>
+        <div className={cn('flex', spacing.inline)}>
           <Input
             placeholder="GitHub username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             disabled={isIndexing}
-            className="flex-1 h-11 text-base"
+            className={cn('flex-1', sizing.input, typography.textBase)}
             onKeyDown={(e) => e.key === 'Enter' && !isIndexing && handleStartIndexing()}
           />
           <Input
@@ -85,53 +87,53 @@ export function IndexingUI({ onIndexingComplete }: IndexingUIProps) {
             value={token}
             onChange={(e) => setToken(e.target.value)}
             disabled={isIndexing}
-            className="flex-1 h-11 text-base"
+            className={cn('flex-1', sizing.input, typography.textBase)}
             onKeyDown={(e) => e.key === 'Enter' && !isIndexing && handleStartIndexing()}
           />
           {!isIndexing ? (
-            <Button onClick={handleStartIndexing} className="h-11 px-8">
+            <Button onClick={handleStartIndexing} className={cn(sizing.input, sizing.buttonNormal)}>
               Index
             </Button>
           ) : (
-            <Button onClick={handleStopIndexing} variant="ghost" className="h-11 px-8">
+            <Button onClick={handleStopIndexing} variant="ghost" className={cn(sizing.input, sizing.buttonNormal)}>
               Cancel
             </Button>
           )}
         </div>
 
         {error && (
-          <p className="text-sm text-destructive">{error}</p>
+          <p className={cn(typography.textSm, colors.destructive)}>{error}</p>
         )}
       </div>
 
       {/* Progress */}
       {progress && (
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <div className="flex items-baseline justify-between text-sm">
-              <span className="text-muted-foreground">
+        <div className={spacing.gridMedium}>
+          <div className={spacing.gridTight}>
+            <div className={cn('flex items-baseline justify-between', typography.textSm)}>
+              <span className={colors.secondary}>
                 {progress.isComplete ? 'Complete' : 'Indexing...'}
               </span>
               <span className="font-medium tabular-nums">
                 {progress.indexedReadmes} / {progress.fetchedRepos}
               </span>
             </div>
-            <div className="h-1 bg-muted rounded-full overflow-hidden">
+            <div className={cn(sizing.progressHeight, colors.bgMuted, effects.roundedFull, 'overflow-hidden')}>
               <div 
-                className="h-full bg-foreground transition-all duration-300"
+                className={cn(sizing.progressHeight, colors.progressBar, effects.transitionWidth)}
                 style={{ width: `${progressPercentage}%` }}
               />
             </div>
           </div>
           
           {progress.errors > 0 && (
-            <p className="text-xs text-muted-foreground">
+            <p className={cn(typography.textXs, colors.secondary)}>
               {progress.errors} error{progress.errors > 1 ? 's' : ''} during indexing
             </p>
           )}
 
           {progress.isComplete && (
-            <p className="text-sm text-muted-foreground">
+            <p className={cn(typography.textSm, colors.secondary)}>
               Indexed {progress.indexedReadmes} README{progress.indexedReadmes !== 1 ? 's' : ''} from {progress.fetchedRepos} repositories
             </p>
           )}

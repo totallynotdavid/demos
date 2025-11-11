@@ -9,6 +9,7 @@ import { SearchIndex } from '@/lib/search-index';
 import { IndexedRepo } from '@/lib/github-indexer';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Github } from 'lucide-react';
+import { spacing, sizing, typography, colors, effects, layout, states, cn } from '@/config/design-tokens';
 
 export default function Home() {
   const [indexedRepos, setIndexedRepos] = useState<IndexedRepo[]>([]);
@@ -25,11 +26,11 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-background via-background to-muted/20">
+    <div className={cn(layout.pageLayout, 'bg-gradient-to-b from-background via-background to-muted/20')}>
       {/* Header with Theme Toggle */}
-      <header className="sticky top-0 z-50 backdrop-blur-xl bg-background/80 border-b border-border/40">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+      <header className={cn('sticky top-0 z-50', effects.backdropBlurStrong, 'bg-background/80', effects.borderBottom, colors.borderLight)}>
+        <div className={cn(layout.container, layout.containerPadding, 'h-16', layout.flexBetween)}>
+          <div className={cn(layout.flexRow, spacing.inline)}>
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-foreground to-foreground/60 flex items-center justify-center">
               <Github className="w-4 h-4 text-background" />
             </div>
@@ -40,37 +41,39 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
+      <main className={cn('flex-1', layout.container, layout.containerPadding, 'py-12', spacing.major)}>
         {/* Hero Section */}
-        <div className="space-y-4 text-center py-8">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight bg-gradient-to-br from-foreground to-foreground/60 bg-clip-text text-transparent">
+        <div className={cn(spacing.gridMedium, 'text-center py-8')}>
+          <h1 className={cn(typography.h1, 'bg-gradient-to-br from-foreground to-foreground/60 bg-clip-text text-transparent')}>
             Discover Your GitHub Activity
           </h1>
-          <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto font-light">
+          <p className={typography.subtitle}>
             Index starred repositories, analyze contribution patterns, and export comprehensive data.
           </p>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex justify-center">
-          <div className="inline-flex items-center gap-2 p-1 rounded-full bg-muted/50 backdrop-blur-sm border border-border/40">
+        <div className={layout.flexCenter}>
+          <div className={cn('inline-flex items-center p-1', effects.roundedFull, colors.bgMuted, effects.backdropBlur, effects.border, colors.borderLight, spacing.gridTight)}>
             <button
               onClick={() => setActiveSection('starred')}
-              className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all ${
+              className={cn(
+                'px-6 py-2.5', effects.roundedFull, typography.textSm, 'font-medium', effects.transition,
                 activeSection === 'starred'
-                  ? 'bg-background text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
+                  ? cn('bg-background', colors.primary, effects.shadow)
+                  : cn(colors.secondary, states.hover)
+              )}
             >
               Starred Repos
             </button>
             <button
               onClick={() => setActiveSection('activity')}
-              className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all ${
+              className={cn(
+                'px-6 py-2.5', effects.roundedFull, typography.textSm, 'font-medium', effects.transition,
                 activeSection === 'activity'
-                  ? 'bg-background text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
+                  ? cn('bg-background', colors.primary, effects.shadow)
+                  : cn(colors.secondary, states.hover)
+              )}
             >
               Activity Analysis
             </button>
@@ -80,18 +83,18 @@ export default function Home() {
         {/* Content Sections */}
         <div className="pb-8">
           {activeSection === 'starred' && (
-            <div className="space-y-12 animate-in fade-in duration-500">
-              <div className="bg-card/50 backdrop-blur-sm rounded-2xl border border-border/40 p-6 sm:p-8 shadow-sm">
-                <IndexingUI onIndexingComplete={handleIndexingComplete} />
+            <div className={cn(spacing.major, 'animate-in fade-in duration-500')}>
+              <div className={cn(layout.card, 'p-6 sm:p-8')}>
+                <IndexingUI onIndexingComplete={handleIndexingComplete} className={spacing.section} />
               </div>
               
               {indexedRepos.length > 0 && (
                 <>
-                  <div className="bg-card/50 backdrop-blur-sm rounded-2xl border border-border/40 p-6 sm:p-8 shadow-sm">
-                    <SearchUI searchIndex={searchIndex} />
+                  <div className={cn(layout.card, 'p-6 sm:p-8')}>
+                    <SearchUI searchIndex={searchIndex} className={spacing.section} />
                   </div>
-                  <div className="bg-card/50 backdrop-blur-sm rounded-2xl border border-border/40 p-6 sm:p-8 shadow-sm">
-                    <ExportUI repos={indexedRepos} />
+                  <div className={cn(layout.card, 'p-6 sm:p-8')}>
+                    <ExportUI repos={indexedRepos} className={spacing.form} />
                   </div>
                 </>
               )}
@@ -99,9 +102,9 @@ export default function Home() {
           )}
 
           {activeSection === 'activity' && (
-            <div className="space-y-12 animate-in fade-in duration-500">
-              <div className="bg-card/50 backdrop-blur-sm rounded-2xl border border-border/40 p-6 sm:p-8 shadow-sm">
-                <ActivityAnalysisUI />
+            <div className={cn(spacing.major, 'animate-in fade-in duration-500')}>
+              <div className={cn(layout.card, 'p-6 sm:p-8')}>
+                <ActivityAnalysisUI className={spacing.major} />
               </div>
             </div>
           )}
@@ -109,15 +112,15 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border/40 bg-card/30 backdrop-blur-sm mt-auto">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <p className="text-xs text-center text-muted-foreground/80">
+      <footer className={cn(effects.borderTop, colors.borderLight, colors.bgMutedLight, effects.backdropBlur, 'mt-auto')}>
+        <div className={cn(layout.container, layout.containerPadding, 'py-6')}>
+          <p className={cn(typography.textXs, 'text-center text-muted-foreground/80')}>
             Rate limits: 60 requests/hour without token, 5,000 with token.{' '}
             <a
               href="https://github.com/settings/tokens"
               target="_blank"
               rel="noopener noreferrer"
-              className="underline underline-offset-2 hover:text-foreground transition-colors"
+              className={cn('underline underline-offset-2', states.hover, effects.transitionColors)}
             >
               Get a personal access token
             </a>

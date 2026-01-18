@@ -1,0 +1,7 @@
+- Los feriados solitarios son días de descanso obligatorios, y los que son en pares uno de esos feriados debe trabajar
+- los días de descanso vienen en bloques de pares
+- luego de un bloque de descanso al inicio de la jornada laboral viene un día de ordenamiento (qué cuenta como día laboral)
+- los días laborales vienen en bloques de 3 a 7 días variables, debe haber aletoriedad
+- Solo puede haber un fin de semana libre por mes, no más, ni menos
+- en cada semana debe haber solo un bloque de descanso, no más ni menos
+- Domingo y lunes no puede ser combinación de día de descanso

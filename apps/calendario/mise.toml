@@ -1,0 +1,19 @@
+[settings]
+python.uv_venv_auto = true
+
+[tools]
+uv = "0.9.26"
+python = "3.14.2"
+ruff = "0.14.13"
+
+[tasks.sync]
+description = "Sync dependencies for all packages and dev"
+run = "uv sync --all-packages --extra dev"
+
+[tasks.format]
+description = "Format all packages"
+run = "ruff format . && ruff check --fix ."
+
+[tasks.lint]
+description = "Run type checking"
+run = "uv run mypy"

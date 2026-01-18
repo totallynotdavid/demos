@@ -2,6 +2,7 @@ from datetime import date
 from pathlib import Path
 
 import click
+import matplotlib.font_manager
 
 from calendario.io.exporters import export_to_csv, export_to_excel
 from calendario.io.visualization import plot_calendar
@@ -103,6 +104,10 @@ def export(year: int, seed: int | None, output_dir: str) -> None:
     click.echo(f"Exported Excel to {excel_path}")
 
     png_path = output_path / f"calendario_{calendar.year}.png"
+
+    inter_font_path = Path(__file__).parent / "inter.ttf"
+    matplotlib.font_manager.fontManager.addfont(str(inter_font_path))
+
     plot_calendar(calendar, output_path=png_path)
     click.echo(f"Exported visualization to {png_path}")
 

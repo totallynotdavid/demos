@@ -21,9 +21,9 @@ def cli() -> None:
 def basic(year: int, seed: int | None) -> None:
     """Generate a basic calendar with custom holidays."""
     holidays = [
-        date(year, 1, 1),  # New Year's Day
-        date(year, 12, 25),  # Christmas
-        date(year, 5, 1),  # Labor Day
+        date(year, 1, 1),
+        date(year, 12, 25),
+        date(year, 5, 1),
     ]
 
     calendar = generate_calendar(

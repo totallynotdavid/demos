@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="logo-icon"></div>
+                <h1>Calendario</h1>
+            </div>
+
+            <div class="controls">
+                <div class="control-group">
+                    <label class="control-label">Año</label>
+                    <input type="number" id="yearInput" class="input-field" value="2025" min="2024" max="2030">
+                </div>
+
+                <div class="control-group">
+                    <div class="group-header">
+                        <label class="control-label">Trabajadores</label>
+                        <button id="addWorkerBtn" class="icon-btn" aria-label="Agregar trabajador">+</button>
+                    </div>
+                    <div id="workersList" class="workers-list">
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button id="generateBtn" class="primary-btn">Generar horario</button>
+                    <button id="saveBtn" class="secondary-btn">Guardar configuración</button>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="status-indicator">
+                    <span class="status-dot online"></span>
+                    Sistema en línea
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="breadcrumbs">
+                    <span class="crumb-root">Espacio de trabajo</span>
+                    <span class="crumb-separator">/</span>
+                    <span class="crumb-current">Análisis de horario</span>
+                </div>
+                <div class="user-menu">
+                    <div class="avatar">DA</div>
+                </div>
+            </header>
+
+            <div id="calendarContainer" class="content-area">
+                <div class="empty-state">
+                    <div class="empty-icon">📅</div>
+                    <h2>No se ha generado horario</h2>
+                    <p>Agregue miembros del equipo y haga clic en 'Generar horario' para visualizar bloques de trabajo.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+
+</html>

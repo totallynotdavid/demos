@@ -7,18 +7,18 @@ from calendario.core.domain import Calendar
 from calendario.generation.execution import execute_plan
 from calendario.generation.holidays import process_holidays
 from calendario.generation.planning import create_plan
-from flask import Blueprint, jsonify, render_template, request
+from flask import Blueprint, Response, jsonify, render_template, request
 
 
 bp = Blueprint("main", __name__)
 
 
 @bp.route("/")
-def index():
+def index() -> str:
     return render_template("index.html")
 
 
-def serialize_calendar(calendar: Calendar):
+def serialize_calendar(calendar: Calendar) -> dict[str, object]:
     return {
         "year": calendar.year,
         "days": [
@@ -38,12 +38,11 @@ def generate_calendar_unsafe(year: int, seed: int | None = None) -> Calendar:
     rng = Random(seed) if seed is not None else Random()
     holiday_map = process_holidays([])
     plan = create_plan(year, holiday_map, rng)
-    calendar = execute_plan(plan)
-    return calendar
+    return execute_plan(plan)
 
 
 @bp.route("/api/generate", methods=["POST"])
-def generate():
+def generate() -> Response | tuple[Response, int]:
     try:
         data = request.get_json()
         year = int(data.get("year", 2025))
@@ -64,9 +63,9 @@ def generate():
                         seed = hash(f"{worker_name}-{year}-{attempt}") % 10000000
                         cal = generate_calendar(year, seed=seed)
                         break
-                    except Exception:
+                    except Exception:  # noqa: BLE001
                         continue
-            except Exception:
+            except Exception:  # noqa: BLE001
                 pass
 
             # Fallback to unsafe if failed
@@ -81,12 +80,12 @@ def generate():
 
         return jsonify({"calendars": calendars_data})
 
-    except Exception as e:
+    except (TypeError, ValueError, KeyError) as e:
         return jsonify({"error": str(e)}), 400
 
 
 @bp.route("/api/save", methods=["POST"])
-def save():
+def save() -> Response:
     return jsonify(
         {"status": "saved", "message": "Calendar configuration saved successfully."}
     )

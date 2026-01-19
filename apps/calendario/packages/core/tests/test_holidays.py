@@ -41,7 +41,7 @@ def test_process_holidays_sunday_monday_pair_raises():
     monday = date(2025, 3, 3)
     assert sunday.weekday() == 6
     assert monday.weekday() == 0
-    
+
     with pytest.raises(ValueError, match="Sunday-Monday holiday pair not allowed"):
         process_holidays([sunday, monday])
 

@@ -38,10 +38,7 @@ def test_validate_work_block_lengths_too_short():
 
 
 def test_validate_work_block_lengths_too_long():
-    days = [
-        Day(date(2025, 1, i), DayType.WORK)
-        for i in range(1, 10)
-    ]
+    days = [Day(date(2025, 1, i), DayType.WORK) for i in range(1, 10)]
     cal = Calendar(2025, tuple(days))
     errors = validate_work_block_lengths(cal)
     assert len(errors) == 1
@@ -91,7 +88,7 @@ def test_validate_no_sunday_monday_rest_valid():
     sunday = date(2025, 1, 5)
     assert saturday.weekday() == 5
     assert sunday.weekday() == 6
-    
+
     days = [
         Day(saturday, DayType.REST),
         Day(sunday, DayType.REST),
@@ -106,7 +103,7 @@ def test_validate_no_sunday_monday_rest_invalid():
     monday = date(2025, 1, 6)
     assert sunday.weekday() == 6
     assert monday.weekday() == 0
-    
+
     days = [
         Day(sunday, DayType.REST),
         Day(monday, DayType.REST),

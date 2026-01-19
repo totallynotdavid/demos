@@ -9,6 +9,10 @@ ruff = "0.14.13"
 [tasks.sync]
 run = ["uv sync --all-packages --extra dev", "cd packages/core && uv pip install -e ."]
 
+[tasks.test]
+dir = "packages/core"
+run = "uv run pytest"
+
 [tasks.pre-commit]
 run = ["ruff format .", "ruff check --fix ."]
 

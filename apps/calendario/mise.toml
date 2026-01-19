@@ -16,6 +16,10 @@ run = [
 dir = "packages/core"
 run = "uv run pytest"
 
+[tasks.dev-server]
+dir = "packages/web"
+run = "flask run"
+
 [tasks.pre-commit]
 run = ["ruff format .", "ruff check --fix ."]
 

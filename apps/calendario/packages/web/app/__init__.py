@@ -1,10 +1,9 @@
-import os
 import pathlib
 
 from flask import Flask
 
 
-def create_app(test_config=None):
+def create_app(test_config: dict[str, object] | None = None) -> Flask:  # noqa: RUF067
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
         SECRET_KEY="dev",
@@ -16,12 +15,12 @@ def create_app(test_config=None):
         app.config.from_mapping(test_config)
 
     # ensure the instance folder exists
-    try:
+    try:  # noqa: SIM105
         pathlib.Path(app.instance_path).mkdir(parents=True)
     except OSError:
         pass
 
-    from . import routes
+    from . import routes  # noqa: TID252
 
     app.register_blueprint(routes.bp)
     app.add_url_rule("/", endpoint="index")

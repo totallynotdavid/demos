@@ -74,3 +74,12 @@ order-by-type = true
 relative-imports-order = "closest-to-furthest"
 extra-standard-library = ["typing"]
 section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]
+
+[tool.mypy]
+files = ["packages/core/calendario", "packages/web/app"]
+strict = true
+enable_error_code = [
+    "ignore-without-code",
+    "redundant-expr",
+    "truthy-bool",
+]

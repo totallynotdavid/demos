@@ -1,12 +1,23 @@
 from dataclasses import dataclass, field
 from datetime import date
+from enum import Enum
 from functools import cached_property
 
-from calendario.core.types import DayType
+
+class DayType(Enum):
+    """Types of days in the calendar"""
+
+    WORK = "work"
+    REST = "rest"
+    ORDERING = "ordering"
+    HOLIDAY = "holiday"
+    WORKING_HOLIDAY = "working_holiday"
 
 
 @dataclass(frozen=True)
 class Day:
+    """A single day in the calendar with its type"""
+
     date: date
     day_type: DayType
 
@@ -25,6 +36,8 @@ class Day:
 
 @dataclass(frozen=True)
 class Calendar:
+    """A complete year calendar with all days"""
+
     year: int
     days: tuple[Day, ...]
     _index: dict[date, Day] = field(default_factory=dict, init=False, repr=False)
@@ -42,15 +55,18 @@ class Calendar:
         object.__setattr__(self, "_index", index)
 
     def get_day(self, d: date) -> Day:
+        """Get a specific day from the calendar"""
         return self._index[d]
 
     def get_month_days(self, month: int) -> tuple[Day, ...]:
+        """Get all days for a specific month"""
         if not 1 <= month <= 12:
             msg = f"Month must be 1-12, got {month}"
             raise ValueError(msg)
         return tuple(d for d in self.days if d.date.month == month)
 
     def get_work_blocks(self) -> list[list[Day]]:
+        """Get all work blocks (consecutive work days)"""
         blocks = []
         current = []
         for day in self.days:
@@ -64,6 +80,7 @@ class Calendar:
         return blocks
 
     def get_rest_blocks(self) -> list[list[Day]]:
+        """Get all REST blocks (consecutive REST days, not holidays)"""
         blocks = []
         current = []
         for day in self.days:

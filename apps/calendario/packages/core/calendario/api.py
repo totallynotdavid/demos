@@ -1,8 +1,8 @@
 from datetime import date
 
 from calendario.config.presets import get_ecuador_holidays
-from calendario.core.domain import Calendar
-from calendario.generation.generator import generate_calendar as _generate_calendar
+from calendario.domain import Calendar
+from calendario.generation.generator import generate_calendar as _generate
 
 
 def generate_calendar(
@@ -23,14 +23,14 @@ def generate_calendar(
 
     Raises:
         ValueError: If year is invalid or holidays contain duplicates
-        ValidationError: If constraints cannot be satisfied
+        ValidationError: If constraints cannot be satisfied (algorithm bug)
 
     Example:
         >>> cal = generate_calendar(2025, seed=42)
         >>> len(cal.days)
         365
     """
-    return _generate_calendar(year, holidays, seed)
+    return _generate(year, holidays, seed)
 
 
 def generate_ecuador_calendar(year: int, seed: int | None = None) -> Calendar:
@@ -46,13 +46,13 @@ def generate_ecuador_calendar(year: int, seed: int | None = None) -> Calendar:
 
     Raises:
         ValueError: If no preset exists for the year
-        ValidationError: If constraints cannot be satisfied
+        ValidationError: If constraints cannot be satisfied (algorithm bug)
 
     Example:
         >>> cal = generate_ecuador_calendar(2025, seed=42)
     """
     holidays = get_ecuador_holidays(year)
-    return _generate_calendar(year, holidays, seed)
+    return _generate(year, holidays, seed)
 
 
 def generate_multiple_calendars(
@@ -63,6 +63,8 @@ def generate_multiple_calendars(
 ) -> list[Calendar]:
     """
     Generate multiple calendars for different workers.
+
+    Each worker gets a different calendar (using incremented seeds).
 
     Args:
         year: Year to generate calendars for
@@ -81,6 +83,6 @@ def generate_multiple_calendars(
     calendars = []
     for i in range(num_workers):
         seed = (base_seed + i) if base_seed is not None else None
-        calendar = _generate_calendar(year, holidays, seed)
+        calendar = _generate(year, holidays, seed)
         calendars.append(calendar)
     return calendars

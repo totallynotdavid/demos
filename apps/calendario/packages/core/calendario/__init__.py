@@ -3,8 +3,7 @@ from calendario.api import (
     generate_ecuador_calendar,
     generate_multiple_calendars,
 )
-from calendario.core.domain import Calendar, Day
-from calendario.core.types import DayType
+from calendario.domain import Calendar, Day, DayType
 from calendario.validation.validator import ValidationError
 
 

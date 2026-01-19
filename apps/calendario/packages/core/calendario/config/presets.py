@@ -34,6 +34,18 @@ ECUADOR_HOLIDAYS = {
 
 
 def get_ecuador_holidays(year: int) -> list[date]:
+    """
+    Get Ecuador's official holidays for a specific year.
+
+    Args:
+        year: Year to get holidays for
+
+    Returns:
+        List of holiday dates
+
+    Raises:
+        ValueError: If no preset exists for the year
+    """
     if year not in ECUADOR_HOLIDAYS:
         msg = f"No Ecuador holidays preset for year {year}"
         raise ValueError(msg)

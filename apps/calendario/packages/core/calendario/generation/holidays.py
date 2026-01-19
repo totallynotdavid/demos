@@ -1,9 +1,27 @@
 from datetime import date
 
-from calendario.core.types import DayType
+from calendario.domain import DayType
 
 
 def process_holidays(holidays: list[date]) -> dict[date, DayType]:
+    """
+    Process holidays into a typed map.
+
+    Rules:
+    - Isolated holidays → HOLIDAY (full rest)
+    - Consecutive pairs → first is WORKING_HOLIDAY, second is HOLIDAY
+    - Sunday-Monday pairs are invalid
+    - Blocks of 3+ are invalid
+
+    Args:
+        holidays: List of holiday dates (will be deduplicated and sorted)
+
+    Returns:
+        Map of date → DayType
+
+    Raises:
+        ValueError: If invalid holiday patterns found
+    """
     if not holidays:
         return {}
 
@@ -29,6 +47,7 @@ def process_holidays(holidays: list[date]) -> dict[date, DayType]:
 
 
 def _group_consecutive_holidays(holidays: list[date]) -> list[list[date]]:
+    """Group consecutive holiday dates into blocks"""
     if not holidays:
         return []
 

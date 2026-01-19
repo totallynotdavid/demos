@@ -97,7 +97,7 @@ def insert_weekday_rest_blocks(
 
     for d in all_dates:
         if d in occupied:
-            if work_gap_length > 7:
+            if work_gap_length > 7 and work_gap_start is not None:
                 rest_interval = _place_rest_in_gap(
                     work_gap_start, work_gap_length, occupied, holidays
                 )
@@ -111,7 +111,7 @@ def insert_weekday_rest_blocks(
                 work_gap_start = d
             work_gap_length += 1
 
-    if work_gap_length > 7:
+    if work_gap_length > 7 and work_gap_start is not None:
         rest_interval = _place_rest_in_gap(
             work_gap_start, work_gap_length, occupied, holidays
         )

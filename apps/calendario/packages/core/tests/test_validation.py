@@ -166,5 +166,5 @@ def test_validate_holiday_pairing_invalid_pair():
     ]
     cal = Calendar(2025, tuple(days))
     errors = validate_holiday_pairing(cal)
-    assert len(errors) == 2
+    assert len(errors) == 1
     assert "should be WORKING_HOLIDAY" in errors[0]

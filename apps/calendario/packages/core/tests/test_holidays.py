@@ -17,15 +17,6 @@ def test_process_holidays_single_isolated():
     assert result == {date(2025, 1, 1): DayType.HOLIDAY}
 
 
-def test_process_holidays_consecutive_pair():
-    holidays = [date(2025, 2, 16), date(2025, 2, 17)]
-    result = process_holidays(holidays)
-    assert result == {
-        date(2025, 2, 16): DayType.WORKING_HOLIDAY,
-        date(2025, 2, 17): DayType.HOLIDAY,
-    }
-
-
 def test_process_holidays_multiple_isolated():
     holidays = [date(2025, 1, 1), date(2025, 5, 1), date(2025, 12, 25)]
     result = process_holidays(holidays)

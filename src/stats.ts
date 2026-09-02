@@ -1,3 +1,4 @@
+import { statfsSync } from "node:fs";
 import { OSUtils } from "node-os-utils";
 
 // Host metrics require neither Docker socket access nor elevated privileges.
@@ -22,11 +23,26 @@ export interface RawStats {
 	block: { readBytes: number; writeBytes: number };
 }
 
+const BYTES_PER_GB = 1024 * 1024 * 1024;
+
+function getDiskUsage(): RawStats["disk"] {
+	const stat = statfsSync("/");
+	const totalBytes = stat.blocks * stat.bsize;
+	const freeBytes = stat.bavail * stat.bsize; // available to non-root; matches what `df` reports as "available"
+	const usedBytes = totalBytes - stat.bfree * stat.bsize; // bfree (not bavail) for "used", matching df's Used column
+
+	return {
+		usedGB: usedBytes / BYTES_PER_GB,
+		totalGB: totalBytes / BYTES_PER_GB,
+		freeGB: freeBytes / BYTES_PER_GB,
+		usedPercent: totalBytes > 0 ? (usedBytes / totalBytes) * 100 : 0,
+	};
+}
+
 export async function collectStats(): Promise<RawStats> {
-	const [cpuResult, memResult, diskResult, networkResult, blockResult] = await Promise.all([
+	const [cpuResult, memResult, networkResult, blockResult] = await Promise.all([
 		osutils.cpu.usage(),
 		osutils.memory.info(),
-		osutils.disk.usageByMountPoint("/"),
 		osutils.network.overview(),
 		osutils.disk.stats(),
 	]);
@@ -41,15 +57,7 @@ export async function collectStats(): Promise<RawStats> {
 			}
 		: { usedGB: 0, totalGB: 0, usedPercent: 0 };
 
-	const disk =
-		diskResult.success && diskResult.data
-			? {
-					usedGB: diskResult.data.used.toGB(),
-					totalGB: diskResult.data.total.toGB(),
-					freeGB: diskResult.data.available.toGB(),
-					usedPercent: diskResult.data.usagePercentage,
-				}
-			: { usedGB: 0, totalGB: 0, freeGB: 0, usedPercent: 0 };
+	const disk = getDiskUsage();
 
 	const network = networkResult.success
 		? {

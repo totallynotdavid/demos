@@ -7,24 +7,61 @@
     <link rel="stylesheet" href="/src/style.css" />
   </head>
   <body>
-    <div class="page">
-      <header class="header">
-        <h1>Registro de asistencia</h1>
-        <p class="subtitle">Elige qué versión del formulario quieres ver.</p>
-      </header>
+    <main class="page">
+      <div class="card">
+        <p class="eyebrow">Registro de asistencia</p>
+        <h1>Humanización, tecnología y ética</h1>
+        <p class="event-meta">
+          02 de setiembre de 2026 · Auditorio Cayetano Heredia
+        </p>
 
-      <main class="form-wrap form-wrap--chooser">
-        <div class="chooser">
-          <a class="chooser-card" href="/embed.html">
-            <h2>Versión embed</h2>
-            <p>El formulario de Google incrustado directamente.</p>
-          </a>
-          <a class="chooser-card" href="/custom.html">
-            <h2>Versión personalizada</h2>
-            <p>Formulario con estilo propio, sin la interfaz de Google.</p>
-          </a>
+        <form id="attendance-form" class="form" novalidate>
+          <label class="field">
+            <span class="field-label">Nombres y apellidos</span>
+            <input
+              type="text"
+              id="field-name"
+              class="text-input"
+              placeholder="Tu nombre completo"
+              autocomplete="name"
+            />
+          </label>
+
+          <fieldset class="field">
+            <legend class="field-label">
+              ¿Confirmas tu asistencia?
+              <span class="required-mark">*</span>
+            </legend>
+            <div class="toggle-group" role="radiogroup">
+              <label class="toggle">
+                <input type="radio" name="attendance" value="Sí" required />
+                <span>Sí, asistiré</span>
+              </label>
+              <label class="toggle">
+                <input type="radio" name="attendance" value="No" required />
+                <span>No podré ir</span>
+              </label>
+            </div>
+            <p id="choice-error" class="field-error" hidden>
+              Selecciona una opción para continuar.
+            </p>
+          </fieldset>
+
+          <button type="submit" class="submit-btn" id="submit-btn">
+            Registrar asistencia
+          </button>
+          <p id="submit-error" class="field-error" hidden>
+            No pudimos registrar tu respuesta. Intenta de nuevo.
+          </p>
+        </form>
+
+        <div id="success" class="success" hidden>
+          <div class="success-icon" aria-hidden="true">&#10003;</div>
+          <p class="success-title">¡Listo!</p>
+          <p class="success-text">Tu asistencia quedó registrada.</p>
         </div>
-      </main>
-    </div>
+      </div>
+    </main>
+    <script type="module" src="/src/main.js"></script>
   </body>
 </html>

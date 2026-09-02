@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registro de asistencia</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="header">
+        <h1>Registro de asistencia</h1>
+        <p class="subtitle">
+          Completa el formulario para confirmar tu asistencia a la clase.
+        </p>
+      </header>
+
+      <main class="form-wrap form-wrap--custom">
+        <form id="attendance-form" class="custom-form" novalidate>
+          <label class="field">
+            <span class="field-label">Nombres y apellidos</span>
+            <input
+              type="text"
+              id="field-name"
+              class="text-input"
+              placeholder="Tu nombre completo"
+              autocomplete="name"
+            />
+          </label>
+
+          <fieldset class="field">
+            <legend class="field-label">
+              Confirma tu asistencia a la clase.
+              <span class="required-mark" aria-hidden="true">*</span>
+            </legend>
+            <div class="choice-group" role="radiogroup">
+              <label class="choice">
+                <input type="radio" class="field-attendance" value="Sí" required />
+                <span>Sí</span>
+              </label>
+              <label class="choice">
+                <input type="radio" class="field-attendance" value="No" required />
+                <span>No</span>
+              </label>
+            </div>
+            <p id="choice-error" class="field-error" hidden>
+              Por favor selecciona una opción.
+            </p>
+          </fieldset>
+
+          <button type="submit" class="submit-btn">Enviar</button>
+        </form>
+
+        <div id="success" class="success-state" hidden>
+          <div class="success-icon" aria-hidden="true">&#10003;</div>
+          <p>¡Registrado!</p>
+        </div>
+
+        <iframe
+          id="hidden-submit-target"
+          name="hidden-submit-target"
+          class="hidden-iframe"
+          title="Envío de formulario"
+          aria-hidden="true"
+        ></iframe>
+      </main>
+    </div>
+    <script type="module" src="/src/main-custom.js"></script>
+  </body>
+</html>

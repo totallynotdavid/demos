@@ -10,24 +10,21 @@
     <div class="page">
       <header class="header">
         <h1>Registro de asistencia</h1>
-        <p class="subtitle">
-          Completa el formulario para confirmar tu asistencia a la clase.
-        </p>
+        <p class="subtitle">Elige qué versión del formulario quieres ver.</p>
       </header>
 
-      <main class="form-wrap">
-        <div id="loading" class="loading">
-          <div class="spinner" aria-hidden="true"></div>
-          <p>Cargando formulario…</p>
+      <main class="form-wrap form-wrap--chooser">
+        <div class="chooser">
+          <a class="chooser-card" href="/embed.html">
+            <h2>Versión embed</h2>
+            <p>El formulario de Google incrustado directamente.</p>
+          </a>
+          <a class="chooser-card" href="/custom.html">
+            <h2>Versión personalizada</h2>
+            <p>Formulario con estilo propio, sin la interfaz de Google.</p>
+          </a>
         </div>
-        <iframe
-          id="attendance-form"
-          class="form-frame"
-          title="Registro de asistencia"
-          loading="eager"
-        ></iframe>
       </main>
     </div>
-    <script type="module" src="/src/main.js"></script>
   </body>
 </html>

@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registro de asistencia</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="header">
+        <h1>Registro de asistencia</h1>
+        <p class="subtitle">
+          Completa el formulario para confirmar tu asistencia a la clase.
+        </p>
+      </header>
+
+      <main class="form-wrap">
+        <div id="loading" class="loading">
+          <div class="spinner" aria-hidden="true"></div>
+          <p>Cargando formulario…</p>
+        </div>
+        <iframe
+          id="attendance-form"
+          class="form-frame"
+          title="Registro de asistencia"
+          loading="eager"
+        ></iframe>
+      </main>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

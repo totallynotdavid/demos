@@ -2,6 +2,8 @@ FROM oven/bun:1.4-alpine
 
 WORKDIR /app
 
+RUN apk add --no-cache coreutils
+
 COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile --production
 

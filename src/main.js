@@ -14,11 +14,13 @@ form.addEventListener("submit", async (event) => {
 
   if (!attendance) {
     choiceError.hidden = false;
+    document.getElementById("attendance-yes").focus();
     return;
   }
   choiceError.hidden = true;
   submitError.hidden = true;
   submitBtn.disabled = true;
+  submitBtn.setAttribute("aria-busy", "true");
   submitBtn.textContent = "Enviando…";
 
   try {
@@ -32,9 +34,12 @@ form.addEventListener("submit", async (event) => {
 
     form.hidden = true;
     success.hidden = false;
+    success.querySelector(".success-title").setAttribute("tabindex", "-1");
+    success.querySelector(".success-title").focus();
   } catch {
     submitError.hidden = false;
     submitBtn.disabled = false;
+    submitBtn.removeAttribute("aria-busy");
     submitBtn.textContent = "Registrar asistencia";
   }
 });

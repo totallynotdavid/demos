@@ -4,16 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Registro de asistencia</title>
+    <meta name="theme-color" content="#f5f5f7" />
     <link rel="stylesheet" href="/src/style.css" />
   </head>
   <body>
     <main class="page">
-      <div class="card">
-        <p class="eyebrow">Registro de asistencia</p>
-        <h1>Humanización, tecnología y ética</h1>
-        <p class="event-meta">
-          02 de setiembre de 2026 · Auditorio Cayetano Heredia
-        </p>
+      <div class="sheet">
+        <header class="header">
+          <h1>Humanización, tecnología y ética</h1>
+          <p class="event-meta">
+            02 de setiembre de 2026 · Auditorio Cayetano Heredia
+          </p>
+        </header>
 
         <form id="attendance-form" class="form" novalidate>
           <label class="field">
@@ -21,8 +23,9 @@
             <input
               type="text"
               id="field-name"
+              name="name"
               class="text-input"
-              placeholder="Tu nombre completo"
+              placeholder="Ej. María López"
               autocomplete="name"
             />
           </label>
@@ -30,19 +33,38 @@
           <fieldset class="field">
             <legend class="field-label">
               ¿Confirmas tu asistencia?
-              <span class="required-mark">*</span>
+              <span class="required-mark" aria-hidden="true">*</span>
             </legend>
-            <div class="toggle-group" role="radiogroup">
-              <label class="toggle">
-                <input type="radio" name="attendance" value="Sí" required />
-                <span>Sí, asistiré</span>
-              </label>
-              <label class="toggle">
-                <input type="radio" name="attendance" value="No" required />
-                <span>No podré ir</span>
-              </label>
+            <div
+              class="segmented"
+              role="radiogroup"
+              aria-describedby="choice-error"
+            >
+              <input
+                type="radio"
+                id="attendance-yes"
+                name="attendance"
+                value="Sí"
+                required
+                class="segmented-input"
+              />
+              <label for="attendance-yes" class="segmented-option"
+                >Sí, asistiré</label
+              >
+              <input
+                type="radio"
+                id="attendance-no"
+                name="attendance"
+                value="No"
+                required
+                class="segmented-input"
+              />
+              <label for="attendance-no" class="segmented-option"
+                >No podré ir</label
+              >
+              <div class="segmented-thumb" aria-hidden="true"></div>
             </div>
-            <p id="choice-error" class="field-error" hidden>
+            <p id="choice-error" class="field-error" role="alert" hidden>
               Selecciona una opción para continuar.
             </p>
           </fieldset>
@@ -50,14 +72,28 @@
           <button type="submit" class="submit-btn" id="submit-btn">
             Registrar asistencia
           </button>
-          <p id="submit-error" class="field-error" hidden>
+          <p id="submit-error" class="field-error" role="alert" hidden>
             No pudimos registrar tu respuesta. Intenta de nuevo.
           </p>
         </form>
 
-        <div id="success" class="success" hidden>
-          <div class="success-icon" aria-hidden="true">&#10003;</div>
-          <p class="success-title">¡Listo!</p>
+        <div id="success" class="success" role="status" aria-live="polite" hidden>
+          <svg
+            class="success-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="12" r="11" fill="var(--accent)" />
+            <path
+              d="M7 12.5L10.2 15.7L17 8.5"
+              stroke="white"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <p class="success-title">Listo</p>
           <p class="success-text">Tu asistencia quedó registrada.</p>
         </div>
       </div>

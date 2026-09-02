@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Host Status</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #0b0d12;
+    --card: #12151c;
+    --border: #232833;
+    --text: #e6e8ec;
+    --muted: #8b93a1;
+    --track: #1c212b;
+    --cpu: #4f8cff;
+    --mem: #a78bfa;
+    --disk: #f5a623;
+    --net-in: #34d399;
+    --net-out: #22a3b8;
+    --blk-read: #f472b6;
+    --blk-write: #fb923c;
+    --danger: #f87171;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      color-scheme: light;
+      --bg: #f5f6f8;
+      --card: #ffffff;
+      --border: #e3e6eb;
+      --text: #1a1d23;
+      --muted: #6b7280;
+      --track: #edeff2;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
+  }
+  main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+  header { margin-bottom: 2rem; }
+  h1 {
+    margin: 0 0 0.35rem;
+    font-size: 1.6rem;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+  }
+  .subtitle {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.92rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--net-in);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--net-in) 25%, transparent);
+    flex: none;
+  }
+  .dot.stale { background: var(--danger); box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 25%, transparent); }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1rem;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.1rem 1.2rem 1rem;
+    display: flex;
+    flex-direction: column;
+    min-height: 190px;
+  }
+  .card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.6rem;
+  }
+  .card-title {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .card-value {
+    font-size: 1.5rem;
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+  }
+  .card-detail {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-top: -0.35rem;
+    margin-bottom: 0.6rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .bar {
+    height: 6px;
+    border-radius: 999px;
+    background: var(--track);
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+    flex: none;
+  }
+  .bar > span {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.4s ease;
+  }
+  .chart-wrap {
+    flex: 1;
+    min-height: 56px;
+    position: relative;
+  }
+  canvas { width: 100%; height: 100%; display: block; }
+  .legend {
+    display: flex;
+    gap: 1.25rem;
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-top: 0.6rem;
+  }
+  .legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .legend b {
+    color: var(--text);
+    font-weight: 600;
+  }
+  .swatch {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    flex: none;
+  }
+  footer {
+    margin-top: 2.5rem;
+    color: var(--muted);
+    font-size: 0.78rem;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Host Status</h1>
+    <p class="subtitle"><span class="dot" id="live-dot"></span><span id="live-text">Live &middot; updates every 5s</span></p>
+  </header>
+
+  <section class="grid">
+    <article class="card">
+      <div class="card-head">
+        <span class="card-title">CPU</span>
+        <span class="card-value" id="cpu-value">&mdash;</span>
+      </div>
+      <div class="bar"><span id="cpu-bar" style="width:0%;background:var(--cpu)"></span></div>
+      <div class="chart-wrap"><canvas id="cpu-chart"></canvas></div>
+    </article>
+
+    <article class="card">
+      <div class="card-head">
+        <span class="card-title">Memory</span>
+        <span class="card-value" id="mem-value">&mdash;</span>
+      </div>
+      <div class="card-detail" id="mem-detail">&nbsp;</div>
+      <div class="bar"><span id="mem-bar" style="width:0%;background:var(--mem)"></span></div>
+      <div class="chart-wrap"><canvas id="mem-chart"></canvas></div>
+    </article>
+
+    <article class="card">
+      <div class="card-head">
+        <span class="card-title">Disk Space (/)</span>
+        <span class="card-value" id="disk-value">&mdash;</span>
+      </div>
+      <div class="card-detail" id="disk-detail">&nbsp;</div>
+      <div class="bar"><span id="disk-bar" style="width:0%;background:var(--disk)"></span></div>
+      <div class="chart-wrap"><canvas id="disk-chart"></canvas></div>
+    </article>
+
+    <article class="card">
+      <div class="card-head">
+        <span class="card-title">Network I/O</span>
+      </div>
+      <div class="chart-wrap"><canvas id="net-chart"></canvas></div>
+      <div class="legend">
+        <span><i class="swatch" style="background:var(--net-in)"></i>In <b id="net-in-label">&mdash;</b></span>
+        <span><i class="swatch" style="background:var(--net-out)"></i>Out <b id="net-out-label">&mdash;</b></span>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="card-head">
+        <span class="card-title">Block I/O</span>
+      </div>
+      <div class="chart-wrap"><canvas id="blk-chart"></canvas></div>
+      <div class="legend">
+        <span><i class="swatch" style="background:var(--blk-read)"></i>Read <b id="blk-read-label">&mdash;</b></span>
+        <span><i class="swatch" style="background:var(--blk-write)"></i>Write <b id="blk-write-label">&mdash;</b></span>
+      </div>
+    </article>
+  </section>
+
+  <footer>Read-only host metrics, collected locally on this server. No login, no Docker access.</footer>
+</main>
+
+<script>
+  const REFRESH_MS = 5000;
+  const STALE_AFTER_MS = REFRESH_MS * 3;
+
+  function formatBytesRate(bytesPerSec) {
+    if (bytesPerSec < 1024) return bytesPerSec.toFixed(0) + " B/s";
+    const kb = bytesPerSec / 1024;
+    if (kb < 1024) return kb.toFixed(1) + " KB/s";
+    return (kb / 1024).toFixed(2) + " MB/s";
+  }
+
+  function formatGB(gb) {
+    return gb.toFixed(gb < 10 ? 2 : 1) + " GB";
+  }
+
+  function getCanvasMetrics(canvas) {
+    if (!canvas) return null;
+    const dpr = window.devicePixelRatio || 1;
+    const w = canvas.clientWidth || 1;
+    const h = canvas.clientHeight || 1;
+    const ctx = canvas.getContext("2d");
+    return { ctx, dpr, w, h };
+  }
+
+  function drawArea(canvas, series, options) {
+    const metrics = getCanvasMetrics(canvas);
+    if (!metrics) return;
+
+    const { ctx, dpr, w, h } = metrics;
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+    drawSeries(ctx, w, h, series, options);
+  }
+
+  function drawOverlayArea(canvas, series, options) {
+    const metrics = getCanvasMetrics(canvas);
+    if (!metrics) return;
+
+    drawSeries(metrics.ctx, metrics.w, metrics.h, series, options);
+  }
+
+  function drawSeries(ctx, w, h, series, { min = 0, max, color, fill }) {
+    if (series.length < 2) return;
+
+    let hi = max ?? Math.max(...series);
+    if (hi <= min) hi = min + 1;
+    const stepX = w / (series.length - 1);
+    const y = (v) => h - ((v - min) / (hi - min)) * (h - 2) - 1;
+
+    ctx.beginPath();
+    series.forEach((v, i) => {
+      const x = i * stepX;
+      i === 0 ? ctx.moveTo(x, y(v)) : ctx.lineTo(x, y(v));
+    });
+    ctx.lineTo(w, h);
+    ctx.lineTo(0, h);
+    ctx.closePath();
+    ctx.fillStyle = fill;
+    ctx.fill();
+
+    ctx.beginPath();
+    series.forEach((v, i) => {
+      const x = i * stepX;
+      i === 0 ? ctx.moveTo(x, y(v)) : ctx.lineTo(x, y(v));
+    });
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.5;
+    ctx.lineJoin = "round";
+    ctx.stroke();
+  }
+
+  let lastPayload = null;
+
+  function render(payload) {
+    lastPayload = payload;
+    const { latest, history } = payload;
+    if (!latest) return;
+
+    renderCpu(latest, history);
+    renderMemory(latest, history);
+    renderDisk(latest, history);
+    renderNetwork(latest, history);
+    renderBlockIo(latest, history);
+
+    document.getElementById("live-dot").classList.remove("stale");
+    document.getElementById("live-text").textContent = "Live · updates every 5s";
+  }
+
+  function renderCpu(latest, history) {
+    document.getElementById("cpu-value").textContent = latest.cpuUsagePercent.toFixed(1) + "%";
+    document.getElementById("cpu-bar").style.width =
+      Math.min(100, latest.cpuUsagePercent) + "%";
+    drawArea(
+      document.getElementById("cpu-chart"),
+      history.map((s) => s.cpuUsagePercent),
+      { min: 0, max: 100, color: "#4f8cff", fill: "rgba(79,140,255,0.18)" }
+    );
+  }
+
+  function renderMemory(latest, history) {
+    document.getElementById("mem-value").textContent = latest.memory.usedPercent.toFixed(1) + "%";
+    document.getElementById("mem-detail").textContent =
+      formatGB(latest.memory.usedGB) + " / " + formatGB(latest.memory.totalGB);
+    document.getElementById("mem-bar").style.width =
+      Math.min(100, latest.memory.usedPercent) + "%";
+    drawArea(
+      document.getElementById("mem-chart"),
+      history.map((s) => s.memory.usedPercent),
+      { min: 0, max: 100, color: "#a78bfa", fill: "rgba(167,139,250,0.18)" }
+    );
+  }
+
+  function renderDisk(latest, history) {
+    document.getElementById("disk-value").textContent = latest.disk.usedPercent.toFixed(1) + "%";
+    document.getElementById("disk-detail").innerHTML =
+      formatGB(latest.disk.usedGB) +
+      " / " +
+      formatGB(latest.disk.totalGB) +
+      " used &middot; " +
+      formatGB(latest.disk.freeGB) +
+      " free";
+    document.getElementById("disk-bar").style.width =
+      Math.min(100, latest.disk.usedPercent) + "%";
+    drawArea(
+      document.getElementById("disk-chart"),
+      history.map((s) => s.disk.usedPercent),
+      { min: 0, max: 100, color: "#f5a623", fill: "rgba(245,166,35,0.18)" }
+    );
+  }
+
+  function renderNetwork(latest, history) {
+    document.getElementById("net-in-label").textContent =
+      formatBytesRate(latest.networkRxBytesPerSec);
+    document.getElementById("net-out-label").textContent =
+      formatBytesRate(latest.networkTxBytesPerSec);
+    const netMax = Math.max(
+      1024,
+      ...history.map((s) => Math.max(s.networkRxBytesPerSec, s.networkTxBytesPerSec))
+    );
+    const netCanvas = document.getElementById("net-chart");
+    drawArea(netCanvas, history.map((s) => s.networkRxBytesPerSec), {
+      min: 0,
+      max: netMax,
+      color: "#34d399",
+      fill: "rgba(52,211,153,0.16)",
+    });
+    drawOverlayArea(netCanvas, history.map((s) => s.networkTxBytesPerSec), {
+      min: 0,
+      max: netMax,
+      color: "#22a3b8",
+      fill: "rgba(34,163,184,0.16)",
+    });
+  }
+
+  function renderBlockIo(latest, history) {
+    document.getElementById("blk-read-label").textContent =
+      formatBytesRate(latest.blockReadBytesPerSec);
+    document.getElementById("blk-write-label").textContent =
+      formatBytesRate(latest.blockWriteBytesPerSec);
+    const blkMax = Math.max(
+      1024,
+      ...history.map((s) => Math.max(s.blockReadBytesPerSec, s.blockWriteBytesPerSec))
+    );
+    const blkCanvas = document.getElementById("blk-chart");
+    drawArea(blkCanvas, history.map((s) => s.blockReadBytesPerSec), {
+      min: 0,
+      max: blkMax,
+      color: "#f472b6",
+      fill: "rgba(244,114,182,0.16)",
+    });
+    drawOverlayArea(blkCanvas, history.map((s) => s.blockWriteBytesPerSec), {
+      min: 0,
+      max: blkMax,
+      color: "#fb923c",
+      fill: "rgba(251,146,60,0.16)",
+    });
+  }
+
+  let lastSuccessAt = 0;
+
+  async function tick() {
+    try {
+      const res = await fetch("/api/stats", { cache: "no-store" });
+      if (!res.ok) throw new Error("bad response " + res.status);
+      const payload = await res.json();
+      render(payload);
+      lastSuccessAt = Date.now();
+    } catch (err) {
+      console.error("Failed to refresh stats:", err);
+    }
+    if (Date.now() - lastSuccessAt > STALE_AFTER_MS && lastSuccessAt !== 0) {
+      document.getElementById("live-dot").classList.add("stale");
+      document.getElementById("live-text").textContent = "Reconnecting…";
+    }
+  }
+
+  tick();
+  setInterval(tick, REFRESH_MS);
+
+  let resizeTimer;
+  window.addEventListener("resize", () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      if (lastPayload) render(lastPayload);
+    }, 150);
+  });
+</script>
+</body>
+</html>

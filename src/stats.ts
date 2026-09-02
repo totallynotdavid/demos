@@ -1,4 +1,4 @@
-import { statfsSync } from "node:fs";
+import { readFileSync, statfsSync } from "node:fs";
 import { OSUtils } from "node-os-utils";
 
 // Host metrics require neither Docker socket access nor elevated privileges.
@@ -39,11 +39,30 @@ function getDiskUsage(): RawStats["disk"] {
 	};
 }
 
+// Exclude loopback from network totals; it doesn't represent real network I/O.
+function getNetworkUsage(): RawStats["network"] {
+	const raw = readFileSync("/proc/net/dev", "utf-8");
+	const lines = raw.trim().split("\n").slice(2); // drop the 2-line header
+
+	let rxBytes = 0;
+	let txBytes = 0;
+	for (const line of lines) {
+		const [rawName, rawData] = line.split(":");
+		if (!rawName || !rawData) continue;
+		if (rawName.trim() === "lo") continue;
+
+		const fields = rawData.trim().split(/\s+/).map(Number);
+		rxBytes += fields[0] ?? 0;
+		txBytes += fields[8] ?? 0;
+	}
+
+	return { rxBytes, txBytes };
+}
+
 export async function collectStats(): Promise<RawStats> {
-	const [cpuResult, memResult, networkResult, blockResult] = await Promise.all([
+	const [cpuResult, memResult, blockResult] = await Promise.all([
 		osutils.cpu.usage(),
 		osutils.memory.info(),
-		osutils.network.overview(),
 		osutils.disk.stats(),
 	]);
 
@@ -58,13 +77,7 @@ export async function collectStats(): Promise<RawStats> {
 		: { usedGB: 0, totalGB: 0, usedPercent: 0 };
 
 	const disk = getDiskUsage();
-
-	const network = networkResult.success
-		? {
-				rxBytes: networkResult.data.totalRxBytes.toBytes(),
-				txBytes: networkResult.data.totalTxBytes.toBytes(),
-			}
-		: { rxBytes: 0, txBytes: 0 };
+	const network = getNetworkUsage();
 
 	const block = { readBytes: 0, writeBytes: 0 };
 	if (blockResult.success) {

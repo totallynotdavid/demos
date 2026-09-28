@@ -1,0 +1,51 @@
+@use "./lib/styles/global";
+@use "./lib/styles/mixins";
+
+:root {
+    --pageBg: #f5f5f7;
+    --footerBg: #fbfbfb;
+
+    @media (prefers-color-scheme: dark) {
+        --pageBg: #000;
+        --footerBg: #151515;
+    }
+}
+
+body {
+    background-color: var(--pageBg);
+    color: var(--systemPrimary);
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro",
+        "Helvetica Neue",
+        Arial,
+        sans-serif;
+    margin: 0;
+}
+
+a {
+    color: var(--keyColor);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+button {
+    border: none;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+    font-family: inherit;
+    color: inherit;
+}
+
+ul,
+ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}

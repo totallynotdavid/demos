@@ -1,0 +1,125 @@
+// Colors
+:root {
+    --keyColor: #007aff;
+    --keyColor-rgb: 0, 122, 255;
+    --systemPrimary: #1d1d1f;
+    --systemSecondary: #6e6e73;
+    --systemTertiary: #86868b;
+    --systemQuaternary: #d2d2d7;
+    --systemQuinary: #e8e8ed;
+    --systemOrange: #ff9500;
+    --systemPrimary-onDark: #fff;
+    --systemSecondary-onDark: rgba(255, 255, 255, 0.6);
+    --systemQuaternary-onDark: rgba(255, 255, 255, 0.15);
+
+    --navSidebarSelectedState: #e8e8ed;
+
+    // Spacing
+    --bodyGutter: 20px;
+
+    // Borders
+    --border-radius-small: 6px;
+    --border-radius-medium: 12px;
+    --border-radius-large: 18px;
+    --border-radius-xlarge: 28px;
+
+    // Shadows
+    --shadow-small: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.12);
+
+    // Typography
+    --large-title-emphasized: 700 40px/1.05 -apple-system, sans-serif;
+    --large-title: 400 40px/1.05 -apple-system, sans-serif;
+
+    --title-1-emphasized: 700 28px/1.14 -apple-system, sans-serif;
+    --title-1: 400 28px/1.14 -apple-system, sans-serif;
+
+    --title-2-emphasized: 600 22px/1.27 -apple-system, sans-serif;
+    --title-2: 400 22px/1.27 -apple-system, sans-serif;
+
+    --title-3-emphasized: 600 20px/1.3 -apple-system, sans-serif;
+    --title-3: 400 20px/1.3 -apple-system, sans-serif;
+    --title-3-medium: 500 20px/1.3 -apple-system, sans-serif;
+    --title-3-bold: 700 20px/1.3 -apple-system, sans-serif;
+
+    --body-emphasized: 600 17px/1.47 -apple-system, sans-serif;
+    --body: 400 17px/1.47 -apple-system, sans-serif;
+
+    --callout-emphasized: 600 16px/1.375 -apple-system, sans-serif;
+    --callout: 400 16px/1.375 -apple-system, sans-serif;
+
+    --subhead-emphasized: 600 15px/1.33 -apple-system, sans-serif;
+    --subhead: 400 15px/1.33 -apple-system, sans-serif;
+    --subhead-medium: 500 15px/1.33 -apple-system, sans-serif;
+    --subhead-bold: 700 15px/1.33 -apple-system, sans-serif;
+
+    --footnote: 400 13px/1.38 -apple-system, sans-serif;
+    --footnote-emphasized: 600 13px/1.38 -apple-system, sans-serif;
+    --footnote-bold: 700 13px/1.38 -apple-system, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --systemPrimary: #f5f5f7;
+        --systemSecondary: #8e8e93;
+        --systemTertiary: #636366;
+        --systemQuaternary: #2c2c2e;
+        --systemQuinary: #3a3a3c;
+        --navSidebarSelectedState: #3a3a3c;
+    }
+}
+
+// Button styles
+.get-button {
+    font: var(--get-button-font, var(--subhead-bold));
+    padding: 6px 16px;
+    border-radius: 9999px;
+    line-height: 1.2;
+    display: inline-block;
+}
+
+.get-button.gray {
+    background-color: var(--systemQuinary);
+    color: var(--keyColor);
+}
+
+.get-button.blue {
+    background-color: var(--keyColor);
+    color: white;
+}
+
+.get-button.dark-gray {
+    background-color: var(--systemQuinary);
+    color: var(--systemPrimary-onLight);
+    @media (prefers-color-scheme: dark) {
+        background-color: var(--systemQuaternary);
+    }
+}
+
+.get-button.transparent {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    backdrop-filter: blur(10px);
+}
+
+// Reset
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body,
+h1,
+h2,
+h3,
+h4,
+p,
+figure,
+blockquote,
+dl,
+dd,
+ul,
+li {
+    margin: 0;
+}

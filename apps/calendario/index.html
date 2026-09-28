@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="/src/style.css">
 </head>
 
 <body>
@@ -21,22 +21,22 @@
 
             <div class="controls">
                 <div class="control-group">
-                    <label class="control-label">Año</label>
+                    <label class="control-label" for="yearInput">Año</label>
                     <input type="number" id="yearInput" class="input-field" value="2025" min="2024" max="2030">
                 </div>
 
                 <div class="control-group">
                     <div class="group-header">
-                        <label class="control-label">Trabajadores</label>
-                        <button id="addWorkerBtn" class="icon-btn" aria-label="Agregar trabajador">+</button>
+                        <span class="control-label">Trabajadores</span>
+                        <button type="button" id="addWorkerBtn" class="icon-btn" aria-label="Agregar trabajador">+</button>
                     </div>
                     <div id="workersList" class="workers-list">
                     </div>
                 </div>
 
                 <div class="actions">
-                    <button id="generateBtn" class="primary-btn">Generar horario</button>
-                    <button id="saveBtn" class="secondary-btn">Guardar configuración</button>
+                    <button type="button" id="generateBtn" class="primary-btn">Generar horario</button>
+                    <button type="button" id="saveBtn" class="secondary-btn">Guardar configuración</button>
                 </div>
             </div>
 
@@ -69,7 +69,7 @@
             </div>
         </main>
     </div>
-    <script src="{{ url_for('static', filename='app.js') }}"></script>
+    <script type="module" src="/src/main.ts"></script>
 </body>
 
 </html>

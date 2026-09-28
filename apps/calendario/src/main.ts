@@ -90,7 +90,7 @@ function renderWorkers(): void {
     row.className = "worker-row";
     row.innerHTML = `
       <input type="text" class="input-field worker-name-input" value="${escapeHtml(worker)}" data-index="${index}">
-      <button type="button" class="icon-btn remove-btn"${state.workers.length === 1 ? "disabled" : ""}>×</button>
+      <button type="button" class="icon-btn remove-btn"${state.workers.length === 1 ? " disabled" : ""}>×</button>
     `;
 
     row.querySelector("input")?.addEventListener("change", (event) => {

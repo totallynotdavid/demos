@@ -2,6 +2,7 @@
   "name": "a-nice-postcard",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "dependencies": {
     "@fontsource/bodoni-moda": "^5.2.7",
     "@fontsource/cormorant-garamond": "^5.2.11",

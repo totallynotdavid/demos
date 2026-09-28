@@ -5,18 +5,18 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   base: "/demos/postcard/",
-  root: path.resolve(__dirname, "src"),
+  root: path.resolve(import.meta.dirname, "src"),
   plugins: [react(), tailwindcss()],
   resolve: {
     extensions: [".js", ".jsx", ".ts", ".tsx", ".json"],
     alias: {
-      "@": path.resolve(__dirname, "src"),
-      "@components": path.resolve(__dirname, "src/components"),
+      "@": path.resolve(import.meta.dirname, "src"),
+      "@components": path.resolve(import.meta.dirname, "src/components"),
     },
   },
   build: {
     target: "esnext",
-    outDir: path.resolve(__dirname, "dist"),
+    outDir: path.resolve(import.meta.dirname, "dist"),
     emptyOutDir: true,
   },
   server: {

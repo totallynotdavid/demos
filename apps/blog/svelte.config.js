@@ -19,9 +19,7 @@ const config = {
   },
   kit: {
     adapter: adapter({ pages: "dist", assets: "dist", fallback: "404.html" }),
-    paths: {
-      base: isDev ? "" : "/demos/blog",
-    },
+    paths: { relative: false },
   },
 };
 

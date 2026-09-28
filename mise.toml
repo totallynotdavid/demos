@@ -22,14 +22,3 @@ depends = ["lint", "typecheck", "build"]
 [tasks.fix]
 description = "Format and apply safe lint fixes"
 run = "biome check --write ."
-
-[tasks.pages]
-description = "Assemble every static demo into _site/<app>/"
-depends = ["build"]
-run = """
-rm -rf _site
-for app in postcard blog dev3pack2 tim-apple; do
-  mkdir -p "_site/$app"
-  cp -r "apps/$app/dist/." "_site/$app/"
-done
-"""

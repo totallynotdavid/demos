@@ -1,11 +1,11 @@
-import { IndexedRepo } from './github-indexer';
+import type { IndexedRepo } from "./github-indexer";
 
 export interface SearchResult extends IndexedRepo {
   score: number;
   matchedLines: string[];
 }
 
-export type SortOption = 'relevance' | 'stars' | 'updated';
+export type SortOption = "relevance" | "stars" | "updated";
 
 export class SearchIndex {
   private repos: IndexedRepo[] = [];
@@ -18,9 +18,9 @@ export class SearchIndex {
     return this.repos;
   }
 
-  search(query: string, sortBy: SortOption = 'relevance'): SearchResult[] {
+  search(query: string, sortBy: SortOption = "relevance"): SearchResult[] {
     if (!query.trim()) {
-      return this.repos.map(repo => ({
+      return this.repos.map((repo) => ({
         ...repo,
         score: 0,
         matchedLines: [],
@@ -28,7 +28,9 @@ export class SearchIndex {
     }
 
     const queryLower = query.toLowerCase();
-    const queryTerms = queryLower.split(/\s+/).filter(term => term.length > 0);
+    const queryTerms = queryLower
+      .split(/\s+/)
+      .filter((term) => term.length > 0);
 
     const results: SearchResult[] = [];
 
@@ -37,10 +39,12 @@ export class SearchIndex {
         repo.name,
         repo.owner,
         repo.fullName,
-        repo.description || '',
-        repo.language || '',
+        repo.description || "",
+        repo.language || "",
         repo.readmeContent,
-      ].join(' ').toLowerCase();
+      ]
+        .join(" ")
+        .toLowerCase();
 
       let score = 0;
       const matchedLines: string[] = [];
@@ -51,14 +55,17 @@ export class SearchIndex {
       }
 
       // Check for all terms present
-      const allTermsMatch = queryTerms.every(term => searchableText.includes(term));
+      const allTermsMatch = queryTerms.every((term) =>
+        searchableText.includes(term),
+      );
       if (allTermsMatch) {
         score += 50;
       }
 
       // Score based on term frequency
       for (const term of queryTerms) {
-        const matches = (searchableText.match(new RegExp(term, 'g')) || []).length;
+        const matches = (searchableText.match(new RegExp(term, "g")) || [])
+          .length;
         score += matches * 10;
 
         // Boost if term matches in important fields
@@ -75,10 +82,10 @@ export class SearchIndex {
 
       // Find matching lines in README
       if (repo.readmeContent) {
-        const lines = repo.readmeContent.split('\n');
+        const lines = repo.readmeContent.split("\n");
         for (const line of lines) {
           const lineLower = line.toLowerCase();
-          if (queryTerms.some(term => lineLower.includes(term))) {
+          if (queryTerms.some((term) => lineLower.includes(term))) {
             matchedLines.push(line.trim());
             if (matchedLines.length >= 3) break;
           }
@@ -96,12 +103,14 @@ export class SearchIndex {
 
     // Sort results
     results.sort((a, b) => {
-      if (sortBy === 'relevance') {
+      if (sortBy === "relevance") {
         return b.score - a.score;
-      } else if (sortBy === 'stars') {
+      } else if (sortBy === "stars") {
         return b.stars - a.stars;
-      } else if (sortBy === 'updated') {
-        return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+      } else if (sortBy === "updated") {
+        return (
+          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+        );
       }
       return 0;
     });

@@ -1,10 +1,22 @@
-"use client";
-
-import { useState, useMemo } from 'react';
-import { SearchIndex, SearchResult, SortOption } from '@/lib/search-index';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { spacing, sizing, typography, colors, effects, states, cn } from '@/config/design-tokens';
+import { type ReactElement, useMemo, useState } from "react";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  cn,
+  colors,
+  effects,
+  sizing,
+  spacing,
+  states,
+  typography,
+} from "@/config/design-tokens";
+import type { SearchIndex, SortOption } from "@/lib/search-index";
 
 interface SearchUIProps {
   searchIndex: SearchIndex;
@@ -12,20 +24,23 @@ interface SearchUIProps {
 }
 
 export function SearchUI({ searchIndex, className }: SearchUIProps) {
-  const [query, setQuery] = useState('');
-  const [sortBy, setSortBy] = useState<SortOption>('relevance');
+  const [query, setQuery] = useState("");
+  const [sortBy, setSortBy] = useState<SortOption>("relevance");
 
   const results = useMemo(() => {
     return searchIndex.search(query, sortBy);
   }, [query, sortBy, searchIndex]);
 
-  const highlightText = (text: string, query: string): JSX.Element => {
+  const highlightText = (text: string, query: string): ReactElement => {
     if (!query.trim()) {
       return <>{text}</>;
     }
 
-    const queryTerms = query.toLowerCase().split(/\s+/).filter(t => t.length > 0);
-    const parts: JSX.Element[] = [];
+    const queryTerms = query
+      .toLowerCase()
+      .split(/\s+/)
+      .filter((t) => t.length > 0);
+    const parts: ReactElement[] = [];
     let lastIndex = 0;
     const textLower = text.toLowerCase();
 
@@ -44,24 +59,36 @@ export function SearchUI({ searchIndex, className }: SearchUIProps) {
       if (merged.length === 0 || merged[merged.length - 1].end < match.start) {
         merged.push(match);
       } else {
-        merged[merged.length - 1].end = Math.max(merged[merged.length - 1].end, match.end);
+        merged[merged.length - 1].end = Math.max(
+          merged[merged.length - 1].end,
+          match.end,
+        );
       }
     }
 
     for (const match of merged) {
       if (match.start > lastIndex) {
-        parts.push(<span key={`text-${lastIndex}`}>{text.slice(lastIndex, match.start)}</span>);
+        parts.push(
+          <span key={`text-${lastIndex}`}>
+            {text.slice(lastIndex, match.start)}
+          </span>,
+        );
       }
       parts.push(
-        <mark key={`mark-${match.start}`} className={cn(colors.highlightBg, 'font-normal')}>
+        <mark
+          key={`mark-${match.start}`}
+          className={cn(colors.highlightBg, "font-normal")}
+        >
           {text.slice(match.start, match.end)}
-        </mark>
+        </mark>,
       );
       lastIndex = match.end;
     }
 
     if (lastIndex < text.length) {
-      parts.push(<span key={`text-${lastIndex}`}>{text.slice(lastIndex)}</span>);
+      parts.push(
+        <span key={`text-${lastIndex}`}>{text.slice(lastIndex)}</span>,
+      );
     }
 
     return <>{parts}</>;
@@ -72,16 +99,22 @@ export function SearchUI({ searchIndex, className }: SearchUIProps) {
   return (
     <div className={className}>
       {/* Search Bar */}
-      <div className={cn('flex', spacing.inline)}>
+      <div className={cn("flex", spacing.inline)}>
         <Input
           placeholder="Search repositories and READMEs..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className={cn('flex-1', sizing.input, typography.textBase)}
+          className={cn("flex-1", sizing.input, typography.textBase)}
           disabled={totalRepos === 0}
         />
-        <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortOption)}>
-          <SelectTrigger disabled={totalRepos === 0} className={cn(sizing.buttonSelect, sizing.select)}>
+        <Select
+          value={sortBy}
+          onValueChange={(value) => setSortBy(value as SortOption)}
+        >
+          <SelectTrigger
+            disabled={totalRepos === 0}
+            className={cn(sizing.buttonSelect, sizing.select)}
+          >
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -95,7 +128,7 @@ export function SearchUI({ searchIndex, className }: SearchUIProps) {
       {/* Results Count */}
       {totalRepos > 0 && (
         <p className={cn(typography.textSm, colors.secondary)}>
-          {results.length} result{results.length !== 1 ? 's' : ''}
+          {results.length} result{results.length !== 1 ? "s" : ""}
         </p>
       )}
 
@@ -103,35 +136,62 @@ export function SearchUI({ searchIndex, className }: SearchUIProps) {
       {results.length > 0 && (
         <div className={spacing.resultList}>
           {results.map((result) => (
-            <div key={result.id} className={cn(spacing.result, 'pb-8', effects.borderBottom, colors.border, 'last:border-0')}>
+            <div
+              key={result.id}
+              className={cn(
+                spacing.result,
+                "pb-8",
+                effects.borderBottom,
+                colors.border,
+                "last:border-0",
+              )}
+            >
               <div>
                 <a
                   href={result.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={cn('text-lg font-medium inline-block', states.hoverUnderline)}
+                  className={cn(
+                    "text-lg font-medium inline-block",
+                    states.hoverUnderline,
+                  )}
                 >
                   {highlightText(result.fullName, query)}
                 </a>
                 {result.description && (
-                  <p className={cn(typography.textSm, colors.secondary, 'mt-1')}>
+                  <p
+                    className={cn(typography.textSm, colors.secondary, "mt-1")}
+                  >
                     {highlightText(result.description, query)}
                   </p>
                 )}
               </div>
 
-              <div className={cn('flex flex-wrap', spacing.inline, typography.textXs, colors.secondary)}>
+              <div
+                className={cn(
+                  "flex flex-wrap",
+                  spacing.inline,
+                  typography.textXs,
+                  colors.secondary,
+                )}
+              >
                 {result.language && <span>{result.language}</span>}
                 <span>★ {result.stars.toLocaleString()}</span>
                 <span>{new Date(result.updatedAt).toLocaleDateString()}</span>
               </div>
 
               {result.matchedLines.length > 0 && (
-                <div className={cn(spacing.gridTight, 'mt-3')}>
+                <div className={cn(spacing.gridTight, "mt-3")}>
                   {result.matchedLines.slice(0, 2).map((line, idx) => (
                     <p
                       key={idx}
-                      className={cn(typography.mono, colors.secondary, colors.bgMutedLight, 'p-2', effects.roundedMd)}
+                      className={cn(
+                        typography.mono,
+                        colors.secondary,
+                        colors.bgMutedLight,
+                        "p-2",
+                        effects.roundedMd,
+                      )}
                     >
                       {highlightText(line, query)}
                     </p>

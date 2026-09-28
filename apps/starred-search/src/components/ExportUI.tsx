@@ -1,11 +1,21 @@
-"use client";
-
-import { useState } from 'react';
-import { CSVExporter, ExportOptions, defaultExportOptions } from '@/lib/csv-exporter';
-import { IndexedRepo } from '@/lib/github-indexer';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { spacing, sizing, typography, colors, effects, cn } from '@/config/design-tokens';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  cn,
+  colors,
+  effects,
+  layout,
+  sizing,
+  spacing,
+  typography,
+} from "@/config/design-tokens";
+import {
+  CSVExporter,
+  defaultExportOptions,
+  type ExportOptions,
+} from "@/lib/csv-exporter";
+import type { IndexedRepo } from "@/lib/github-indexer";
 
 interface ExportUIProps {
   repos: IndexedRepo[];
@@ -19,7 +29,7 @@ export function ExportUI({ repos, className }: ExportUIProps) {
   const handleExport = () => {
     const exporter = new CSVExporter();
     const csvContent = exporter.exportToCSV(repos, options);
-    const filename = `github-starred-repos-${new Date().toISOString().split('T')[0]}.csv`;
+    const filename = `github-starred-repos-${new Date().toISOString().split("T")[0]}.csv`;
     exporter.downloadCSV(filename, csvContent);
   };
 
@@ -28,12 +38,12 @@ export function ExportUI({ repos, className }: ExportUIProps) {
   };
 
   const exportOptionsList = [
-    { key: 'includeDescription' as const, label: 'Description' },
-    { key: 'includeLanguage' as const, label: 'Language' },
-    { key: 'includeStars' as const, label: 'Stars' },
-    { key: 'includeUpdatedAt' as const, label: 'Last updated' },
-    { key: 'includeUrl' as const, label: 'URL' },
-    { key: 'includeReadme' as const, label: 'README content' },
+    { key: "includeDescription" as const, label: "Description" },
+    { key: "includeLanguage" as const, label: "Language" },
+    { key: "includeStars" as const, label: "Stars" },
+    { key: "includeUpdatedAt" as const, label: "Last updated" },
+    { key: "includeUrl" as const, label: "URL" },
+    { key: "includeReadme" as const, label: "README content" },
   ];
 
   const selectedCount = Object.values(options).filter(Boolean).length;
@@ -44,17 +54,17 @@ export function ExportUI({ repos, className }: ExportUIProps) {
 
   return (
     <div className={className}>
-      <div className={cn('flex items-center', spacing.gridMedium)}>
-        <Button 
+      <div className={cn("flex items-center", spacing.gridMedium)}>
+        <Button
           onClick={() => setShowOptions(!showOptions)}
           variant="ghost"
           className={cn(sizing.button, sizing.buttonWide)}
         >
-          {showOptions ? 'Hide options' : 'Export to CSV'}
+          {showOptions ? "Hide options" : "Export to CSV"}
         </Button>
         {showOptions && (
-          <Button 
-            onClick={handleExport} 
+          <Button
+            onClick={handleExport}
             disabled={selectedCount === 0}
             className={cn(sizing.button, sizing.buttonNormal)}
           >
@@ -64,16 +74,36 @@ export function ExportUI({ repos, className }: ExportUIProps) {
       </div>
 
       {showOptions && (
-        <div className={cn(spacing.grid2Col, spacing.gridWideX, spacing.gridWideY, 'pl-6', effects.borderLeft, colors.border)}>
+        <div
+          className={cn(
+            layout.grid2Col,
+            spacing.gridWideX,
+            spacing.gridWideY,
+            "pl-6",
+            effects.borderLeft,
+            colors.border,
+          )}
+        >
           {exportOptionsList.map((option) => (
-            <label key={option.key} className={cn('flex items-center gap-2.5 cursor-pointer group')}>
+            <label
+              key={option.key}
+              htmlFor={option.key}
+              className={cn("flex items-center gap-2.5 cursor-pointer group")}
+            >
               <Checkbox
+                id={option.key}
                 checked={options[option.key]}
-                onCheckedChange={(checked) => 
+                onCheckedChange={(checked) =>
                   updateOption(option.key, checked as boolean)
                 }
               />
-              <span className={cn(typography.textSm, 'group-hover:text-foreground', effects.transitionColors)}>
+              <span
+                className={cn(
+                  typography.textSm,
+                  "group-hover:text-foreground",
+                  effects.transitionColors,
+                )}
+              >
                 {option.label}
               </span>
             </label>

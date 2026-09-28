@@ -3,14 +3,15 @@
 Small demos that share one Bun workspace, one lockfile, one lint config and one
 CI run. Each demo lives in `apps/<name>` and keeps its own README.
 
-| Demo                                  | What it is                                          | Live                               |
-| ------------------------------------- | --------------------------------------------------- | ---------------------------------- |
-| [asistencia](apps/asistencia)         | Attendance form backed by a Google Form.            | https://asistencia-vert.vercel.app |
-| [blog](apps/blog)                     | Static SvelteKit blog with search.                  | https://demos-blog.vercel.app      |
-| [dev3pack2](apps/dev3pack2)           | DevProof, an AI-graded skills roadmap (React).      | https://demos-dev3pack2.vercel.app |
-| [dokploy-status](apps/dokploy-status) | Public server monitoring page (Bun, Docker).        |                                    |
-| [postcard](apps/postcard)             | Postcard design editor with live preview (React).   | https://demos-postcard.vercel.app  |
-| [tim-apple](apps/tim-apple)           | App Store front page clone with mock data (Svelte). | https://demos-tim-apple.vercel.app |
+| Demo                                  | What it is                                          | Live                                    |
+| ------------------------------------- | --------------------------------------------------- | --------------------------------------- |
+| [asistencia](apps/asistencia)         | Attendance form backed by a Google Form.            | https://asistencia-vert.vercel.app      |
+| [blog](apps/blog)                     | Static SvelteKit blog with search.                  | https://demos-blog.vercel.app           |
+| [dev3pack2](apps/dev3pack2)           | DevProof, an AI-graded skills roadmap (React).      | https://demos-dev3pack2.vercel.app      |
+| [dokploy-status](apps/dokploy-status) | Public server monitoring page (Bun, Docker).        |                                         |
+| [postcard](apps/postcard)             | Postcard design editor with live preview (React).   | https://demos-postcard.vercel.app       |
+| [starred-search](apps/starred-search) | Search the READMEs of your GitHub stars (React).    | https://demos-starred-search.vercel.app |
+| [tim-apple](apps/tim-apple)           | App Store front page clone with mock data (Svelte). | https://demos-tim-apple.vercel.app      |
 
 ## Develop
 

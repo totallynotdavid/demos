@@ -17,7 +17,6 @@ const config = {
 
   kit: {
     adapter: adapter({ pages: "dist", assets: "dist" }),
-    paths: { relative: false },
     prerender: {
       handleHttpError: ({ path, message }) => {
         if (!deadLinks.has(path)) throw new Error(message);

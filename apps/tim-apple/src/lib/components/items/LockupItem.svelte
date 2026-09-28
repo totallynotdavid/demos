@@ -1,5 +1,4 @@
 <script lang="ts">
-import { base } from "$app/paths";
 import type { LockupItem } from "$lib/types";
 import AppIcon from "./AppIcon.svelte";
 
@@ -8,7 +7,7 @@ export let size: "small" | "medium" = "small";
 export let buttonVariant: "gray" | "blue" | "transparent" = "gray";
 </script>
 
-<a href="{base}{item.url}" class="lockup lockup-{size}">
+<a href={item.url} class="lockup lockup-{size}">
     <AppIcon icon={item.icon} size={size === 'small' ? 'small' : 'medium'} />
 
     <div class="info">

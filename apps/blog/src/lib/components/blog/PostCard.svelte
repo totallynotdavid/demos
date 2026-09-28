@@ -1,6 +1,4 @@
 <script lang="ts">
-import { base } from "$app/paths";
-
 let {
   title,
   excerpt,
@@ -27,7 +25,7 @@ let formattedDate = $derived(
 </script>
 
 <article class="card">
-  <h2><a href="{base}/blog/{slug}">{title}</a></h2>
+  <h2><a href="/blog/{slug}">{title}</a></h2>
   <time datetime={date}>{formattedDate}</time>
   <p class="excerpt">{excerpt}</p>
   

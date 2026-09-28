@@ -1,6 +1,5 @@
 <script lang="ts">
 import { goto } from "$app/navigation";
-import { base } from "$app/paths";
 import AppIcon from "$lib/components/items/AppIcon.svelte";
 import Artwork from "$lib/components/shared/Artwork.svelte";
 import type { TodayCard } from "$lib/types";
@@ -12,7 +11,7 @@ const isLight = card.style === "light";
 function handleLockupClick(event: MouseEvent | KeyboardEvent) {
   event.stopPropagation();
   if (card.lockup?.url) {
-    goto(`${base}${card.lockup.url}`);
+    goto(card.lockup.url);
   }
 }
 
@@ -25,7 +24,7 @@ function handleLockupKeydown(event: KeyboardEvent) {
 </script>
 
 <a
-    href="{base}{card.url}"
+    href={card.url}
     class="today-card"
     class:light={isLight}
     class:dark={!isLight}

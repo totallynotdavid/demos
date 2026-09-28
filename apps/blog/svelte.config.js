@@ -19,7 +19,6 @@ const config = {
   },
   kit: {
     adapter: adapter({ pages: "dist", assets: "dist", fallback: "404.html" }),
-    paths: { relative: false },
   },
 };
 

@@ -1,7 +1,3 @@
-<script lang="ts">
-import { base } from "$app/paths";
-</script>
-
 <footer>
     <div class="footer-content">
         <p>
@@ -9,8 +5,8 @@ import { base } from "$app/paths";
         </p>
 
         <ul class="footer-links">
-            <li><a href="{base}/terms">Terms of Use</a></li>
-            <li><a href="{base}/policy">Privacy Policy</a></li>
+            <li><a href="/terms">Terms of Use</a></li>
+            <li><a href="/policy">Privacy Policy</a></li>
         </ul>
     </div>
 </footer>

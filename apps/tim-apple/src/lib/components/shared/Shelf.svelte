@@ -1,5 +1,4 @@
 <script lang="ts">
-import { base } from "$app/paths";
 import type { Shelf } from "$lib/types";
 
 export let shelf: Shelf;
@@ -11,7 +10,7 @@ export let horizontal: boolean = false;
         <div class="shelf-header">
             <h2>{shelf.title}</h2>
             {#if shelf.seeAllUrl}
-                <a href="{base}{shelf.seeAllUrl}" class="see-all">
+                <a href={shelf.seeAllUrl} class="see-all">
                     See All
                     <span aria-hidden="true">›</span>
                 </a>

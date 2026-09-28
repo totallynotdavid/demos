@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { weekday } from "./dates.ts";
+import { monthOf, weekday } from "./dates.ts";
 import {
   generateCalendar,
   generateEcuadorCalendar,
@@ -126,7 +126,8 @@ describe("generateCalendar", () => {
       (day, i) =>
         day.dayType === "REST" &&
         weekday(day.date) === 5 &&
-        cal.days[i + 1]?.dayType === "REST",
+        cal.days[i + 1]?.dayType === "REST" &&
+        monthOf(cal.days[i + 1].date) === monthOf(day.date),
     );
     expect(weekends).toHaveLength(12);
   });
@@ -199,6 +200,32 @@ describe("every rule holds", () => {
       }
     });
   }
+
+  test("a rest block on a Saturday that ends a month is allowed", () => {
+    // Every other choice fails, so the only valid year rests Sat Feb 29 and
+    // Sun Mar 1 without counting them as a free weekend.
+    const holidays = [
+      "2020-01-22",
+      "2020-01-28",
+      "2020-02-20",
+      "2020-02-21",
+      "2020-03-02",
+      "2020-05-07",
+      "2020-06-09",
+      "2020-06-12",
+      "2020-09-29",
+      "2020-10-02",
+      "2020-11-21",
+      "2020-11-30",
+      "2020-12-07",
+    ];
+    for (const seed of [0, 1, 42]) {
+      const cal = generateCalendar(2020, { holidays, seed });
+      for (const rule of ALL_RULES) expect(rule(cal)).toEqual([]);
+      expect(cal.getDay("2020-02-29").dayType).toBe("REST");
+      expect(cal.getDay("2020-03-01").dayType).toBe("REST");
+    }
+  });
 
   test("2000 to 2100", () => {
     for (let year = 2000; year <= 2100; year++) {

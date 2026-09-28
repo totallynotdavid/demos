@@ -6,14 +6,15 @@ import { buildSchedule } from "./schedule.ts";
 
 const NO_HOLIDAYS = new Map<string, DayType>();
 
-/** Saturdays that start a free weekend. */
+/** Saturdays that start a free weekend: Sunday rests too, in the same month. */
 function freeWeekends(days: Day[]): string[] {
   return days
     .filter(
       (day, i) =>
         weekday(day.date) === 5 &&
         day.dayType === "REST" &&
-        days[i + 1]?.dayType === "REST",
+        days[i + 1]?.dayType === "REST" &&
+        monthOf(days[i + 1].date) === monthOf(day.date),
     )
     .map((day) => day.date);
 }
@@ -53,12 +54,19 @@ describe("buildSchedule", () => {
     }
   });
 
-  test("a Saturday that ends a month cannot be the free weekend", () => {
-    // Sat May 31, 2025 is followed by Sun Jun 1, a different month.
+  test("a Saturday that ends a month is an ordinary rest block", () => {
+    // Sat May 31, 2025 is followed by Sun Jun 1, a different month. Resting
+    // both days is allowed but is nobody's free weekend.
+    let rested = 0;
     for (let seed = 0; seed < 50; seed++) {
       const days = buildSchedule(2025, NO_HOLIDAYS, seededRng(seed));
       expect(freeWeekends(days)).not.toContain("2025-05-31");
+      expect(freeWeekends(days)).toHaveLength(12);
+      if (days[150].dayType === "REST" && days[151].dayType === "REST") {
+        rested++;
+      }
     }
+    expect(rested).toBeGreaterThan(0);
   });
 
   test("fails when a month has no Saturday-Sunday left", () => {

@@ -7,6 +7,7 @@ CI run. Each demo lives in `apps/<name>` and keeps its own README.
 | ------------------------------------- | --------------------------------------------------- | --------------------------------------- |
 | [asistencia](apps/asistencia)         | Attendance form backed by a Google Form.            | https://asistencia-vert.vercel.app      |
 | [blog](apps/blog)                     | Static SvelteKit blog with search.                  | https://demos-blog.vercel.app           |
+| [calendario](apps/calendario)         | Work and rest calendar generator under seven rules. | https://demos-calendario.vercel.app     |
 | [dev3pack2](apps/dev3pack2)           | DevProof, an AI-graded skills roadmap (React).      | https://demos-dev3pack2.vercel.app      |
 | [dokploy-status](apps/dokploy-status) | Public server monitoring page (Bun, Docker).        |                                         |
 | [postcard](apps/postcard)             | Postcard design editor with live preview (React).   | https://demos-postcard.vercel.app       |

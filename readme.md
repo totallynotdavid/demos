@@ -33,7 +33,10 @@ Pushes to `master` run `ci.yml` (`mise run check`).
 
 Each web demo is its own Vercel project with Root Directory `apps/<app>`. It
 installs with bun from the root `bun.lock`, builds with the app's `build` script
-and serves `dist` at `/`. Vercel skips a project's build when a push does not
+and serves `dist` at `/`. The SvelteKit apps (blog, tim-apple) build to `build/`
+locally. On Vercel, adapter-static detects `VERCEL` and writes `.vercel/output`,
+which maps each prerendered page to its clean path. Give the adapter no options,
+or that mode turns off. Vercel skips a project's build when a push does not
 affect it.
 
 `dokploy-status` is a Docker image, built from the repository root with

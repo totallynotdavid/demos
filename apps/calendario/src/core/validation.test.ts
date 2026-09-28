@@ -1,10 +1,12 @@
 import { describe, expect, test } from "bun:test";
-import { addDays } from "./dates.ts";
+import { addDays, allDatesInYear, monthOf, weekday } from "./dates.ts";
 import { Calendar, type Day, type DayType } from "./domain.ts";
 import {
   validateCalendar,
   validateHolidayPairing,
+  validateMonthlyWeekends,
   validateNoSundayMondayRest,
+  validateOneRestPerWeek,
   validateOrderingPlacement,
   validateRestBlocks,
   validateWorkBlockLengths,
@@ -121,6 +123,100 @@ describe("ordering placement", () => {
   test("rejects a working holiday right after a holiday", () => {
     const cal = calendarOf("2025-01-01", "HOLIDAY", "WORKING_HOLIDAY");
     expect(validateOrderingPlacement(cal)).toHaveLength(1);
+  });
+});
+
+/** A whole year of work, with `rest` dates set to REST. */
+function yearWithRest(rest: Iterable<string>): Calendar {
+  const restDates = new Set(rest);
+  const days = allDatesInYear(2025).map(
+    (date): Day => ({
+      date,
+      dayType: restDates.has(date) ? "REST" : "WORK",
+    }),
+  );
+  return new Calendar(2025, days);
+}
+
+/** Every Thursday and Friday of 2025 rests: one block in each week. */
+const thursdaysAndFridays = () =>
+  allDatesInYear(2025).filter((date) => [3, 4].includes(weekday(date)));
+
+/** The first Saturday of each month whose Sunday is in the same month. */
+const firstWeekendOfEachMonth = () =>
+  Array.from({ length: 12 }, (_, i) => {
+    const saturday = allDatesInYear(2025).find(
+      (date) =>
+        monthOf(date) === i + 1 &&
+        weekday(date) === 5 &&
+        monthOf(addDays(date, 1)) === i + 1,
+    );
+    return saturday as string;
+  });
+
+describe("one rest block per week", () => {
+  test("accepts a rest block in every week", () => {
+    const cal = yearWithRest(thursdaysAndFridays());
+    expect(validateOneRestPerWeek(cal)).toEqual([]);
+  });
+
+  test("rejects a week without a rest block", () => {
+    const rest = thursdaysAndFridays().filter(
+      (date) => date !== "2025-03-06" && date !== "2025-03-07",
+    );
+    const errors = validateOneRestPerWeek(yearWithRest(rest));
+    expect(errors).toEqual(["Week 10 has 0 rest blocks (must be 1)"]);
+  });
+
+  test("rejects a week with two rest blocks", () => {
+    const rest = [...thursdaysAndFridays(), "2025-03-03", "2025-03-04"];
+    const errors = validateOneRestPerWeek(yearWithRest(rest));
+    expect(errors).toEqual(["Week 10 has 2 rest blocks (must be 1)"]);
+  });
+
+  test("a single rest day is not a block", () => {
+    const rest = thursdaysAndFridays().filter((date) => date !== "2025-03-07");
+    const errors = validateOneRestPerWeek(yearWithRest(rest));
+    expect(errors).toEqual(["Week 10 has 0 rest blocks (must be 1)"]);
+  });
+});
+
+describe("monthly weekends", () => {
+  const weekendDays = (saturdays: string[]) =>
+    saturdays.flatMap((date) => [date, addDays(date, 1)]);
+
+  test("accepts one free weekend in every month", () => {
+    const cal = yearWithRest(weekendDays(firstWeekendOfEachMonth()));
+    expect(validateMonthlyWeekends(cal)).toEqual([]);
+  });
+
+  test("rejects a month without a free weekend", () => {
+    const saturdays = firstWeekendOfEachMonth().filter(
+      (date) => monthOf(date) !== 3,
+    );
+    const errors = validateMonthlyWeekends(
+      yearWithRest(weekendDays(saturdays)),
+    );
+    expect(errors).toEqual(["Month 3 has 0 free weekends (must be 1)"]);
+  });
+
+  test("rejects a month with two free weekends", () => {
+    const saturdays = [...firstWeekendOfEachMonth(), "2025-03-15"];
+    const errors = validateMonthlyWeekends(
+      yearWithRest(weekendDays(saturdays)),
+    );
+    expect(errors).toEqual(["Month 3 has 2 free weekends (must be 1)"]);
+  });
+
+  test("a weekend split across two months counts for neither", () => {
+    // Sat May 31 and Sun Jun 1 rest; June still needs a weekend of its own.
+    const saturdays = firstWeekendOfEachMonth().filter(
+      (date) => monthOf(date) !== 6,
+    );
+    const errors = validateMonthlyWeekends(
+      yearWithRest(weekendDays([...saturdays, "2025-05-31"])),
+    );
+    expect(errors).toEqual(["Month 6 has 0 free weekends (must be 1)"]);
   });
 });
 

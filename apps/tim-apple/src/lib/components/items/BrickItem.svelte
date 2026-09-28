@@ -1,11 +1,12 @@
 <script lang="ts">
+import { base } from "$app/paths";
 import Artwork from "$lib/components/shared/Artwork.svelte";
 import type { BrickItem } from "$lib/types";
 
 export let item: BrickItem;
 </script>
 
-<a href={item.url} class="brick">
+<a href="{base}{item.url}" class="brick">
     <Artwork artwork={item.media} alt="" />
     <div class="overlay"></div>
     <div class="text-container">

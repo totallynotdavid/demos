@@ -1,47 +1,64 @@
-import React, { useState } from 'react';
-import { ChevronRight } from 'lucide-react';
-import { useApp } from '@/lib/appContext';
-import { generateRoadmap } from '@/lib/aiService';
-import TerminalLoader from '@/components/TerminalLoader';
-import type { Goal, Level } from '@/lib/types';
+import { ChevronRight } from "lucide-react";
+import type React from "react";
+import { useState } from "react";
+import TerminalLoader from "@/components/TerminalLoader";
+import { generateRoadmap } from "@/lib/aiService";
+import { useApp } from "@/lib/appContext";
+import type { Goal, Level } from "@/lib/types";
 
 const goals: { value: Goal; label: string; desc: string }[] = [
-  { value: 'get-a-job', label: 'Get a job', desc: 'Land your next developer role' },
-  { value: 'learn-a-new-stack', label: 'Learn a new stack', desc: 'Master Solana/Web3 development' },
-  { value: 'specialize', label: 'Specialize', desc: 'Go deep in a technical area' },
+  {
+    value: "get-a-job",
+    label: "Get a job",
+    desc: "Land your next developer role",
+  },
+  {
+    value: "learn-a-new-stack",
+    label: "Learn a new stack",
+    desc: "Master Solana/Web3 development",
+  },
+  {
+    value: "specialize",
+    label: "Specialize",
+    desc: "Go deep in a technical area",
+  },
 ];
 
 const levels: { value: Level; label: string }[] = [
-  { value: 'junior', label: 'Junior' },
-  { value: 'mid', label: 'Mid' },
-  { value: 'senior', label: 'Senior' },
+  { value: "junior", label: "Junior" },
+  { value: "mid", label: "Mid" },
+  { value: "senior", label: "Senior" },
 ];
 
 export default function Onboarding() {
   const { setProfile, setSkills, setScreen } = useApp();
-  const [name, setName] = useState('');
-  const [goal, setGoal] = useState<Goal | ''>('');
-  const [level, setLevel] = useState<Level | ''>('');
+  const [name, setName] = useState("");
+  const [goal, setGoal] = useState<Goal | "">("");
+  const [level, setLevel] = useState<Level | "">("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
-  const isValid = name.trim().length > 0 && goal !== '' && level !== '';
+  const isValid = name.trim().length > 0 && goal !== "" && level !== "";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isValid || loading) return;
 
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
-      const profile = { name: name.trim(), goal: goal as Goal, level: level as Level };
+      const profile = {
+        name: name.trim(),
+        goal: goal as Goal,
+        level: level as Level,
+      };
       const skills = await generateRoadmap(profile.goal, profile.level);
       setProfile(profile);
       setSkills(skills);
-      setScreen('roadmap');
+      setScreen("roadmap");
     } catch {
-      setError('Failed to generate roadmap. Try again.');
+      setError("Failed to generate roadmap. Try again.");
       setLoading(false);
     }
   };
@@ -58,11 +75,11 @@ export default function Onboarding() {
               `init --user "${name}"`,
               `set --goal "${goal}"`,
               `set --level "${level}"`,
-              'analyzing skill gaps...',
-              'querying knowledge graph...',
-              'building personalized roadmap...',
-              'ordering by dependency chain...',
-              'roadmap ready.',
+              "analyzing skill gaps...",
+              "querying knowledge graph...",
+              "building personalized roadmap...",
+              "ordering by dependency chain...",
+              "roadmap ready.",
             ]}
             speed={180}
           />
@@ -88,38 +105,45 @@ export default function Onboarding() {
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Name */}
           <div className="space-y-2">
-            <label className="text-xs text-muted-foreground block">
+            <label
+              htmlFor="name"
+              className="text-xs text-muted-foreground block"
+            >
               <span className="text-neon">$</span> name
             </label>
             <input
+              id="name"
               type="text"
               value={name}
-              onChange={e => setName(e.target.value)}
+              onChange={(e) => setName(e.target.value)}
               placeholder="your name"
               className="w-full bg-card border border-surface-border rounded-md px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-neon/50 focus:ring-1 focus:ring-neon/20 transition-colors"
+              // biome-ignore lint/a11y/noAutofocus: the form is the only content on the screen
               autoFocus
             />
           </div>
 
           {/* Goal */}
           <div className="space-y-2">
-            <label className="text-xs text-muted-foreground block">
+            <div className="text-xs text-muted-foreground block">
               <span className="text-neon">$</span> goal
-            </label>
+            </div>
             <div className="space-y-2">
-              {goals.map(g => (
+              {goals.map((g) => (
                 <button
                   key={g.value}
                   type="button"
                   onClick={() => setGoal(g.value)}
                   className={`w-full text-left px-3 py-2.5 rounded-md border text-sm transition-all ${
                     goal === g.value
-                      ? 'bg-neon/10 border-neon/40 text-neon'
-                      : 'bg-card border-surface-border text-foreground hover:border-surface-border hover:bg-surface-hover'
+                      ? "bg-neon/10 border-neon/40 text-neon"
+                      : "bg-card border-surface-border text-foreground hover:border-surface-border hover:bg-surface-hover"
                   }`}
                 >
                   <div className="font-medium">{g.label}</div>
-                  <div className={`text-xs mt-0.5 ${goal === g.value ? 'text-neon/70' : 'text-muted-foreground'}`}>
+                  <div
+                    className={`text-xs mt-0.5 ${goal === g.value ? "text-neon/70" : "text-muted-foreground"}`}
+                  >
                     {g.desc}
                   </div>
                 </button>
@@ -129,19 +153,19 @@ export default function Onboarding() {
 
           {/* Level */}
           <div className="space-y-2">
-            <label className="text-xs text-muted-foreground block">
+            <div className="text-xs text-muted-foreground block">
               <span className="text-neon">$</span> level
-            </label>
+            </div>
             <div className="flex gap-2">
-              {levels.map(l => (
+              {levels.map((l) => (
                 <button
                   key={l.value}
                   type="button"
                   onClick={() => setLevel(l.value)}
                   className={`flex-1 px-3 py-2.5 rounded-md border text-sm font-medium transition-all ${
                     level === l.value
-                      ? 'bg-neon/10 border-neon/40 text-neon'
-                      : 'bg-card border-surface-border text-muted-foreground hover:bg-surface-hover hover:text-foreground'
+                      ? "bg-neon/10 border-neon/40 text-neon"
+                      : "bg-card border-surface-border text-muted-foreground hover:bg-surface-hover hover:text-foreground"
                   }`}
                 >
                   {l.label}
@@ -151,9 +175,7 @@ export default function Onboarding() {
           </div>
 
           {/* Error */}
-          {error && (
-            <p className="text-xs text-destructive">{error}</p>
-          )}
+          {error && <p className="text-xs text-destructive">{error}</p>}
 
           {/* Submit */}
           <button
@@ -161,8 +183,8 @@ export default function Onboarding() {
             disabled={!isValid}
             className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-md text-sm font-semibold transition-all ${
               isValid
-                ? 'bg-neon text-primary-foreground hover:brightness-110 glow-green'
-                : 'bg-muted text-muted-foreground cursor-not-allowed'
+                ? "bg-neon text-primary-foreground hover:brightness-110 glow-green"
+                : "bg-muted text-muted-foreground cursor-not-allowed"
             }`}
           >
             Generate my roadmap

@@ -53,7 +53,8 @@
     /* Glow effects */
     --glow-green: 0 0 20px hsla(135, 55%, 49%, 0.3);
     --glow-blue: 0 0 20px hsla(212, 100%, 67%, 0.3);
-    --glow-green-strong: 0 0 40px hsla(135, 55%, 49%, 0.4), 0 0 80px hsla(135, 55%, 49%, 0.1);
+    --glow-green-strong:
+      0 0 40px hsla(135, 55%, 49%, 0.4), 0 0 80px hsla(135, 55%, 49%, 0.1);
   }
 }
 
@@ -65,7 +66,7 @@
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
-    font-family: 'JetBrains Mono', monospace;
+    font-family: "JetBrains Mono", monospace;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -128,23 +129,33 @@
 
   /* Terminal cursor blink */
   .cursor-blink::after {
-    content: '█';
+    content: "█";
     animation: blink 1s step-end infinite;
     color: hsl(var(--neon));
   }
 
   @keyframes blink {
-    50% { opacity: 0; }
+    50% {
+      opacity: 0;
+    }
   }
 
   @keyframes scanline {
-    0% { transform: translateY(-100%); }
-    100% { transform: translateY(100vh); }
+    0% {
+      transform: translateY(-100%);
+    }
+    100% {
+      transform: translateY(100vh);
+    }
   }
 
   @keyframes typewriter {
-    from { width: 0; }
-    to { width: 100%; }
+    from {
+      width: 0;
+    }
+    to {
+      width: 100%;
+    }
   }
 
   @keyframes fade-up {
@@ -159,11 +170,14 @@
   }
 
   @keyframes pulse-glow {
-    0%, 100% {
+    0%,
+    100% {
       box-shadow: 0 0 8px hsla(135, 55%, 49%, 0.2);
     }
     50% {
-      box-shadow: 0 0 24px hsla(135, 55%, 49%, 0.5), 0 0 48px hsla(135, 55%, 49%, 0.15);
+      box-shadow:
+        0 0 24px hsla(135, 55%, 49%, 0.5),
+        0 0 48px hsla(135, 55%, 49%, 0.15);
     }
   }
 
@@ -197,20 +211,38 @@
     animation: mint-reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
-  .animate-delay-100 { animation-delay: 100ms; }
-  .animate-delay-200 { animation-delay: 200ms; }
-  .animate-delay-300 { animation-delay: 300ms; }
-  .animate-delay-400 { animation-delay: 400ms; }
-  .animate-delay-500 { animation-delay: 500ms; }
-  .animate-delay-600 { animation-delay: 600ms; }
-  .animate-delay-700 { animation-delay: 700ms; }
-  .animate-delay-800 { animation-delay: 800ms; }
-  .animate-delay-900 { animation-delay: 900ms; }
+  .animate-delay-100 {
+    animation-delay: 100ms;
+  }
+  .animate-delay-200 {
+    animation-delay: 200ms;
+  }
+  .animate-delay-300 {
+    animation-delay: 300ms;
+  }
+  .animate-delay-400 {
+    animation-delay: 400ms;
+  }
+  .animate-delay-500 {
+    animation-delay: 500ms;
+  }
+  .animate-delay-600 {
+    animation-delay: 600ms;
+  }
+  .animate-delay-700 {
+    animation-delay: 700ms;
+  }
+  .animate-delay-800 {
+    animation-delay: 800ms;
+  }
+  .animate-delay-900 {
+    animation-delay: 900ms;
+  }
 }
 
 /* Override Solana wallet button */
 .wallet-adapter-button {
-  font-family: 'JetBrains Mono', monospace !important;
+  font-family: "JetBrains Mono", monospace !important;
   background-color: hsl(var(--surface)) !important;
   border: 1px solid hsl(var(--surface-border)) !important;
   border-radius: var(--radius) !important;
@@ -228,7 +260,7 @@
   background-color: hsl(var(--surface)) !important;
 }
 .wallet-adapter-modal-wrapper {
-  font-family: 'JetBrains Mono', monospace !important;
+  font-family: "JetBrains Mono", monospace !important;
   background-color: hsl(var(--card)) !important;
 }
 .wallet-adapter-modal-button-close {

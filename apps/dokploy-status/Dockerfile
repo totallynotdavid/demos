@@ -1,12 +1,16 @@
+# Build with the repository root as the context:
+#   docker build -f apps/dokploy-status/Dockerfile .
 FROM oven/bun:1.4-alpine
 
 WORKDIR /app
 
 COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile --production
+COPY apps/dokploy-status/package.json apps/dokploy-status/
+RUN bun install --frozen-lockfile --production --filter dokploy-status
 
-COPY src ./src
-COPY public ./public
+WORKDIR /app/apps/dokploy-status
+COPY apps/dokploy-status/src ./src
+COPY apps/dokploy-status/public ./public
 
 ENV NODE_ENV=production \
     PORT=3000

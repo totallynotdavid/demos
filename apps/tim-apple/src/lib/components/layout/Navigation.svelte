@@ -1,11 +1,12 @@
 <script lang="ts">
+import { base } from "$app/paths";
 import { page } from "$app/state";
 import { mockData } from "$lib/data/mock-data";
 import NavigationItem from "./NavigationItem.svelte";
 
 let menuOpen = false;
 
-$: currentPath = page.url.pathname;
+$: currentPath = page.url.pathname.slice(base.length) || "/";
 </script>
 
 <nav class="navigation" class:is-expanded={menuOpen}>
@@ -26,7 +27,7 @@ $: currentPath = page.url.pathname;
             </span>
         </button>
 
-        <a href="/" class="logo" aria-label="App Store">
+        <a href="{base}/" class="logo" aria-label="App Store">
             <svg
                 class="logo-icon"
                 viewBox="0 0 32 32"
@@ -40,7 +41,7 @@ $: currentPath = page.url.pathname;
             <span class="logo-text">App Store</span>
         </a>
 
-        <a href="/search" class="search-link" aria-label="Search">
+        <a href="{base}/search" class="search-link" aria-label="Search">
             <svg
                 width="20"
                 height="20"

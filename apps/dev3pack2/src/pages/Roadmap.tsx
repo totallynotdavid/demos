@@ -1,33 +1,36 @@
-import React from 'react';
-import { Lock, ChevronRight, CheckCircle2, Circle } from 'lucide-react';
-import { useApp } from '@/lib/appContext';
-import type { Skill } from '@/lib/types';
+import { CheckCircle2, ChevronRight, Circle, Lock } from "lucide-react";
+import { useApp } from "@/lib/appContext";
+import type { Skill } from "@/lib/types";
 
 function SkillCard({ skill, index }: { skill: Skill; index: number }) {
   const { setActiveSkill, setScreen } = useApp();
 
   const handleClick = () => {
-    if (skill.status !== 'available') return;
+    if (skill.status !== "available") return;
     setActiveSkill(skill.id);
-    setScreen('challenge');
+    setScreen("challenge");
   };
 
-  const isLocked = skill.status === 'locked';
-  const isCompleted = skill.status === 'completed';
-  const isAvailable = skill.status === 'available';
+  const isLocked = skill.status === "locked";
+  const isCompleted = skill.status === "completed";
+  const isAvailable = skill.status === "available";
 
   return (
     <button
+      type="button"
       onClick={handleClick}
       disabled={isLocked}
       className={`group w-full text-left rounded-lg border p-4 transition-all opacity-0 animate-fade-up ${
         isCompleted
-          ? 'bg-neon/5 border-neon/20'
+          ? "bg-neon/5 border-neon/20"
           : isAvailable
-          ? 'bg-card border-surface-border hover:border-neon/30 hover:bg-surface-hover cursor-pointer'
-          : 'bg-card/50 border-surface-border/50 opacity-50 cursor-not-allowed'
+            ? "bg-card border-surface-border hover:border-neon/30 hover:bg-surface-hover cursor-pointer"
+            : "bg-card/50 border-surface-border/50 opacity-50 cursor-not-allowed"
       }`}
-      style={{ animationDelay: `${index * 60}ms`, animationFillMode: 'forwards' }}
+      style={{
+        animationDelay: `${index * 60}ms`,
+        animationFillMode: "forwards",
+      }}
     >
       <div className="flex items-start gap-3">
         {/* Status icon */}
@@ -47,10 +50,10 @@ function SkillCard({ skill, index }: { skill: Skill; index: number }) {
             <h3
               className={`text-sm font-medium truncate ${
                 isCompleted
-                  ? 'text-neon'
+                  ? "text-neon"
                   : isAvailable
-                  ? 'text-foreground group-hover:text-neon transition-colors'
-                  : 'text-muted-foreground/60'
+                    ? "text-foreground group-hover:text-neon transition-colors"
+                    : "text-muted-foreground/60"
               }`}
             >
               {skill.name}
@@ -61,7 +64,7 @@ function SkillCard({ skill, index }: { skill: Skill; index: number }) {
           </div>
           <p
             className={`text-xs mt-1 leading-relaxed ${
-              isLocked ? 'text-muted-foreground/30' : 'text-muted-foreground'
+              isLocked ? "text-muted-foreground/30" : "text-muted-foreground"
             }`}
           >
             {skill.description}
@@ -93,7 +96,7 @@ function SkillCard({ skill, index }: { skill: Skill; index: number }) {
 
 export default function Roadmap() {
   const { profile, skills, achievements } = useApp();
-  const completed = skills.filter(s => s.status === 'completed').length;
+  const completed = skills.filter((s) => s.status === "completed").length;
   const total = skills.length;
   const progressPercent = total > 0 ? (completed / total) * 100 : 0;
 
@@ -114,7 +117,8 @@ export default function Roadmap() {
             Your Skill Roadmap
           </h2>
           <p className="text-xs text-muted-foreground">
-            Complete challenges to earn soulbound credentials. Skills unlock sequentially.
+            Complete challenges to earn soulbound credentials. Skills unlock
+            sequentially.
           </p>
         </div>
 
@@ -135,7 +139,8 @@ export default function Roadmap() {
           </div>
           {achievements.length > 0 && (
             <div className="mt-2 text-[10px] text-muted-foreground">
-              {achievements.length} soulbound token{achievements.length !== 1 ? 's' : ''} minted
+              {achievements.length} soulbound token
+              {achievements.length !== 1 ? "s" : ""} minted
             </div>
           )}
         </div>
@@ -150,7 +155,9 @@ export default function Roadmap() {
         {/* All complete */}
         {completed === total && total > 0 && (
           <div className="mt-8 p-6 bg-neon/5 border border-neon/20 rounded-lg text-center animate-fade-up">
-            <div className="text-neon text-lg font-bold mb-1">All skills verified</div>
+            <div className="text-neon text-lg font-bold mb-1">
+              All skills verified
+            </div>
             <p className="text-xs text-muted-foreground">
               You've earned {total} soulbound tokens. Your proof is on-chain.
             </p>

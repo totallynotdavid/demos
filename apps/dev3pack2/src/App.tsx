@@ -1,8 +1,7 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import { Toaster } from '@/components/ui/toaster';
-import Index from './pages/Index';
-import NotFound from './pages/NotFound';
+import { Route, Routes } from "react-router-dom";
+import { Toaster } from "@/components/ui/toaster";
+import Index from "./pages/Index";
+import NotFound from "./pages/NotFound";
 
 const App = () => {
   return (

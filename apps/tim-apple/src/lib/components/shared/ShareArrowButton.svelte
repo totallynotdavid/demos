@@ -5,21 +5,21 @@ export let withLabel: boolean = false;
 let isShareSheetOpen = false;
 
 async function handleShareClick() {
-	isShareSheetOpen = !isShareSheetOpen;
+  isShareSheetOpen = !isShareSheetOpen;
 
-	if (
-		typeof navigator !== "undefined" &&
-		typeof navigator.share === "function"
-	) {
-		try {
-			await navigator.share({ url });
-			isShareSheetOpen = false;
-		} catch {
-			isShareSheetOpen = false;
-		}
-	} else {
-		isShareSheetOpen = false;
-	}
+  if (
+    typeof navigator !== "undefined" &&
+    typeof navigator.share === "function"
+  ) {
+    try {
+      await navigator.share({ url });
+      isShareSheetOpen = false;
+    } catch {
+      isShareSheetOpen = false;
+    }
+  } else {
+    isShareSheetOpen = false;
+  }
 }
 </script>
 

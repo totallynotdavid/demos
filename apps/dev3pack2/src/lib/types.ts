@@ -1,6 +1,6 @@
-export type Goal = 'get-a-job' | 'learn-a-new-stack' | 'specialize';
-export type Level = 'junior' | 'mid' | 'senior';
-export type SkillStatus = 'locked' | 'available' | 'completed';
+export type Goal = "get-a-job" | "learn-a-new-stack" | "specialize";
+export type Level = "junior" | "mid" | "senior";
+export type SkillStatus = "locked" | "available" | "completed";
 
 export interface UserProfile {
   name: string;

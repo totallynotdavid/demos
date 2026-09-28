@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
-import type { UserProfile, Skill, Achievement } from './types';
+import type React from "react";
+import { createContext, useCallback, useContext, useState } from "react";
+import type { Achievement, Skill, UserProfile } from "./types";
 
-type Screen = 'onboarding' | 'roadmap' | 'challenge' | 'achievement';
+type Screen = "onboarding" | "roadmap" | "challenge" | "achievement";
 
 interface AppState {
   screen: Screen;
@@ -23,7 +24,7 @@ interface AppContextType extends AppState {
 }
 
 const initialState: AppState = {
-  screen: 'onboarding',
+  screen: "onboarding",
   profile: null,
   skills: [],
   activeSkillId: null,
@@ -37,51 +38,56 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<AppState>(initialState);
 
   const setScreen = useCallback((screen: Screen) => {
-    setState(prev => ({ ...prev, screen }));
+    setState((prev) => ({ ...prev, screen }));
   }, []);
 
   const setProfile = useCallback((profile: UserProfile) => {
-    setState(prev => ({ ...prev, profile }));
+    setState((prev) => ({ ...prev, profile }));
   }, []);
 
   const setSkills = useCallback((skills: Skill[]) => {
-    setState(prev => ({ ...prev, skills }));
+    setState((prev) => ({ ...prev, skills }));
   }, []);
 
   const setActiveSkill = useCallback((skillId: string) => {
-    setState(prev => ({ ...prev, activeSkillId: skillId }));
+    setState((prev) => ({ ...prev, activeSkillId: skillId }));
   }, []);
 
   const clearActiveSkill = useCallback(() => {
-    setState(prev => ({ ...prev, activeSkillId: null }));
+    setState((prev) => ({ ...prev, activeSkillId: null }));
   }, []);
 
-  const completeSkill = useCallback((skillId: string, achievement: Achievement) => {
-    setState(prev => {
-      const skills = prev.skills.map((skill, _idx, arr) => {
-        if (skill.id === skillId) {
-          return { ...skill, status: 'completed' as const };
+  const completeSkill = useCallback(
+    (skillId: string, achievement: Achievement) => {
+      setState((prev) => {
+        const skills = prev.skills.map((skill, _idx, arr) => {
+          if (skill.id === skillId) {
+            return { ...skill, status: "completed" as const };
+          }
+          return skill;
+        });
+
+        // Unlock next locked skill
+        const completedIndex = skills.findIndex((s) => s.id === skillId);
+        const nextLocked = skills.find(
+          (s, i) => i > completedIndex && s.status === "locked",
+        );
+        if (nextLocked) {
+          const idx = skills.indexOf(nextLocked);
+          skills[idx] = { ...skills[idx], status: "available" as const };
         }
-        return skill;
+
+        return {
+          ...prev,
+          skills,
+          lastAchievement: achievement,
+          achievements: [...prev.achievements, achievement],
+          activeSkillId: null,
+        };
       });
-
-      // Unlock next locked skill
-      const completedIndex = skills.findIndex(s => s.id === skillId);
-      const nextLocked = skills.find((s, i) => i > completedIndex && s.status === 'locked');
-      if (nextLocked) {
-        const idx = skills.indexOf(nextLocked);
-        skills[idx] = { ...skills[idx], status: 'available' as const };
-      }
-
-      return {
-        ...prev,
-        skills,
-        lastAchievement: achievement,
-        achievements: [...prev.achievements, achievement],
-        activeSkillId: null,
-      };
-    });
-  }, []);
+    },
+    [],
+  );
 
   const reset = useCallback(() => {
     setState(initialState);
@@ -107,6 +113,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
 export function useApp() {
   const ctx = useContext(AppContext);
-  if (!ctx) throw new Error('useApp must be used within AppProvider');
+  if (!ctx) throw new Error("useApp must be used within AppProvider");
   return ctx;
 }

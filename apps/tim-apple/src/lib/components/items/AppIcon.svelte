@@ -6,13 +6,13 @@ export let size: "small" | "medium" | "large" = "medium";
 export let withBorder: boolean = false;
 
 const sizes = {
-	small: "64px",
-	medium: "100px",
-	large: "128px",
+  small: "64px",
+  medium: "100px",
+  large: "128px",
 };
 
 $: needsBorder =
-	withBorder || (icon.bgColor && icon.bgColor.toLowerCase() === "#ffffff");
+  withBorder || (icon.bgColor && icon.bgColor.toLowerCase() === "#ffffff");
 </script>
 
 <div class="app-icon" class:with-border={needsBorder} style:--size={sizes[size]}>

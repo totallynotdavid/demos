@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useEffect, useState } from "react";
 
 interface TerminalLoaderProps {
   lines: string[];
@@ -6,14 +6,21 @@ interface TerminalLoaderProps {
   speed?: number;
 }
 
-export default function TerminalLoader({ lines, onComplete, speed = 200 }: TerminalLoaderProps) {
+export default function TerminalLoader({
+  lines,
+  onComplete,
+  speed = 200,
+}: TerminalLoaderProps) {
   const [visibleLines, setVisibleLines] = useState<number>(0);
 
   useEffect(() => {
     if (visibleLines < lines.length) {
-      const timer = setTimeout(() => {
-        setVisibleLines(prev => prev + 1);
-      }, speed + Math.random() * 150);
+      const timer = setTimeout(
+        () => {
+          setVisibleLines((prev) => prev + 1);
+        },
+        speed + Math.random() * 150,
+      );
       return () => clearTimeout(timer);
     } else if (onComplete) {
       const timer = setTimeout(onComplete, 400);
@@ -26,7 +33,11 @@ export default function TerminalLoader({ lines, onComplete, speed = 200 }: Termi
       {lines.slice(0, visibleLines).map((line, i) => (
         <div key={i} className="flex items-center gap-2">
           <span className="text-muted-foreground select-none">$</span>
-          <span className={i === visibleLines - 1 ? 'text-neon' : 'text-muted-foreground'}>
+          <span
+            className={
+              i === visibleLines - 1 ? "text-neon" : "text-muted-foreground"
+            }
+          >
             {line}
           </span>
         </div>

@@ -2,9 +2,9 @@
 export let rating: number;
 
 const stars = [1, 2, 3, 4, 5].map((position) => {
-	if (position <= Math.floor(rating)) return 100;
-	if (position > Math.ceil(rating)) return 0;
-	return Math.round((rating % 1) * 100);
+  if (position <= Math.floor(rating)) return 100;
+  if (position > Math.ceil(rating)) return 0;
+  return Math.round((rating % 1) * 100);
 });
 </script>
 

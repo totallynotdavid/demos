@@ -18,10 +18,9 @@ const config = {
       : false,
   },
   kit: {
-    adapter: adapter({ pages: "build", assets: "build", fallback: "404.html" }),
+    adapter: adapter({ pages: "dist", assets: "dist", fallback: "404.html" }),
     paths: {
-      // BASE_PATH is set in .github/workflows/deploy.yml
-      base: isDev ? "" : process.env.BASE_PATH,
+      base: isDev ? "" : "/demos/blog",
     },
   },
 };

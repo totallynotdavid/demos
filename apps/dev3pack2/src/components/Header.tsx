@@ -1,6 +1,5 @@
-import React from 'react';
-import { Terminal, RotateCcw } from 'lucide-react';
-import { useApp } from '@/lib/appContext';
+import { RotateCcw, Terminal } from "lucide-react";
+import { useApp } from "@/lib/appContext";
 
 export default function Header() {
   const { screen, profile, achievements, reset } = useApp();
@@ -13,9 +12,9 @@ export default function Header() {
           <span className="text-sm font-semibold tracking-tight text-neon">
             DevProof
           </span>
-          {screen !== 'onboarding' && (
+          {screen !== "onboarding" && (
             <span className="text-xs text-muted-foreground hidden sm:inline">
-              // {profile?.name ?? 'anon'}
+              {"//"} {profile?.name ?? "anon"}
             </span>
           )}
         </div>
@@ -23,11 +22,13 @@ export default function Header() {
         <div className="flex items-center gap-3">
           {achievements.length > 0 && (
             <span className="text-xs text-muted-foreground">
-              <span className="text-neon">{achievements.length}</span> SBT{achievements.length !== 1 ? 's' : ''}
+              <span className="text-neon">{achievements.length}</span> SBT
+              {achievements.length !== 1 ? "s" : ""}
             </span>
           )}
-          {screen !== 'onboarding' && (
+          {screen !== "onboarding" && (
             <button
+              type="button"
               onClick={reset}
               className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
               title="Reset"

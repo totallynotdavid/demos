@@ -1,17 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Send, Loader2, CheckCircle2, XCircle } from 'lucide-react';
-import { useApp } from '@/lib/appContext';
-import { generateChallenge, evaluateAnswer, createAchievement } from '@/lib/aiService';
-import TerminalLoader from '@/components/TerminalLoader';
-import type { Challenge as ChallengeType, EvaluationResult } from '@/lib/types';
+import { ArrowLeft, CheckCircle2, Loader2, Send, XCircle } from "lucide-react";
+import { useEffect, useState } from "react";
+import TerminalLoader from "@/components/TerminalLoader";
+import {
+  createAchievement,
+  evaluateAnswer,
+  generateChallenge,
+} from "@/lib/aiService";
+import { useApp } from "@/lib/appContext";
+import type { Challenge as ChallengeType, EvaluationResult } from "@/lib/types";
 
 export default function Challenge() {
-  const { profile, skills, activeSkillId, setScreen, completeSkill, clearActiveSkill } = useApp();
+  const {
+    profile,
+    skills,
+    activeSkillId,
+    setScreen,
+    completeSkill,
+    clearActiveSkill,
+  } = useApp();
 
-  const skill = skills.find(s => s.id === activeSkillId);
+  const skill = skills.find((s) => s.id === activeSkillId);
   const [challenge, setChallenge] = useState<ChallengeType | null>(null);
   const [loadingChallenge, setLoadingChallenge] = useState(true);
-  const [answer, setAnswer] = useState('');
+  const [answer, setAnswer] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<EvaluationResult | null>(null);
 
@@ -33,7 +44,9 @@ export default function Challenge() {
     };
 
     load();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [skill, profile]);
 
   const handleSubmit = async () => {
@@ -45,7 +58,7 @@ export default function Challenge() {
         challenge.skillName,
         challenge.prompt,
         answer,
-        profile.level
+        profile.level,
       );
       setResult(evalResult);
 
@@ -57,11 +70,14 @@ export default function Challenge() {
             ...achievement,
             skillName: skill.name,
           });
-          setScreen('achievement');
+          setScreen("achievement");
         }, 2000);
       }
     } catch {
-      setResult({ passed: false, feedback: 'Evaluation failed. Please try again.' });
+      setResult({
+        passed: false,
+        feedback: "Evaluation failed. Please try again.",
+      });
     } finally {
       setSubmitting(false);
     }
@@ -69,7 +85,7 @@ export default function Challenge() {
 
   const handleBack = () => {
     clearActiveSkill();
-    setScreen('roadmap');
+    setScreen("roadmap");
   };
 
   if (!skill) {
@@ -83,15 +99,16 @@ export default function Challenge() {
       <div className="min-h-[calc(100vh-48px)] flex items-center justify-center px-4">
         <div className="w-full max-w-lg bg-card border border-surface-border rounded-lg p-6">
           <div className="text-xs text-muted-foreground mb-4">
-            generating challenge for <span className="text-blue">{skill.name}</span>...
+            generating challenge for{" "}
+            <span className="text-blue">{skill.name}</span>...
           </div>
           <TerminalLoader
             lines={[
               `load --skill "${skill.name}"`,
               `set --difficulty "${profile?.level}"`,
-              'generating challenge...',
-              'calibrating difficulty...',
-              'challenge ready.',
+              "generating challenge...",
+              "calibrating difficulty...",
+              "challenge ready.",
             ]}
             speed={220}
           />
@@ -105,6 +122,7 @@ export default function Challenge() {
       <div className="max-w-2xl mx-auto">
         {/* Back */}
         <button
+          type="button"
           onClick={handleBack}
           className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors mb-6"
         >
@@ -120,12 +138,10 @@ export default function Challenge() {
             <span className="text-muted-foreground/40">--skill</span>
             <span className="text-blue">{skill.name}</span>
           </div>
-          <h2 className="text-lg font-bold text-foreground">
-            {skill.name}
-          </h2>
+          <h2 className="text-lg font-bold text-foreground">{skill.name}</h2>
           <p className="text-xs text-muted-foreground mt-1">
-            Level: <span className="text-foreground">{profile?.level}</span>
-            {' '}&middot; Write a thorough answer to pass
+            Level: <span className="text-foreground">{profile?.level}</span>{" "}
+            &middot; Write a thorough answer to pass
           </p>
         </div>
 
@@ -143,12 +159,16 @@ export default function Challenge() {
         {!result && (
           <div className="space-y-4 animate-fade-up animate-delay-200">
             <div>
-              <label className="text-xs text-muted-foreground block mb-2">
+              <label
+                htmlFor="answer"
+                className="text-xs text-muted-foreground block mb-2"
+              >
                 <span className="text-neon">$</span> your answer
               </label>
               <textarea
+                id="answer"
                 value={answer}
-                onChange={e => setAnswer(e.target.value)}
+                onChange={(e) => setAnswer(e.target.value)}
                 placeholder="Write your answer here. Include code, explanations, and examples..."
                 rows={10}
                 className="w-full bg-card border border-surface-border rounded-lg px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-neon/50 focus:ring-1 focus:ring-neon/20 transition-colors resize-y font-mono leading-relaxed"
@@ -162,12 +182,13 @@ export default function Challenge() {
             </div>
 
             <button
+              type="button"
               onClick={handleSubmit}
               disabled={!answer.trim() || submitting}
               className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-md text-sm font-semibold transition-all ${
                 answer.trim() && !submitting
-                  ? 'bg-blue text-secondary-foreground hover:brightness-110 glow-blue'
-                  : 'bg-muted text-muted-foreground cursor-not-allowed'
+                  ? "bg-blue text-secondary-foreground hover:brightness-110 glow-blue"
+                  : "bg-muted text-muted-foreground cursor-not-allowed"
               }`}
             >
               {submitting ? (
@@ -190,8 +211,8 @@ export default function Challenge() {
           <div
             className={`rounded-lg border p-5 animate-fade-up ${
               result.passed
-                ? 'bg-neon/5 border-neon/30'
-                : 'bg-destructive/5 border-destructive/30'
+                ? "bg-neon/5 border-neon/30"
+                : "bg-destructive/5 border-destructive/30"
             }`}
           >
             <div className="flex items-center gap-2 mb-3">
@@ -200,8 +221,10 @@ export default function Challenge() {
               ) : (
                 <XCircle className="w-5 h-5 text-destructive" />
               )}
-              <span className={`text-sm font-bold ${result.passed ? 'text-neon' : 'text-destructive'}`}>
-                {result.passed ? 'PASSED' : 'FAILED'}
+              <span
+                className={`text-sm font-bold ${result.passed ? "text-neon" : "text-destructive"}`}
+              >
+                {result.passed ? "PASSED" : "FAILED"}
               </span>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
@@ -216,9 +239,10 @@ export default function Challenge() {
 
             {!result.passed && (
               <button
+                type="button"
                 onClick={() => {
                   setResult(null);
-                  setAnswer('');
+                  setAnswer("");
                 }}
                 className="mt-4 text-xs text-blue hover:text-foreground transition-colors"
               >

@@ -4,8 +4,8 @@ import TodayCard from "$lib/components/items/TodayCard.svelte";
 import Shelf from "$lib/components/shared/Shelf.svelte";
 import { mockData } from "$lib/data/mock-data";
 import type {
-	LockupItem as LockupItemType,
-	TodayCard as TodayCardType,
+  LockupItem as LockupItemType,
+  TodayCard as TodayCardType,
 } from "$lib/types";
 
 const page = mockData.todayPage;

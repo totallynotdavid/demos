@@ -1,11 +1,12 @@
 <script lang="ts">
+import { base } from "$app/paths";
 import type { NavigationTab } from "$lib/types";
 
 export let tab: NavigationTab;
 export let active: boolean = false;
 </script>
 
-<a href={tab.url} class="nav-item" class:active>
+<a href="{base}{tab.url}" class="nav-item" class:active>
     <span class="icon">{tab.icon}</span>
     <span class="label">{tab.label}</span>
 </a>

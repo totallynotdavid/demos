@@ -7,10 +7,10 @@ import Shelf from "$lib/components/shared/Shelf.svelte";
 import StarRating from "$lib/components/shared/StarRating.svelte";
 import { mockData } from "$lib/data/mock-data";
 import type {
-	ProductBadgeItem,
-	ProductDescriptionItem,
-	ProductMediaItem,
-	ProductRatingItem,
+  ProductBadgeItem,
+  ProductDescriptionItem,
+  ProductMediaItem,
+  ProductRatingItem,
 } from "$lib/types";
 
 const page = mockData.productPage;

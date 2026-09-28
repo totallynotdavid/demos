@@ -1,4 +1,4 @@
-import type { Post, SearchResult, SearchState } from "../types";
+import type { Post, SearchState } from "../types";
 import { searchPosts } from "../utils/search";
 
 function createSearchState() {

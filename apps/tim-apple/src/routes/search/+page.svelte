@@ -1,4 +1,5 @@
 <script lang="ts">
+import { base } from "$app/paths";
 import Shelf from "$lib/components/shared/Shelf.svelte";
 import { mockData } from "$lib/data/mock-data";
 
@@ -44,7 +45,7 @@ let searchQuery = "";
                 <ul class="search-links">
                     {#each shelf.items as item}
                         <li>
-                            <a href={item.url} class="search-link">
+                            <a href="{base}{item.url}" class="search-link">
                                 <span class="search-icon" aria-hidden="true">
                                     <svg
                                         width="20"

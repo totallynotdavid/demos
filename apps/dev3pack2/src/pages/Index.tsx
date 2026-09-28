@@ -1,22 +1,21 @@
-import React from 'react';
-import { AppProvider, useApp } from '@/lib/appContext';
-import Header from '@/components/Header';
-import Onboarding from './Onboarding';
-import Roadmap from './Roadmap';
-import Challenge from './Challenge';
-import Achievement from './Achievement';
+import Header from "@/components/Header";
+import { AppProvider, useApp } from "@/lib/appContext";
+import Achievement from "./Achievement";
+import Challenge from "./Challenge";
+import Onboarding from "./Onboarding";
+import Roadmap from "./Roadmap";
 
 function ScreenRouter() {
   const { screen } = useApp();
 
   switch (screen) {
-    case 'onboarding':
+    case "onboarding":
       return <Onboarding />;
-    case 'roadmap':
+    case "roadmap":
       return <Roadmap />;
-    case 'challenge':
+    case "challenge":
       return <Challenge />;
-    case 'achievement':
+    case "achievement":
       return <Achievement />;
     default:
       return <Onboarding />;

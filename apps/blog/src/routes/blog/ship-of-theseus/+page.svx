@@ -1,0 +1,98 @@
+---
+title: "The Ship of Theseus and Your Body"
+slug: "ship-of-theseus"
+date: "2025-08-10"
+tags: ["philosophy", "identity", "biology"]
+excerpt: "If every atom in your body is replaced every seven years, are you still you? An ancient paradox meets modern biology."
+published: true
+---
+
+<script>
+	import AsciiArt from '$lib/components/effects/AsciiArt.svelte';
+	
+	const shipArt = `
+    ┌──────────────────┐      ┌──────────────────┐
+    │   ORIGINAL       │  →   │   REPLACED       │
+    │   ⚓ SHIP ⛵      │      │   ⚓ SHIP? ⛵     │
+    └──────────────────┘      └──────────────────┘`;
+</script>
+
+<AsciiArt art={shipArt} topic="Ship of Theseus" />
+
+# {title}
+
+The ancient Greeks had a thought experiment: Theseus has a ship. Over time, each plank rots and gets replaced. Eventually, every single piece of the original ship has been replaced.
+
+Is it still the same ship?
+
+Now add a twist: someone collects all the discarded planks and rebuilds the original ship. Which one is the "real" Ship of Theseus?
+
+## Your Body Is The Ship
+
+Here's what makes this more than abstract philosophy: **you are the Ship of Theseus**.
+
+Every atom in your body (except for some in your DNA) is replaced over time:
+- **Stomach lining**: 2-5 days
+- **Skin**: 2-4 weeks  
+- **Red blood cells**: 4 months
+- **Liver**: 5 months
+- **Skeleton**: 10 years
+
+Within about 7-10 years, almost nothing in your body is the same matter that was there before. You are not the same physical object you were a decade ago.
+
+## So Who Are You?
+
+If you're not the atoms, what are you?
+
+**Option 1: The Pattern**  
+You're not the matter but the arrangement of it—like a wave is a pattern in water, not the water itself. The atoms change, but the pattern persists.
+
+**Option 2: The Process**  
+You're not a thing at all, but an ongoing process—a verb, not a noun. You are "happening" rather than "being."
+
+**Option 3: The Story**  
+You're the narrative that connects all these changing states. Memory is the glue that holds the selves together into a continuous identity.
+
+**Option 4: The Observer**  
+You're the subjective experience itself—the consciousness that watches all this change but remains fundamentally unchanged.
+
+## The Paradox Deepens
+
+Consider this: your "you" from 10 years ago has literally ceased to exist. Not metaphorically—physically. Every particle that made up that person is gone.
+
+Yet you remember being that person. You take responsibility for their actions. You inherit their bank account and their traumas.
+
+In what sense are you the same person?
+
+## Kintsugi: Broken and Beautiful
+
+The Japanese art of **kintsugi** repairs broken pottery with gold, making the cracks visible. The bowl is broken, repaired, and more beautiful for having been broken.
+
+Maybe that's what we are: constantly breaking and repairing ourselves, marked by our repairs, made more interesting by our changes.
+
+The Ship of Theseus sails on, plank by different plank, still itself and forever new.
+
+## The Practical Implication
+
+This isn't just philosophy. It's deeply practical:
+- That person who hurt you 5 years ago? They don't exist anymore. Literally.
+- That mistake you made? Done by someone who is now just a memory.
+- The person you'll be in 5 years? They don't exist yet.
+
+We spend so much energy defending a self that's already gone or hasn't arrived yet.
+
+## The Answer
+
+So is it the same ship?
+
+**Yes**, because continuity matters.  
+**No**, because nothing is permanent.  
+**Both**, because these aren't contradictions—they're different perspectives on the same process.
+
+You are the Ship of Theseus, sailing through time, repairing yourself with every breath, every thought, every moment.
+
+And that's not a problem to solve—it's the nature of being alive.
+
+---
+
+*The person who started reading this post is not the same person finishing it. Welcome aboard, new you.*

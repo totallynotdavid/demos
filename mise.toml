@@ -15,9 +15,13 @@ run = "bun run --filter '*' typecheck"
 description = "Build every app"
 run = "bun run --filter '*' build"
 
+[tasks.test]
+description = "Run every app's tests"
+run = "bun run --filter '*' test"
+
 [tasks.check]
-description = "Lint, typecheck and build every app"
-depends = ["lint", "typecheck", "build"]
+description = "Lint, typecheck, test and build every app"
+depends = ["lint", "typecheck", "test", "build"]
 
 [tasks.fix]
 description = "Format and apply safe lint fixes"

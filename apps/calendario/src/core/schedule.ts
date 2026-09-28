@@ -13,10 +13,8 @@ const MAX_WORK = 7;
 const SUNDAY = 6;
 const SATURDAY = 5;
 
-/**
- * What the last placed day was. Values 1 to MAX_WORK are a work streak of
- * that length.
- */
+// What the last placed day was. Values 1 to MAX_WORK are a work streak of that
+// length; the constants below are the other states.
 const YEAR_START = 0;
 const REST_FIRST = 8;
 const AFTER_REST = 9;
@@ -72,12 +70,17 @@ export function buildSchedule(
     // The work block before it would be too short.
     if (isStreak(last) && last < MIN_WORK) return false;
     if (inCheckedWeek[i] && weekRests > 0) return false;
-    if (weekdays[i] === SATURDAY) {
-      // Saturday and Sunday both rest is the month's free weekend: one per
-      // month, with both days in that month.
-      return !weekendTaken && months[i + 1] === months[i];
-    }
-    return true;
+    // A second free weekend in the month is not allowed.
+    return !(startsFreeWeekend(i) && weekendTaken);
+  }
+
+  /**
+   * Whether a rest block on day `i` is the month's free weekend: a Saturday
+   * whose Sunday is in the same month. A Saturday that ends a month is an
+   * ordinary rest block.
+   */
+  function startsFreeWeekend(i: number): boolean {
+    return weekdays[i] === SATURDAY && months[i + 1] === months[i];
   }
 
   /**
@@ -141,7 +144,7 @@ export function buildSchedule(
         if (next(i, streak + 1, weekRests, weekendTaken)) return true;
       } else {
         types[i] = "REST";
-        const weekend = weekendTaken || weekdays[i] === SATURDAY;
+        const weekend = weekendTaken || startsFreeWeekend(i);
         if (next(i, REST_FIRST, weekRests, weekend)) return true;
       }
     }

@@ -8,7 +8,7 @@ const rootElement = document.getElementById("root");
 if (!rootElement) throw new Error("Failed to find the root element");
 
 createRoot(rootElement).render(
-  <BrowserRouter basename={import.meta.env.BASE_URL}>
+  <BrowserRouter>
     <App />
   </BrowserRouter>,
 );

@@ -60,7 +60,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const completeSkill = useCallback(
     (skillId: string, achievement: Achievement) => {
       setState((prev) => {
-        const skills = prev.skills.map((skill, _idx, arr) => {
+        const skills = prev.skills.map((skill) => {
           if (skill.id === skillId) {
             return { ...skill, status: "completed" as const };
           }

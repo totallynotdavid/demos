@@ -54,16 +54,11 @@ export default function Challenge() {
 
     setSubmitting(true);
     try {
-      const evalResult = await evaluateAnswer(
-        challenge.skillName,
-        challenge.prompt,
-        answer,
-        profile.level,
-      );
+      const evalResult = await evaluateAnswer(answer, profile.level);
       setResult(evalResult);
 
       if (evalResult.passed && skill) {
-        const achievement = createAchievement(skill.name);
+        const achievement = createAchievement();
         // Small delay before transitioning
         setTimeout(() => {
           completeSkill(skill.id, {

@@ -438,8 +438,6 @@ export async function generateChallenge(
 }
 
 export async function evaluateAnswer(
-  skillName: string,
-  challenge: string,
   answer: string,
   level: Level,
 ): Promise<EvaluationResult> {
@@ -480,7 +478,7 @@ export async function evaluateAnswer(
   };
 }
 
-export function createAchievement(skillName: string): {
+export function createAchievement(): {
   walletAddress: string;
   txHash: string;
   tokenId: string;

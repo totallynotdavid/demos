@@ -16,7 +16,7 @@ const config = {
   preprocess: vitePreprocess(),
 
   kit: {
-    adapter: adapter({ pages: "dist", assets: "dist" }),
+    adapter: adapter(),
     prerender: {
       handleHttpError: ({ path, message }) => {
         if (!deadLinks.has(path)) throw new Error(message);

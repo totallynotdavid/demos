@@ -18,7 +18,7 @@ const config = {
       : false,
   },
   kit: {
-    adapter: adapter({ pages: "dist", assets: "dist", fallback: "404.html" }),
+    adapter: adapter(),
   },
 };
 

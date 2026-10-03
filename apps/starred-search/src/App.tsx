@@ -1,7 +1,7 @@
-import { Github } from "lucide-react";
 import { useMemo, useState } from "react";
 import { ActivityAnalysisUI } from "@/components/ActivityAnalysisUI";
 import { ExportUI } from "@/components/ExportUI";
+import { GithubMark } from "@/components/github-mark";
 import { IndexingUI } from "@/components/IndexingUI";
 import { SearchUI } from "@/components/SearchUI";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -60,7 +60,7 @@ export default function App() {
         >
           <div className={cn(layout.flexRow, spacing.inline)}>
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-foreground to-foreground/60 flex items-center justify-center">
-              <Github className="w-4 h-4 text-background" />
+              <GithubMark className="w-4 h-4 text-background" />
             </div>
             <span className="text-lg font-medium tracking-tight">
               GitHub Insights

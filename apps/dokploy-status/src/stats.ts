@@ -1,21 +1,22 @@
-import { readFileSync, statfsSync } from "node:fs";
-import { OSUtils } from "node-os-utils";
+import { existsSync, readdirSync, readFileSync, statfsSync } from "node:fs";
+import { join } from "node:path";
 
-// Host metrics require neither Docker socket access nor elevated privileges.
-const osutils = new OSUtils({
-  // Each poll should read current host values instead of cached results.
-  cacheEnabled: false,
-  disk: {
-    includeStats: true,
-  },
-});
+const BYTES_PER_GB = 1024 * 1024 * 1024;
+const BYTES_PER_KB = 1024;
+// /proc/diskstats counts 512-byte sectors whatever the device's sector size.
+const BYTES_PER_SECTOR = 512;
 
-// Exclude virtual block devices from block I/O totals.
-const BLOCK_DEVICE_EXCLUDE = [/^loop/, /^ram/, /^sr\d+$/, /^fd\d+$/];
+// Cumulative counters per device or interface, stored as [first, second].
+export type Counters = Record<string, [number, number]>;
 
-export interface RawStats {
+export type NetworkSnapshot =
+  | { available: true; interfaces: Counters }
+  | { available: false; reason: string };
+
+export interface Snapshot {
   timestamp: number;
-  cpuUsagePercent: number;
+  // Jiffies since boot: busy and total across all CPUs.
+  cpu: { busy: number; total: number };
   memory: { usedGB: number; totalGB: number; usedPercent: number };
   disk: {
     usedGB: number;
@@ -23,15 +24,79 @@ export interface RawStats {
     freeGB: number;
     usedPercent: number;
   };
-  // These counters are cumulative since boot.
-  network: { rxBytes: number; txBytes: number };
-  block: { readBytes: number; writeBytes: number };
+  network: NetworkSnapshot;
+  block: Counters;
 }
 
-const BYTES_PER_GB = 1024 * 1024 * 1024;
+export interface Roots {
+  // Directory that holds proc/ and sys/. Tests point it at a fixture tree.
+  fs: string;
+  // Filesystem whose usage the disk card shows.
+  disk: string;
+}
 
-function getDiskUsage(): RawStats["disk"] {
-  const stat = statfsSync("/");
+const DEFAULT_ROOTS: Roots = { fs: "/", disk: "/" };
+
+export const NO_PHYSICAL_NIC_REASON =
+  "Only a container network namespace is visible, so its traffic would be shown instead of the host's. Run the container with host networking.";
+
+function readText(roots: Roots, path: string): string {
+  return readFileSync(join(roots.fs, path), "utf-8");
+}
+
+function listDir(roots: Roots, path: string): string[] {
+  return readdirSync(join(roots.fs, path));
+}
+
+// Real hardware has a `device` link in sysfs. Bridges, veth pairs, tunnels and
+// loop devices do not, so counting only devices that have one skips traffic
+// that is already counted on the physical interface or disk beneath them.
+function isPhysical(roots: Roots, sysfsDir: string, name: string): boolean {
+  return existsSync(join(roots.fs, sysfsDir, name, "device"));
+}
+
+function getCpu(roots: Roots): Snapshot["cpu"] {
+  const line = readText(roots, "proc/stat").split("\n")[0] ?? "";
+  // The first eight fields are user, nice, system, idle, iowait, irq, softirq,
+  // and steal. Guest time is already included in user.
+  const [user, nice, system, idle, iowait, irq, softirq, steal] = line
+    .split(/\s+/)
+    .slice(1, 9)
+    .map(Number);
+  const idleTotal = (idle ?? 0) + (iowait ?? 0);
+  const total =
+    (user ?? 0) +
+    (nice ?? 0) +
+    (system ?? 0) +
+    idleTotal +
+    (irq ?? 0) +
+    (softirq ?? 0) +
+    (steal ?? 0);
+  if (!line.startsWith("cpu ") || !Number.isFinite(total)) {
+    throw new Error("unexpected /proc/stat format");
+  }
+  return { busy: total - idleTotal, total };
+}
+
+function getMemory(roots: Roots): Snapshot["memory"] {
+  const meminfo = readText(roots, "proc/meminfo");
+  const kb = (field: string): number => {
+    const match = meminfo.match(new RegExp(`^${field}:\\s+(\\d+) kB`, "m"));
+    if (!match?.[1]) throw new Error(`${field} missing from /proc/meminfo`);
+    return Number(match[1]) * BYTES_PER_KB;
+  };
+  const totalBytes = kb("MemTotal");
+  const usedBytes = totalBytes - kb("MemAvailable");
+
+  return {
+    usedGB: usedBytes / BYTES_PER_GB,
+    totalGB: totalBytes / BYTES_PER_GB,
+    usedPercent: totalBytes > 0 ? (usedBytes / totalBytes) * 100 : 0,
+  };
+}
+
+function getDisk(roots: Roots): Snapshot["disk"] {
+  const stat = statfsSync(roots.disk);
   const totalBytes = stat.blocks * stat.bsize;
   const freeBytes = stat.bavail * stat.bsize; // available to non-root; matches what `df` reports as "available"
   const usedBytes = totalBytes - stat.bfree * stat.bsize; // bfree (not bavail) for "used", matching df's Used column
@@ -44,66 +109,67 @@ function getDiskUsage(): RawStats["disk"] {
   };
 }
 
-// Exclude loopback from network totals; it doesn't represent real network I/O.
-function getNetworkUsage(): RawStats["network"] {
-  const raw = readFileSync("/proc/net/dev", "utf-8");
-  const lines = raw.trim().split("\n").slice(2); // drop the 2-line header
-
-  let rxBytes = 0;
-  let txBytes = 0;
-  for (const line of lines) {
-    const [rawName, rawData] = line.split(":");
-    if (!rawName || !rawData) continue;
-    if (rawName.trim() === "lo") continue;
-
-    const fields = rawData.trim().split(/\s+/).map(Number);
-    rxBytes += fields[0] ?? 0;
-    txBytes += fields[8] ?? 0;
+// /proc/net/dev lists the interfaces of the reader's network namespace. In a
+// container on the default bridge that is the container's own `eth0`, not the
+// host's traffic. A namespace without a physical interface is therefore
+// reported as unavailable instead of read.
+function getNetwork(roots: Roots): NetworkSnapshot {
+  let names: string[];
+  try {
+    names = listDir(roots, "sys/class/net");
+  } catch (error) {
+    return {
+      available: false,
+      reason: `Cannot list network interfaces in /sys/class/net: ${error instanceof Error ? error.message : error}`,
+    };
+  }
+  const physical = new Set(
+    names.filter((name) => isPhysical(roots, "sys/class/net", name)),
+  );
+  if (physical.size === 0) {
+    return { available: false, reason: NO_PHYSICAL_NIC_REASON };
   }
 
-  return { rxBytes, txBytes };
+  const interfaces: Counters = {};
+  for (const line of readText(roots, "proc/net/dev").split("\n").slice(2)) {
+    const [name, data] = line.split(":");
+    const iface = name?.trim();
+    if (!iface || !data || !physical.has(iface)) continue;
+    const fields = data.trim().split(/\s+/).map(Number);
+    interfaces[iface] = [fields[0] ?? 0, fields[8] ?? 0];
+  }
+  return { available: true, interfaces };
 }
 
-export async function collectStats(): Promise<RawStats> {
-  const [cpuResult, memResult, blockResult] = await Promise.all([
-    osutils.cpu.usage(),
-    osutils.memory.info(),
-    osutils.disk.stats(),
-  ]);
+function getBlock(roots: Roots): Counters {
+  // Partitions are not in /sys/block, so a disk and its partitions are never
+  // both counted.
+  const disks = new Set(
+    listDir(roots, "sys/block").filter((name) =>
+      isPhysical(roots, "sys/block", name),
+    ),
+  );
 
-  const cpuUsagePercent = cpuResult.success ? cpuResult.data : 0;
-
-  const memory = memResult.success
-    ? {
-        usedGB: memResult.data.used.toGB(),
-        totalGB: memResult.data.total.toGB(),
-        usedPercent: memResult.data.usagePercentage,
-      }
-    : { usedGB: 0, totalGB: 0, usedPercent: 0 };
-
-  const disk = getDiskUsage();
-  const network = getNetworkUsage();
-
-  const block = { readBytes: 0, writeBytes: 0 };
-  if (blockResult.success) {
-    for (const stat of blockResult.data) {
-      if (
-        stat.device &&
-        BLOCK_DEVICE_EXCLUDE.some((pattern) => pattern.test(stat.device))
-      ) {
-        continue;
-      }
-      block.readBytes += stat.readBytes.toBytes();
-      block.writeBytes += stat.writeBytes.toBytes();
-    }
+  const block: Counters = {};
+  for (const line of readText(roots, "proc/diskstats").split("\n")) {
+    const fields = line.trim().split(/\s+/);
+    const name = fields[2];
+    if (!name || !disks.has(name)) continue;
+    block[name] = [
+      Number(fields[5] ?? 0) * BYTES_PER_SECTOR,
+      Number(fields[9] ?? 0) * BYTES_PER_SECTOR,
+    ];
   }
+  return block;
+}
 
+export function collectSnapshot(roots: Roots = DEFAULT_ROOTS): Snapshot {
   return {
     timestamp: Date.now(),
-    cpuUsagePercent,
-    memory,
-    disk,
-    network,
-    block,
+    cpu: getCpu(roots),
+    memory: getMemory(roots),
+    disk: getDisk(roots),
+    network: getNetwork(roots),
+    block: getBlock(roots),
   };
 }

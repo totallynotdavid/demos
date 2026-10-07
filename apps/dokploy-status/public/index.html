@@ -151,6 +151,13 @@
     border-radius: 2px;
     flex: none;
   }
+  .card-note {
+    margin: 0;
+    color: var(--danger);
+    font-size: 0.85rem;
+    line-height: 1.45;
+  }
+  .card-note[hidden], .chart-wrap[hidden], .legend[hidden] { display: none; }
   footer {
     margin-top: 2.5rem;
     color: var(--muted);
@@ -200,8 +207,9 @@
       <div class="card-head">
         <span class="card-title">Network I/O</span>
       </div>
-      <div class="chart-wrap"><canvas id="net-chart"></canvas></div>
-      <div class="legend">
+      <p class="card-note" id="net-note" hidden></p>
+      <div class="chart-wrap" id="net-chart-wrap"><canvas id="net-chart"></canvas></div>
+      <div class="legend" id="net-legend">
         <span><i class="swatch" style="background:var(--net-in)"></i>In <b id="net-in-label">&mdash;</b></span>
         <span><i class="swatch" style="background:var(--net-out)"></i>Out <b id="net-out-label">&mdash;</b></span>
       </div>
@@ -227,14 +235,14 @@
   const STALE_AFTER_MS = REFRESH_MS * 3;
 
   function formatBytesRate(bytesPerSec) {
-    if (bytesPerSec < 1024) return bytesPerSec.toFixed(0) + " B/s";
+    if (bytesPerSec < 1024) return `${bytesPerSec.toFixed(0)} B/s`;
     const kb = bytesPerSec / 1024;
-    if (kb < 1024) return kb.toFixed(1) + " KB/s";
-    return (kb / 1024).toFixed(2) + " MB/s";
+    if (kb < 1024) return `${kb.toFixed(1)} KB/s`;
+    return `${(kb / 1024).toFixed(2)} MB/s`;
   }
 
   function formatGB(gb) {
-    return gb.toFixed(gb < 10 ? 2 : 1) + " GB";
+    return `${gb.toFixed(gb < 10 ? 2 : 1)} GB`;
   }
 
   function getCanvasMetrics(canvas) {
@@ -313,9 +321,9 @@
   }
 
   function renderCpu(latest, history) {
-    document.getElementById("cpu-value").textContent = latest.cpuUsagePercent.toFixed(1) + "%";
+    document.getElementById("cpu-value").textContent = `${latest.cpuUsagePercent.toFixed(1)}%`;
     document.getElementById("cpu-bar").style.width =
-      Math.min(100, latest.cpuUsagePercent) + "%";
+      `${Math.min(100, latest.cpuUsagePercent)}%`;
     drawArea(
       document.getElementById("cpu-chart"),
       history.map((s) => s.cpuUsagePercent),
@@ -324,11 +332,11 @@
   }
 
   function renderMemory(latest, history) {
-    document.getElementById("mem-value").textContent = latest.memory.usedPercent.toFixed(1) + "%";
+    document.getElementById("mem-value").textContent = `${latest.memory.usedPercent.toFixed(1)}%`;
     document.getElementById("mem-detail").textContent =
-      formatGB(latest.memory.usedGB) + " / " + formatGB(latest.memory.totalGB);
+      `${formatGB(latest.memory.usedGB)} / ${formatGB(latest.memory.totalGB)}`;
     document.getElementById("mem-bar").style.width =
-      Math.min(100, latest.memory.usedPercent) + "%";
+      `${Math.min(100, latest.memory.usedPercent)}%`;
     drawArea(
       document.getElementById("mem-chart"),
       history.map((s) => s.memory.usedPercent),
@@ -337,7 +345,7 @@
   }
 
   function renderDisk(latest, history) {
-    document.getElementById("disk-value").textContent = latest.disk.usedPercent.toFixed(1) + "%";
+    document.getElementById("disk-value").textContent = `${latest.disk.usedPercent.toFixed(1)}%`;
     document.getElementById("disk-detail").innerHTML =
       formatGB(latest.disk.usedGB) +
       " / " +
@@ -346,7 +354,7 @@
       formatGB(latest.disk.freeGB) +
       " free";
     document.getElementById("disk-bar").style.width =
-      Math.min(100, latest.disk.usedPercent) + "%";
+      `${Math.min(100, latest.disk.usedPercent)}%`;
     drawArea(
       document.getElementById("disk-chart"),
       history.map((s) => s.disk.usedPercent),
@@ -355,22 +363,31 @@
   }
 
   function renderNetwork(latest, history) {
+    const note = document.getElementById("net-note");
+    const available = latest.network.available;
+    note.hidden = available;
+    document.getElementById("net-chart-wrap").hidden = !available;
+    document.getElementById("net-legend").hidden = !available;
+    if (!available) {
+      note.textContent = latest.network.reason;
+      return;
+    }
+
+    const rx = history.map((s) => (s.network.available ? s.network.rxBytesPerSec : 0));
+    const tx = history.map((s) => (s.network.available ? s.network.txBytesPerSec : 0));
     document.getElementById("net-in-label").textContent =
-      formatBytesRate(latest.networkRxBytesPerSec);
+      formatBytesRate(latest.network.rxBytesPerSec);
     document.getElementById("net-out-label").textContent =
-      formatBytesRate(latest.networkTxBytesPerSec);
-    const netMax = Math.max(
-      1024,
-      ...history.map((s) => Math.max(s.networkRxBytesPerSec, s.networkTxBytesPerSec))
-    );
+      formatBytesRate(latest.network.txBytesPerSec);
+    const netMax = Math.max(1024, ...rx, ...tx);
     const netCanvas = document.getElementById("net-chart");
-    drawArea(netCanvas, history.map((s) => s.networkRxBytesPerSec), {
+    drawArea(netCanvas, rx, {
       min: 0,
       max: netMax,
       color: "#34d399",
       fill: "rgba(52,211,153,0.16)",
     });
-    drawOverlayArea(netCanvas, history.map((s) => s.networkTxBytesPerSec), {
+    drawOverlayArea(netCanvas, tx, {
       min: 0,
       max: netMax,
       color: "#22a3b8",
@@ -407,7 +424,7 @@
   async function tick() {
     try {
       const res = await fetch("/api/stats", { cache: "no-store" });
-      if (!res.ok) throw new Error("bad response " + res.status);
+      if (!res.ok) throw new Error(`bad response ${res.status}`);
       const payload = await res.json();
       render(payload);
       lastSuccessAt = Date.now();

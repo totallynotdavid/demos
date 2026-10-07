@@ -1,60 +1,99 @@
-import { collectStats, type RawStats } from "./stats";
+import { type Counters, collectSnapshot, type Snapshot } from "./stats";
 
 const POLL_INTERVAL_MS = 5_000;
 const HISTORY_WINDOW_MS = 10 * 60 * 1000;
 
+export type NetworkSample =
+  | { available: true; rxBytesPerSec: number; txBytesPerSec: number }
+  | { available: false; reason: string };
+
 export interface Sample {
   timestamp: number;
   cpuUsagePercent: number;
-  memory: RawStats["memory"];
-  disk: RawStats["disk"];
+  memory: Snapshot["memory"];
+  disk: Snapshot["disk"];
   // Expose rates for charting instead of cumulative counters.
-  networkRxBytesPerSec: number;
-  networkTxBytesPerSec: number;
+  network: NetworkSample;
   blockReadBytesPerSec: number;
   blockWriteBytesPerSec: number;
 }
 
 let history: Sample[] = [];
-let previousRaw: RawStats | null = null;
+let previous: Snapshot | null = null;
 
-function rate(deltaBytes: number, deltaMs: number): number {
-  if (deltaMs <= 0) return 0;
-  return Math.max(0, (deltaBytes / deltaMs) * 1000);
+// A rate uses counters present in both snapshots. Resets and newly appearing
+// devices contribute zero.
+function counterRates(
+  before: Counters,
+  after: Counters,
+  deltaMs: number,
+): [number, number] {
+  if (deltaMs <= 0) return [0, 0];
+  let first = 0;
+  let second = 0;
+  for (const [name, [now0, now1]] of Object.entries(after)) {
+    const then = before[name];
+    if (!then) continue;
+    first += Math.max(0, now0 - then[0]);
+    second += Math.max(0, now1 - then[1]);
+  }
+  return [(first / deltaMs) * 1000, (second / deltaMs) * 1000];
 }
 
-async function poll(): Promise<void> {
-  let raw: RawStats;
+export function computeSample(
+  before: Snapshot | null,
+  after: Snapshot,
+): Sample {
+  const deltaMs = before ? after.timestamp - before.timestamp : 0;
+
+  const cpuTotal = before ? after.cpu.total - before.cpu.total : 0;
+  const cpuBusy = before ? after.cpu.busy - before.cpu.busy : 0;
+  const cpuUsagePercent =
+    cpuTotal > 0 ? Math.min(100, Math.max(0, (cpuBusy / cpuTotal) * 100)) : 0;
+
+  const [blockRead, blockWrite] = counterRates(
+    before?.block ?? {},
+    after.block,
+    deltaMs,
+  );
+
+  let network: NetworkSample;
+  if (!after.network.available) {
+    network = after.network;
+  } else {
+    const [rx, tx] =
+      before?.network.available === true
+        ? counterRates(
+            before.network.interfaces,
+            after.network.interfaces,
+            deltaMs,
+          )
+        : [0, 0];
+    network = { available: true, rxBytesPerSec: rx, txBytesPerSec: tx };
+  }
+
+  return {
+    timestamp: after.timestamp,
+    cpuUsagePercent,
+    memory: after.memory,
+    disk: after.disk,
+    network,
+    blockReadBytesPerSec: blockRead,
+    blockWriteBytesPerSec: blockWrite,
+  };
+}
+
+function poll(): void {
+  let snapshot: Snapshot;
   try {
-    raw = await collectStats();
+    snapshot = collectSnapshot();
   } catch (error) {
     console.error("Failed to collect host stats:", error);
     return;
   }
 
-  const deltaMs = previousRaw ? raw.timestamp - previousRaw.timestamp : 0;
-
-  const sample: Sample = {
-    timestamp: raw.timestamp,
-    cpuUsagePercent: raw.cpuUsagePercent,
-    memory: raw.memory,
-    disk: raw.disk,
-    networkRxBytesPerSec: previousRaw
-      ? rate(raw.network.rxBytes - previousRaw.network.rxBytes, deltaMs)
-      : 0,
-    networkTxBytesPerSec: previousRaw
-      ? rate(raw.network.txBytes - previousRaw.network.txBytes, deltaMs)
-      : 0,
-    blockReadBytesPerSec: previousRaw
-      ? rate(raw.block.readBytes - previousRaw.block.readBytes, deltaMs)
-      : 0,
-    blockWriteBytesPerSec: previousRaw
-      ? rate(raw.block.writeBytes - previousRaw.block.writeBytes, deltaMs)
-      : 0,
-  };
-
-  previousRaw = raw;
-  history.push(sample);
+  history.push(computeSample(previous, snapshot));
+  previous = snapshot;
 
   const cutoff = Date.now() - HISTORY_WINDOW_MS;
   history = history.filter((s) => s.timestamp >= cutoff);

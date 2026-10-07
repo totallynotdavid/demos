@@ -1,12 +1,18 @@
 {
-  "extends": ["../../tsconfig.base.json", "./.svelte-kit/tsconfig.json"],
+  "extends": ["../../tsconfig.base.json", "$app/tsconfig"],
   "compilerOptions": {
     "allowJs": true,
     "checkJs": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "sourceMap": true
-  }
+    "sourceMap": true,
+    "paths": {
+      "$lib": ["./src/lib"],
+      "$lib/*": ["./src/lib/*"]
+    }
+  },
+  "include": ["src", "test", "*"],
+  "exclude": ["src/service-worker"]
   // Path aliases are handled by https://svelte.dev/docs/kit/configuration#alias
   // except $lib which is handled by https://svelte.dev/docs/kit/configuration#files
   //

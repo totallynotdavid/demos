@@ -1,45 +1,40 @@
 # demos
 
-Small demos that share one Bun workspace, one lockfile, one lint config and one
-CI run. Each demo lives in `apps/<name>` and keeps its own README.
+Eight small web demos in one Bun workspace. Each lives in `apps/<name>`, builds
+on its own, and shares one lockfile, one lint config and one CI run. Most are
+static front ends. `asistencia` adds a serverless function and `dokploy-status`
+is a Bun server. Every package is private: nothing here is published or meant to
+be imported.
 
-| Demo                                  | What it is                                          | Live                                    |
-| ------------------------------------- | --------------------------------------------------- | --------------------------------------- |
-| [asistencia](apps/asistencia)         | Attendance form backed by a Google Form.            | https://asistencia-vert.vercel.app      |
-| [blog](apps/blog)                     | Static SvelteKit blog with search.                  | https://demos-blog.vercel.app           |
-| [calendario](apps/calendario)         | Work and rest calendar generator under seven rules. | https://demos-calendario.vercel.app     |
-| [dev3pack2](apps/dev3pack2)           | DevProof, an AI-graded skills roadmap (React).      | https://demos-dev3pack2.vercel.app      |
-| [dokploy-status](apps/dokploy-status) | Public server monitoring page (Bun, Docker).        |                                         |
-| [postcard](apps/postcard)             | Postcard design editor with live preview (React).   | https://demos-postcard.vercel.app       |
-| [starred-search](apps/starred-search) | Search the READMEs of your GitHub stars (React).    | https://demos-starred-search.vercel.app |
-| [tim-apple](apps/tim-apple)           | App Store front page clone with mock data (Svelte). | https://demos-tim-apple.vercel.app      |
+## Run a demo
 
-## Develop
-
-Tools are pinned in `mise.toml` (bun, biome, node). With
-[mise](https://mise.jdx.dev) installed:
+Install [Bun](https://bun.sh) (the workspace pins 1.4.2 in `mise.toml`), then:
 
 ```sh
-mise install
 bun install
-mise run check     # lint, typecheck and build every app
-mise run fix       # format and apply safe lint fixes
+cd apps/calendario
+bun run dev
 ```
 
-Run one app with `bun run --filter <package> dev`, or `bun run dev` inside its
-folder.
+Vite prints the local URL. Every app has a `dev` script; `dokploy-status` is a
+Bun server on port 3000 rather than a Vite app.
 
-## Deploy
+## Demos
 
-Pushes to `master` run `ci.yml` (`mise run check`).
+| Demo                                  | What it is                                                      | Live                                    |
+| ------------------------------------- | --------------------------------------------------------------- | --------------------------------------- |
+| [asistencia](apps/asistencia)         | Attendance form that records answers in a Google Form.          | https://asistencia-vert.vercel.app      |
+| [blog](apps/blog)                     | Static SvelteKit blog with search.                              | https://demos-blog.vercel.app           |
+| [calendario](apps/calendario)         | Work and rest calendar generator under seven rules.             | https://demos-calendario.vercel.app     |
+| [dev3pack2](apps/dev3pack2)           | DevProof, a skills roadmap with challenges (React, no backend). | https://demos-dev3pack2.vercel.app      |
+| [dokploy-status](apps/dokploy-status) | Public server monitoring page (Bun, Docker).                    |                                         |
+| [postcard](apps/postcard)             | Postcard design editor with live preview (React).               | https://demos-postcard.vercel.app       |
+| [starred-search](apps/starred-search) | Search the READMEs of your GitHub stars (React).                | https://demos-starred-search.vercel.app |
+| [tim-apple](apps/tim-apple)           | App Store front page clone with mock data (SvelteKit).          | https://demos-tim-apple.vercel.app      |
 
-Each web demo is its own Vercel project with Root Directory `apps/<app>`. It
-installs with bun from the root `bun.lock`, builds with the app's `build` script
-and serves the result. The Vite apps serve `dist` at `/`. The SvelteKit apps
-(blog, tim-apple) build to `build/` locally. On Vercel, adapter-static's
-zero-config mode writes `.vercel/output` with a clean route for each prerendered
-page. Any adapter option turns that mode off, so call `adapter()` with none.
-Vercel skips a project's build when a push does not affect it.
+## Documentation
 
-`dokploy-status` is a Docker image, built from the repository root with
-`docker build -f apps/dokploy-status/Dockerfile .`.
+- [Manual](docs/readme.md): the workspace layout and how the demos deploy.
+- [dokploy-status manual](apps/dokploy-status/docs/readme.md): architecture, API
+  and Docker deployment of the status server.
+- [Contributing](.github/contributing.md): set up, check and add a demo.

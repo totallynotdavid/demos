@@ -5,13 +5,13 @@ keeps ten minutes of samples in memory, and serves them as JSON to a static page
 that draws the charts.
 
 ```text
-/proc, statfs("/")
+/proc, /sys, statfs("/")
       │
   stats.ts      read one raw snapshot of cumulative counters
       │
   monitor.ts    every 5 s: turn counters into rates, keep 10 minutes
       │
-  index.ts      /api/stats returns latest + history
+  server.ts     /api/stats returns latest + history
       │
   public/index.html   polls /api/stats every 5 s and draws
 ```
@@ -20,18 +20,26 @@ that draws the charts.
 
 ### `src/index.ts`
 
-Loads `public/index.html` once at startup, starts the monitor, and serves two
-routes with `Bun.serve` on `0.0.0.0`. The port comes from `PORT`. See
-[API](api.md) for the routes.
+Starts the monitor and the server on the port from `PORT`, and logs the URL.
+
+### `src/server.ts`
+
+`createServer(port)` loads `public/index.html` and serves two routes with
+`Bun.serve` on `0.0.0.0`. Each route handles `GET`, and Bun answers `HEAD` for
+it. A `fetch` fallback returns `405` with `Allow: GET, HEAD` for another method
+on a known path, and `404` for an unknown path. See [API](api.md) for the
+routes.
 
 ### `src/monitor.ts`
 
 Owns the history. `startMonitor` polls once, then every 5 seconds
 (`POLL_INTERVAL_MS`).
 
-- A poll turns the difference between two raw snapshots into bytes per second.
-  The first poll has no earlier snapshot, so its rates are `0`. A negative
-  difference, such as a counter reset, becomes `0`.
+- A poll turns the difference between two raw snapshots into rates
+  (`computeSample`). Network and block rates are summed per device, over the
+  devices present in both snapshots. The first poll has no earlier snapshot, so
+  its rates are `0`. A negative difference, such as a counter reset, and a
+  device that appears between polls add `0`.
 - Samples older than ten minutes (`HISTORY_WINDOW_MS`) are dropped on each poll.
 - A poll that throws is logged and skipped. No sample is added.
 - History lives in a module variable. Nothing is written to disk, so a restart
@@ -39,20 +47,23 @@ Owns the history. `startMonitor` polls once, then every 5 seconds
 
 ### `src/stats.ts`
 
-Reads one raw snapshot. CPU, memory and block I/O come from
-[`node-os-utils`](https://www.npmjs.com/package/node-os-utils) with its cache
-off. Disk and network are read directly.
+Reads one raw snapshot directly from `/proc`, `/sys` and the filesystem. A
+failed CPU, memory or disk read throws, and the poll that called it is skipped.
 
-| Metric      | Source                                                                                                                |
-| ----------- | --------------------------------------------------------------------------------------------------------------------- |
-| CPU         | `node-os-utils` `cpu.usage()`. A failed read gives `0`.                                                               |
-| Memory      | `node-os-utils` `memory.info()`, from `/proc/meminfo`. A failed read gives zeros.                                     |
-| Disk        | `statfsSync("/")`. Used is `blocks - bfree`, free is `bavail`, as `df` reports.                                       |
-| Network I/O | `/proc/net/dev`: receive bytes and transmit bytes summed over all interfaces except `lo`.                             |
-| Block I/O   | `node-os-utils` `disk.stats()`: read and write bytes summed over all devices except `loop*`, `ram*`, `sr*` and `fd*`. |
+Sysfs marks hardware with a `device` entry. Bridges, `veth` pairs, loop and
+device-mapper devices, and partitions have none, so counting only entries that
+have one avoids counting the same traffic twice.
 
-Network and block counters are cumulative since boot. `monitor.ts` turns them
-into rates.
+| Metric      | Source                                                                                                                                       |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| CPU         | `/proc/stat`: busy and total jiffies. `monitor.ts` takes the busy share between two snapshots.                                               |
+| Memory      | `MemTotal` and `MemAvailable` from `/proc/meminfo`.                                                                                          |
+| Disk        | `statfsSync("/")`. Used is `blocks - bfree`, free is `bavail`, as `df` reports.                                                              |
+| Network I/O | `/proc/net/dev`: receive and transmit bytes of interfaces with a `device` entry in `/sys/class/net`. With none, the snapshot is unavailable. |
+| Block I/O   | `/proc/diskstats`: sectors read and written, times 512, of whole disks with a `device` entry in `/sys/block`.                                |
+
+CPU, network and block counters are cumulative since boot. `monitor.ts` turns
+them into rates.
 
 ### `public/index.html`
 
@@ -62,6 +73,6 @@ A single file with inline CSS and JavaScript, no build step. It fetches
 
 ## Dependencies
 
-The only runtime dependency is `node-os-utils`. In `apps/dokploy-status`,
-`bun run typecheck` runs `tsc` against [`tsconfig.json`](../tsconfig.json), and
-`bun run lint` runs Biome.
+There are no runtime dependencies. In `apps/dokploy-status`, `bun run typecheck`
+runs `tsc` against [`tsconfig.json`](../tsconfig.json), `bun run lint` runs
+Biome, `bun run test` runs `bun test`, and `bun run check` runs all three.

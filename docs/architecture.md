@@ -137,8 +137,13 @@ as a word.
 
 `meta.detail` is `full` when the cache was written with a token (READMEs and
 lists) and `basic` when it was written without one. A cache is only valid for
-the source that wrote it: adding a token and removing one both make it due, so
-data a token fetched never outlives the token.
+the source that wrote it: adding a token and removing one both make it due.
+Removing one also has a first step. Before the first request, the full sync
+empties `readme` and `lists` of every repo and sets `meta.detail` to `basic`, in
+that order. A sync that then stops at a rate limit or an error leaves a
+`partial` cache with no token data, and `meta.detail` never says `full` over
+basic data. The tab applies the same rule to what it shows, so a page without a
+token never displays a cache's READMEs and lists.
 
 Only three functions write these stores: `refresh`, `fullResync` and
 `clearCache` in `src/lib/sync.ts`. Each holds the Web Lock

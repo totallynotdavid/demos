@@ -2,10 +2,8 @@ import type { Store } from "./db";
 import { type GitHubClient, RateLimitError } from "./github";
 
 export interface CachedGetOptions {
-  /** Cache key. Different paths need different keys. */
   key: string;
   path: string;
-  /** Inside this age the stored body is returned without a request. */
   maxAgeMs: number;
   now?: () => number;
   signal?: AbortSignal;
@@ -14,7 +12,6 @@ export interface CachedGetOptions {
 export interface CachedBody<T> {
   body: T;
   hasNext: boolean;
-  /** True when a rate limit stopped the refresh and an older body is served. */
   stale: boolean;
 }
 

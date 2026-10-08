@@ -29,7 +29,6 @@ function Bar({ limit, now }: { limit: RateLimit; now: number }) {
   );
 }
 
-/** The most pressed bucket decides what the pill shows. */
 function tightest(snapshot: ClientSnapshot, now: number) {
   const known = (Object.keys(LABELS) as Resource[])
     .map((resource) => ({ resource, limit: snapshot.limits[resource] }))

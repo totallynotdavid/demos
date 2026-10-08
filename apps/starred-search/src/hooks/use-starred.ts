@@ -10,11 +10,8 @@ import {
 export type { Problem };
 
 export interface Starred extends SessionState {
-  /** Asks GitHub whether anything changed, even inside the fresh window. */
   sync(): void;
-  /** Rewrites every repo, which also drops the ones no longer starred. */
   resync(): void;
-  /** Deletes the cache of this account. False when a sync holds it. */
   clearCache(): Promise<boolean>;
 }
 

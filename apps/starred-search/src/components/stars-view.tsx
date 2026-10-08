@@ -309,7 +309,6 @@ export function StarsView({ login, hasToken, starred, onEditAccount }: Props) {
     </>
   );
 
-  // Nothing is cached and GitHub said why, so search and filters have no use.
   if (repos.length === 0 && problem && !syncing) {
     return <div className="space-y-3">{banners}</div>;
   }

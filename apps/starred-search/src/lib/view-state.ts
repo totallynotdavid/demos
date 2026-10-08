@@ -29,7 +29,6 @@ export function parseView(search: string): View {
   };
 }
 
-/** The query string for a view, empty for the default view. */
 export function viewToSearch(view: View): string {
   const params = new URLSearchParams();
   if (view.query) params.set("q", view.query);

@@ -1,0 +1,14 @@
+{
+  "root": false,
+  "extends": "//",
+  "files": {
+    "includes": [
+      "**",
+      "!**/.agents",
+      "!**/.claude",
+      "!**/skills-lock.json",
+      "!**/*.svg",
+      "!test/fixtures"
+    ]
+  }
+}

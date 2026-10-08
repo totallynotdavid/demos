@@ -25,7 +25,7 @@ takes the package name.
 | blog           | `another-blog`            | SvelteKit, Svelte 5, mdsvex | `src/routes`                                 |
 | calendario     | `calendario`              | Vite, TypeScript            | `src/main.ts` (page), `src/core` (generator) |
 | dev3pack2      | `plena-react-starter-app` | Vite, React, Tailwind       | `src/main.tsx`                               |
-| dokploy-status | `dokploy-status`          | Bun, `node-os-utils`        | `src/index.ts`                               |
+| dokploy-status | `dokploy-status`          | Bun, no dependencies        | `src/index.ts`                               |
 | postcard       | `a-nice-postcard`         | Vite, React, Tailwind       | `src/index.tsx` (the Vite root is `src`)     |
 | starred-search | `starred-search`          | Vite, React, Tailwind       | `src/main.tsx`                               |
 | tim-apple      | `tim-apples`              | SvelteKit, Svelte 5, Sass   | `src/routes`                                 |

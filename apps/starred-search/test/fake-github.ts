@@ -91,7 +91,6 @@ export class FakeGitHub {
     this.stars = this.stars.filter((entry) => entry.id !== id);
   }
 
-  /** Starts a new hour: every counter goes back to zero. */
   resetWindow(resetAt: number) {
     this.used.clear();
     this.resetAt = resetAt;
@@ -335,11 +334,20 @@ export class FakeGitHub {
     }
 
     if (operation === "Lists") {
+      const offset = variables.after
+        ? Number(atob(String(variables.after)))
+        : 0;
+      const slice = this.lists.slice(offset, offset + 100);
+      const end = offset + slice.length;
       return respond(200, {
         data: {
           user: {
             lists: {
-              nodes: this.lists.map((list) => ({
+              pageInfo: {
+                hasNextPage: end < this.lists.length,
+                endCursor: btoa(String(end)),
+              },
+              nodes: slice.map((list) => ({
                 id: list.id,
                 name: list.name,
                 items: itemsOf(list.repoIds, 0),

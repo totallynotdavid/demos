@@ -287,6 +287,28 @@ describe("sync with a token", () => {
     expect(repos.every((repo) => repo.lists.includes("Everything"))).toBe(true);
   });
 
+  it("keeps the membership of every list when there are more than a page of lists", async () => {
+    env.github.lists = Array.from({ length: 130 }, (_, index) => ({
+      id: `L_${index}`,
+      name: `List ${index}`,
+      repoIds: [env.github.stars[index].id],
+    }));
+
+    await refresh(env.options(env.client("ghp_test")));
+
+    const byId = new Map(
+      (await env.store.loadRepos("dubu")).map((repo) => [repo.id, repo.lists]),
+    );
+    for (let index = 0; index < 130; index++) {
+      expect(byId.get(env.github.stars[index].id)).toEqual([`List ${index}`]);
+    }
+    expect(byId.get(env.github.stars[130].id)).toEqual([]);
+    // Three pages of stars and two pages of lists.
+    expect(
+      env.github.counted.filter((r) => r.resource === "graphql"),
+    ).toHaveLength(5);
+  });
+
   it("halves the page size when the server fails on a large page", async () => {
     env.github.maxFirst = 30;
 
@@ -364,6 +386,59 @@ describe("sync with a token", () => {
     expect(repos.every((repo) => repo.readme === null)).toBe(true);
     expect(repos.every((repo) => repo.lists.length === 0)).toBe(true);
     expect((await env.store.loadMeta("dubu"))?.detail).toBe("basic");
+  });
+
+  async function expectNoTokenData() {
+    const repos = await env.store.loadRepos("dubu");
+    expect(repos).toHaveLength(250);
+    expect(repos.filter((repo) => repo.readme !== null)).toEqual([]);
+    expect(repos.filter((repo) => repo.lists.length > 0)).toEqual([]);
+  }
+
+  async function fillWithToken() {
+    withLists();
+    await refresh(env.options(env.client("ghp_test")));
+    const repos = await env.store.loadRepos("dubu");
+    expect(repos.some((repo) => repo.readme !== null)).toBe(true);
+    expect(repos.some((repo) => repo.lists.length > 0)).toBe(true);
+    env.clock.now += 1000;
+  }
+
+  it("leaves no token data when the sync after the token goes away stops early", async () => {
+    await fillWithToken();
+
+    const result = await refresh({
+      ...env.options(env.client()),
+      onPage: () => env.github.exhaust("core", null),
+    });
+
+    expect(result.status).toBe("rate-limited");
+    await expectNoTokenData();
+    expect(await env.store.loadMeta("dubu")).toMatchObject({
+      detail: "basic",
+      resume: { fetched: 100 },
+    });
+  });
+
+  it("leaves no token data when GitHub refuses the first request", async () => {
+    await fillWithToken();
+    env.github.exhaust("core", null);
+
+    const result = await refresh(env.options(env.client()));
+
+    expect(result.status).toBe("rate-limited");
+    await expectNoTokenData();
+    expect((await env.store.loadMeta("dubu"))?.detail).toBe("basic");
+  });
+
+  it("leaves no token data when a forced full sync runs without the token", async () => {
+    await fillWithToken();
+    env.github.exhaust("core", null);
+
+    const result = await fullResync(env.options(env.client()));
+
+    expect(result.status).toBe("rate-limited");
+    await expectNoTokenData();
   });
 
   it("goes back to cheap syncs once the cache matches the source", async () => {

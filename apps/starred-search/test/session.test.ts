@@ -116,6 +116,28 @@ describe("a page's view of the cache", () => {
     expect(env.github.requests.length).toBe(sent);
   });
 
+  it("shows a cache a token filled as basic once the token is gone", async () => {
+    const filler = open(undefined, "ghp_test");
+    await filler.sync("auto");
+    expect(filler.getState().detail).toBe("full");
+    expect(filler.getState().repos.some((repo) => repo.readme !== null)).toBe(
+      true,
+    );
+
+    const session = open();
+    env.github.exhaust("core", null);
+    session.start();
+    await until(() => settled(session.getState()), "the end of the sync");
+
+    const { repos, detail, problem } = session.getState();
+    expect(problem).toMatchObject({ kind: "rate-limited" });
+    expect(detail).toBe("basic");
+    expect(repos).toHaveLength(250);
+    expect(
+      repos.some((repo) => repo.readme !== null || repo.lists.length),
+    ).toBe(false);
+  });
+
   describe("with two tabs on one account", () => {
     async function twoTabs() {
       const first = open();

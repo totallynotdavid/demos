@@ -23,7 +23,6 @@ function event(
   };
 }
 
-/** Newest first, one per hour. */
 function timeline(count: number, now: number): ActivityEvent[] {
   return Array.from({ length: count }, (_, i) =>
     event(i, "PushEvent", now - i * HOUR, `acme/repo${i % 12}`, {

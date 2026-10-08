@@ -12,8 +12,19 @@ affect it.
 | asistencia, calendario, dev3pack2, postcard, starred-search | `dist/`        | static files at `/`                |
 | blog, tim-apple (SvelteKit with `@sveltejs/adapter-static`) | `build/`       | on Vercel, `.vercel/output/static` |
 
-`asistencia` also deploys `api/register.js` as a serverless function. The Vite
-dev server does not serve it, so the form cannot submit locally.
+`asistencia` also deploys `api/attendance.ts`, `api/form.ts` and
+`api/register.ts` as serverless functions, and builds two pages: `/` and
+`/panel/`. Set these environment variables on its project; the Vite dev server
+reads the same names from `apps/asistencia/.env`.
+
+| Variable        | Required | Value                                                |
+| --------------- | -------- | ---------------------------------------------------- |
+| `SHEET_URL`     | yes      | Address of the Form's linked Sheet                   |
+| `FORM_URL`      | yes      | The Form's link (`viewform` or `forms.gle`)          |
+| `DASHBOARD_KEY` | no       | When set, `/panel/` asks for it before showing names |
+
+The Sheet must be shared as "Anyone with the link" with Viewer access. Setup for
+the Form and Sheet is in the [app readme](../apps/asistencia/readme.md).
 
 ### SvelteKit on Vercel
 

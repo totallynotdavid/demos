@@ -1,97 +1,93 @@
-import type { IndexedRepo } from "./github-indexer";
+import type { Repo } from "./types";
 
-export interface ExportOptions {
-  includeDescription: boolean;
-  includeLanguage: boolean;
-  includeTags: boolean;
-  includeStars: boolean;
-  includeUpdatedAt: boolean;
-  includeUrl: boolean;
-  includeReadme: boolean;
+export interface Column {
+  id: string;
+  label: string;
+  value: (repo: Repo) => string | number;
+  /** Whether the column is ticked when the export dialog opens. */
+  default: boolean;
 }
 
-export const defaultExportOptions: ExportOptions = {
-  includeDescription: true,
-  includeLanguage: true,
-  includeTags: false,
-  includeStars: true,
-  includeUpdatedAt: true,
-  includeUrl: true,
-  includeReadme: false,
-};
+export const COLUMNS: Column[] = [
+  { id: "owner", label: "Owner", value: (r) => r.owner, default: true },
+  { id: "name", label: "Name", value: (r) => r.name, default: true },
+  {
+    id: "description",
+    label: "Description",
+    value: (r) => r.description ?? "",
+    default: true,
+  },
+  {
+    id: "language",
+    label: "Language",
+    value: (r) => r.language ?? "",
+    default: true,
+  },
+  {
+    id: "topics",
+    label: "Topics",
+    value: (r) => r.topics.join(";"),
+    default: false,
+  },
+  {
+    id: "lists",
+    label: "Lists",
+    value: (r) => r.lists.join(";"),
+    default: false,
+  },
+  { id: "stars", label: "Stars", value: (r) => r.stars, default: true },
+  {
+    id: "starredAt",
+    label: "Starred at",
+    value: (r) => r.starredAt,
+    default: true,
+  },
+  {
+    id: "updatedAt",
+    label: "Last updated",
+    value: (r) => r.updatedAt,
+    default: false,
+  },
+  { id: "url", label: "URL", value: (r) => r.url, default: true },
+  {
+    id: "readme",
+    label: "README",
+    value: (r) => r.readme ?? "",
+    default: false,
+  },
+];
 
-export class CSVExporter {
-  private escapeCSV(value: string): string {
-    if (!value) return "";
-    // Escape double quotes and wrap in quotes if contains comma, newline, or quote
-    const stringValue = String(value);
-    if (
-      stringValue.includes(",") ||
-      stringValue.includes("\n") ||
-      stringValue.includes('"')
-    ) {
-      return `"${stringValue.replace(/"/g, '""')}"`;
-    }
-    return stringValue;
+/**
+ * A cell that starts with one of these is read as a formula by spreadsheets.
+ * Descriptions and READMEs are written by strangers, so such cells get a
+ * leading quote, which the spreadsheet shows as text.
+ */
+const FORMULA_START = /^[=+\-@\t\r]/;
+
+function cell(value: string | number): string {
+  let text = String(value);
+  if (typeof value === "string" && FORMULA_START.test(text)) text = `'${text}`;
+  return /[",\r\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
+}
+
+export function toCsv(repos: Repo[], columnIds: string[]): string {
+  const columns = COLUMNS.filter((column) => columnIds.includes(column.id));
+  const lines = [columns.map((column) => cell(column.label)).join(",")];
+  for (const repo of repos) {
+    lines.push(columns.map((column) => cell(column.value(repo))).join(","));
   }
+  return `${lines.join("\r\n")}\r\n`;
+}
 
-  exportToCSV(repos: IndexedRepo[], options: ExportOptions): string {
-    const headers: string[] = ["Owner", "Name", "Full Name"];
-
-    if (options.includeDescription) headers.push("Description");
-    if (options.includeLanguage) headers.push("Language");
-    if (options.includeStars) headers.push("Stars");
-    if (options.includeUpdatedAt) headers.push("Last Updated");
-    if (options.includeUrl) headers.push("URL");
-    if (options.includeReadme) headers.push("README Content");
-
-    const rows: string[] = [headers.join(",")];
-
-    for (const repo of repos) {
-      const row: string[] = [
-        this.escapeCSV(repo.owner),
-        this.escapeCSV(repo.name),
-        this.escapeCSV(repo.fullName),
-      ];
-
-      if (options.includeDescription) {
-        row.push(this.escapeCSV(repo.description || ""));
-      }
-      if (options.includeLanguage) {
-        row.push(this.escapeCSV(repo.language || ""));
-      }
-      if (options.includeStars) {
-        row.push(String(repo.stars));
-      }
-      if (options.includeUpdatedAt) {
-        row.push(this.escapeCSV(new Date(repo.updatedAt).toISOString()));
-      }
-      if (options.includeUrl) {
-        row.push(this.escapeCSV(repo.url));
-      }
-      if (options.includeReadme) {
-        row.push(this.escapeCSV(repo.readmeContent || ""));
-      }
-
-      rows.push(row.join(","));
-    }
-
-    return rows.join("\n");
-  }
-
-  downloadCSV(filename: string, csvContent: string): void {
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-
-    link.setAttribute("href", url);
-    link.setAttribute("download", filename);
-    link.style.visibility = "hidden";
-
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    URL.revokeObjectURL(url);
-  }
+export function downloadCsv(filename: string, csv: string): void {
+  const url = URL.createObjectURL(
+    new Blob([csv], { type: "text/csv;charset=utf-8" }),
+  );
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
 }

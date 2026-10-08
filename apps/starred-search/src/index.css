@@ -1,108 +1,110 @@
 @import "tailwindcss";
-@import "tw-animate-css";
 @import "@fontsource-variable/geist";
 @import "@fontsource-variable/geist-mono";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Geist Mono Variable", ui-monospace, monospace;
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-hover: var(--hover);
+  --color-line: var(--line);
+  --color-fg: var(--fg);
+  --color-dim: var(--dim);
   --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --color-accent-soft: var(--accent-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-ok: var(--ok);
 }
 
 :root {
-  --radius: 0.75rem;
-  --background: oklch(0.99 0 0);
-  --foreground: oklch(0.12 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.12 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.12 0 0);
-  --primary: oklch(0.18 0 0);
-  --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.96 0 0);
-  --secondary-foreground: oklch(0.18 0 0);
-  --muted: oklch(0.96 0 0);
-  --muted-foreground: oklch(0.5 0 0);
-  --accent: oklch(0.96 0 0);
-  --accent-foreground: oklch(0.18 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.9 0 0);
-  --input: oklch(0.9 0 0);
-  --ring: oklch(0.7 0 0);
-  --chart-1: oklch(0.5 0 0);
-  --chart-2: oklch(0.6 0 0);
-  --chart-3: oklch(0.7 0 0);
-  --chart-4: oklch(0.4 0 0);
-  --chart-5: oklch(0.55 0 0);
+  --bg: oklch(0.985 0.002 250);
+  --surface: oklch(1 0 0);
+  --hover: oklch(0.955 0.004 250);
+  --line: oklch(0.9 0.004 250);
+  --fg: oklch(0.2 0.01 250);
+  --dim: oklch(0.48 0.012 250);
+  --accent: oklch(0.5 0.17 258);
+  --accent-soft: oklch(0.94 0.04 258);
+  --warn: oklch(0.5 0.12 70);
+  --warn-soft: oklch(0.96 0.05 85);
+  --danger: oklch(0.5 0.19 27);
+  --danger-soft: oklch(0.96 0.03 27);
+  --ok: oklch(0.55 0.14 150);
 }
 
 .dark {
-  --background: oklch(0.12 0 0);
-  --foreground: oklch(0.96 0 0);
-  --card: oklch(0.16 0 0);
-  --card-foreground: oklch(0.96 0 0);
-  --popover: oklch(0.16 0 0);
-  --popover-foreground: oklch(0.96 0 0);
-  --primary: oklch(0.96 0 0);
-  --primary-foreground: oklch(0.12 0 0);
-  --secondary: oklch(0.22 0 0);
-  --secondary-foreground: oklch(0.96 0 0);
-  --muted: oklch(0.22 0 0);
-  --muted-foreground: oklch(0.6 0 0);
-  --accent: oklch(0.22 0 0);
-  --accent-foreground: oklch(0.96 0 0);
-  --destructive: oklch(0.6 0.22 27);
-  --border: oklch(0.24 0 0);
-  --input: oklch(0.24 0 0);
-  --ring: oklch(0.5 0 0);
-  --chart-1: oklch(0.7 0 0);
-  --chart-2: oklch(0.6 0 0);
-  --chart-3: oklch(0.5 0 0);
-  --chart-4: oklch(0.8 0 0);
-  --chart-5: oklch(0.65 0 0);
+  --bg: oklch(0.15 0.006 250);
+  --surface: oklch(0.19 0.008 250);
+  --hover: oklch(0.24 0.01 250);
+  --line: oklch(0.28 0.01 250);
+  --fg: oklch(0.95 0.004 250);
+  --dim: oklch(0.7 0.01 250);
+  --accent: oklch(0.72 0.14 258);
+  --accent-soft: oklch(0.27 0.06 258);
+  --warn: oklch(0.82 0.13 85);
+  --warn-soft: oklch(0.27 0.05 80);
+  --danger: oklch(0.75 0.15 27);
+  --danger-soft: oklch(0.27 0.06 27);
+  --ok: oklch(0.75 0.14 150);
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
+  html {
+    color-scheme: light;
+  }
+  html.dark {
+    color-scheme: dark;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-bg font-sans text-sm text-fg;
+  }
+  * {
+    @apply border-line;
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+  /* The ring of a text field shows while it is being edited, not only by key. */
+  input:focus,
+  select:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+  mark {
+    @apply rounded-sm bg-accent-soft text-inherit;
+  }
+  kbd {
+    @apply inline-flex min-w-5 items-center justify-center rounded border border-line bg-surface px-1 font-mono text-[11px] leading-5 text-dim;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex h-8 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-md border border-line bg-surface px-3 text-[13px] font-medium transition-colors hover:bg-hover disabled:pointer-events-none disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply border-transparent bg-fg text-bg hover:bg-fg/85;
+  }
+  .btn-ghost {
+    @apply border-transparent bg-transparent;
+  }
+  .field {
+    @apply h-9 w-full rounded-md border border-line bg-surface px-3 text-sm placeholder:text-dim;
+  }
+  .chip {
+    @apply inline-flex min-h-6 items-center gap-1 rounded-full border border-line px-2 text-xs transition-colors hover:bg-hover;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-spin {
+    animation-duration: 3s;
   }
 }

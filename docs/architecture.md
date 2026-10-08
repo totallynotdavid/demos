@@ -114,3 +114,79 @@ the load was in flight). Deleting by key would then evict the newer, good entry
 and cost one extra request to Google. Nothing is shared between function
 instances or survives a cold start, so each instance makes its own request per
 TTL.
+
+## Shared state in starred-search
+
+`starred-search` keeps one IndexedDB database per browser. Every tab on the same
+origin reads and writes it, so its states and who moves them are fixed here. The
+code is in `apps/starred-search/src/lib`.
+
+### The cache of one account
+
+The `repos` and `meta` stores hold the stars of one login. The `meta` row
+decides the state. A state is derived from the row and the clock, never stored
+as a word.
+
+| State   | Meaning                                                                                |
+| ------- | -------------------------------------------------------------------------------------- |
+| absent  | No `meta` row. The account has never been synced, or the cache was deleted.            |
+| partial | `meta.resume` is set. A full sync stopped and keeps its cursor and generation.         |
+| fresh   | Complete, and `syncedAt` is less than 5 minutes old.                                   |
+| stale   | Complete, `syncedAt` is older, and `meta.detail` matches the source in use.            |
+| due     | Complete, but `meta.detail` differs from the source in use, or `fullAt` is 7 days old. |
+
+`meta.detail` is `full` when the cache was written with a token (READMEs and
+lists) and `basic` when it was written without one. A cache is only valid for
+the source that wrote it: adding a token and removing one both make it due, so
+data a token fetched never outlives the token.
+
+Only three functions write these stores: `refresh`, `fullResync` and
+`clearCache` in `src/lib/sync.ts`. Each holds the Web Lock
+`starred-sync:<login>` for its whole run and asks for it with `ifAvailable`. A
+second tab that cannot get it receives `busy` and writes nothing. The browser
+releases the lock when a tab closes, so a crashed tab leaves a `partial` cache
+and never a held lock.
+
+| Transition              | Function     | Who asks, and when                                                                 |
+| ----------------------- | ------------ | ---------------------------------------------------------------------------------- |
+| absent to partial       | `refresh`    | The page opening, the tab becoming visible, the rate-limit reset, Fetch stars.     |
+| partial to partial      | `refresh`    | The same triggers. It stopped again at a rate limit or an error.                   |
+| partial to fresh        | `refresh`    | The same triggers. The full sync reached the last page and pruned unstarred repos. |
+| due to partial or fresh | `refresh`    | The same triggers, without asking the user.                                        |
+| stale to fresh          | `refresh`    | The same triggers. One conditional request, then only the newer stars.             |
+| stale to partial        | `refresh`    | The star total no longer adds up, so something was unstarred.                      |
+| fresh to stale          | none         | Time passing. Nothing writes.                                                      |
+| fresh or stale to fresh | `refresh`    | The Refresh button, which ignores the fresh window.                                |
+| any complete to partial | `fullResync` | The user, with Fetch everything again. Never started automatically.                |
+| any state to absent     | `clearCache` | The user, with Delete the cache. Never started automatically.                      |
+
+The automatic triggers are `auto` syncs. They do nothing inside the fresh
+window, nothing while the rate limit pauses them, and nothing after the user
+deleted the cache. Only a user action (Refresh, Fetch stars, Fetch everything
+again) makes a deleted cache `absent` to `partial` again.
+
+### One tab's view
+
+`StarredSession` (`src/lib/session.ts`) is the only caller of the three
+functions. A tab is in one of these states:
+
+| State   | Meaning                                                            | Leaves when                                       |
+| ------- | ------------------------------------------------------------------ | ------------------------------------------------- |
+| loading | The cache has not been read yet.                                   | The read ends, or fails and shows the failure.    |
+| idle    | Showing the cache. No sync runs.                                   | A sync starts.                                    |
+| syncing | One of the three functions runs for this tab.                      | It returns. A failure also ends it, never sticks. |
+| paused  | A rate limit stopped a sync. `auto` syncs wait for the reset time. | The reset timer fires, or the user asks.          |
+| emptied | The user deleted the cache here or in another tab. `auto` is off.  | The user asks, or another tab fills the cache.    |
+
+When a sync finishes or the cache is deleted, the tab announces it on the
+BroadcastChannel `starred-search`. The other tabs of that account only read the
+cache again. An announcement never starts a sync, so one tab deleting the cache
+cannot make another tab download it again.
+
+### The HTTP cache
+
+The `http` store holds one record per GET: the body, its ETag and `fetchedAt`.
+Activity requests use it through `cachedGet`. It has two states, absent and
+stored, and no lock. Two tabs may revalidate the same record at once. Each
+writes a whole valid record and the last write wins. "Delete the cache" does not
+touch it.

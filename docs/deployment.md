@@ -4,8 +4,26 @@
 
 Each web demo is its own Vercel project with Root Directory `apps/<name>`.
 Vercel installs with Bun from the root `bun.lock`, builds with the app's `build`
-script and serves the result. It skips a project's build when a push does not
-affect it.
+script and serves the result.
+
+### Skipped builds
+
+Vercel's built-in skipping of unaffected projects only recognises changes inside
+the workspace definition (`apps/*`). A change outside it, such as `docs/`,
+`readme.md`, `mise.toml` or `biome.json`, counts as global and rebuilds every
+project. Each app's `vercel.json` sets an `ignoreCommand` that overrides the
+dashboard's Ignored Build Step:
+
+```sh
+git diff --quiet HEAD^ HEAD -- . ../../bun.lock ../../package.json ../../tsconfig.base.json
+```
+
+The command runs in the app's Root Directory. Exit 0 skips the build; exit 1
+builds. An app builds only when its own folder or an install or build input
+shared by all apps changed in the latest commit. Those inputs are `bun.lock`,
+the root `package.json` and `tsconfig.base.json`. The command compares only
+`HEAD^` with `HEAD`, so a push of several commits is judged by its last commit
+alone.
 
 | Apps                                                        | `build` writes | Served as                          |
 | ----------------------------------------------------------- | -------------- | ---------------------------------- |

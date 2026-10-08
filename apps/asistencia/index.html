@@ -6,20 +6,36 @@
     <title>Registro de asistencia</title>
     <meta name="theme-color" content="#f5f5f7" />
     <link rel="stylesheet" href="/src/style.css" />
+    <link rel="stylesheet" href="/src/register.css" />
   </head>
   <body>
+    <a class="skip-link" href="#field-name">Ir al formulario</a>
     <main class="page">
       <div class="sheet">
-        <header class="header">
-          <h1>Humanización, tecnología y ética</h1>
-          <p class="event-meta">
-            02 de setiembre de 2026 · Auditorio Cayetano Heredia
+        <header class="header" id="event" aria-busy="true">
+          <h1 id="event-heading">
+            <span class="skeleton skeleton-title" aria-hidden="true"></span>
+            <span class="visually-hidden">Cargando…</span>
+          </h1>
+          <p class="event-meta" id="event-meta">
+            <span class="skeleton skeleton-line" aria-hidden="true"></span>
           </p>
         </header>
 
-        <form id="attendance-form" class="form" novalidate>
-          <label class="field">
-            <span class="field-label">Nombres y apellidos</span>
+        <div id="load-error" class="notice" role="alert" hidden>
+          <p class="notice-title">No pudimos abrir el formulario</p>
+          <p class="notice-text" id="load-error-text"></p>
+          <button type="button" class="btn btn-secondary" id="retry-btn">
+            Reintentar
+          </button>
+        </div>
+
+        <form id="attendance-form" class="form" novalidate hidden>
+          <div class="field">
+            <label class="field-label" for="field-name">
+              Nombres y apellidos
+              <span class="required-mark" aria-hidden="true">*</span>
+            </label>
             <input
               type="text"
               id="field-name"
@@ -27,24 +43,26 @@
               class="text-input"
               placeholder="Ej. María López"
               autocomplete="name"
+              maxlength="120"
+              required
+              aria-describedby="name-error"
             />
-          </label>
+            <p id="name-error" class="field-error" hidden>
+              Escribe tu nombre completo.
+            </p>
+          </div>
 
           <fieldset class="field">
             <legend class="field-label">
               ¿Confirmas tu asistencia?
               <span class="required-mark" aria-hidden="true">*</span>
             </legend>
-            <div
-              class="segmented"
-              role="radiogroup"
-              aria-describedby="choice-error"
-            >
+            <div class="segmented" aria-describedby="choice-error">
               <input
                 type="radio"
                 id="attendance-yes"
                 name="attendance"
-                value="Sí"
+                value="yes"
                 required
                 class="segmented-input"
               />
@@ -55,7 +73,7 @@
                 type="radio"
                 id="attendance-no"
                 name="attendance"
-                value="No"
+                value="no"
                 required
                 class="segmented-input"
               />
@@ -64,20 +82,18 @@
               >
               <div class="segmented-thumb" aria-hidden="true"></div>
             </div>
-            <p id="choice-error" class="field-error" role="alert" hidden>
+            <p id="choice-error" class="field-error" hidden>
               Selecciona una opción para continuar.
             </p>
           </fieldset>
 
-          <button type="submit" class="submit-btn" id="submit-btn">
+          <button type="submit" class="btn btn-primary" id="submit-btn">
             Registrar asistencia
           </button>
-          <p id="submit-error" class="field-error" role="alert" hidden>
-            No pudimos registrar tu respuesta. Intenta de nuevo.
-          </p>
+          <p id="submit-error" class="field-error" role="alert" hidden></p>
         </form>
 
-        <div id="success" class="success" role="status" aria-live="polite" hidden>
+        <div id="success" class="success" tabindex="-1" hidden>
           <svg
             class="success-icon"
             viewBox="0 0 24 24"
@@ -93,11 +109,18 @@
               stroke-linejoin="round"
             />
           </svg>
-          <p class="success-title">Listo</p>
-          <p class="success-text">Tu asistencia quedó registrada.</p>
+          <p class="success-title" id="success-title">Listo</p>
+          <p class="success-text" id="success-text"></p>
+          <button type="button" class="btn btn-secondary" id="again-btn">
+            Registrar a otra persona
+          </button>
         </div>
+
+        <p class="footer-link">
+          <a href="/panel/">Ver la lista de asistentes</a>
+        </p>
       </div>
     </main>
-    <script type="module" src="/src/main.js"></script>
+    <script type="module" src="/src/register.ts"></script>
   </body>
 </html>

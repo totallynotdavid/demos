@@ -1,4 +1,4 @@
-import type { Repo } from "./types";
+import { type Repo, withoutTokenData } from "./types";
 
 export interface SyncMeta {
   account: string;
@@ -118,6 +118,29 @@ export class Store {
 
     await finished(transaction);
     return removed;
+  }
+
+  /** Empties `readme` and `lists` of every repo of the account. */
+  async dropTokenData(account: string): Promise<number> {
+    const transaction = this.db.transaction(STORES.repos, "readwrite");
+    const index = transaction.objectStore(STORES.repos).index("account");
+    let changed = 0;
+
+    const cursorRequest = index.openCursor(account);
+    cursorRequest.onsuccess = () => {
+      const cursor = cursorRequest.result;
+      if (!cursor) return;
+      const stored = cursor.value as StoredRepo;
+      const basic = withoutTokenData(stored);
+      if (basic !== stored) {
+        cursor.update(basic);
+        changed++;
+      }
+      cursor.continue();
+    };
+
+    await finished(transaction);
+    return changed;
   }
 
   async clear(account: string): Promise<void> {

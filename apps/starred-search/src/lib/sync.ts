@@ -163,7 +163,7 @@ function emptyMeta(account: string): SyncMeta {
 }
 
 async function fullSync(run: Run, meta: SyncMeta | null): Promise<SyncResult> {
-  const current = meta ?? emptyMeta(run.account);
+  const current = await dropTokenData(run, meta ?? emptyMeta(run.account));
   const resume = await startOrResume(run, current);
   let fetched = resume.fetched;
   let cursor = resume.cursor;
@@ -196,6 +196,23 @@ async function fullSync(run: Run, meta: SyncMeta | null): Promise<SyncResult> {
     resume: null,
   });
   return { status: "synced", fetched, removed };
+}
+
+/**
+ * Without a token the cache must not keep what a token fetched. A full sync
+ * overwrites repos page by page, so one that stops early would leave the repos
+ * it has not reached with their READMEs and lists. They go first, before any
+ * request, and the meta says `basic` from then on.
+ */
+async function dropTokenData(run: Run, meta: SyncMeta): Promise<SyncMeta> {
+  if (run.source.detail !== "basic") return meta;
+
+  await run.store.dropTokenData(run.account);
+  if (meta.detail === "basic") return meta;
+
+  const basic: SyncMeta = { ...meta, detail: "basic" };
+  await run.store.saveMeta(basic);
+  return basic;
 }
 
 /** A resume written by the other kind of source would misread its cursor. */

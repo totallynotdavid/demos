@@ -14,3 +14,9 @@ export interface Repo {
   lists: string[];
   readme: string | null;
 }
+
+/** READMEs and lists come only from a token. Without one, they must not show. */
+export function withoutTokenData(repo: Repo): Repo {
+  if (repo.readme === null && repo.lists.length === 0) return repo;
+  return { ...repo, readme: null, lists: [] };
+}

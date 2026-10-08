@@ -9,7 +9,7 @@ import {
   type SyncProgress,
   type SyncResult,
 } from "./sync";
-import type { Repo } from "./types";
+import { type Repo, withoutTokenData } from "./types";
 
 export type Problem =
   | { kind: "rate-limited"; resetAt: number }
@@ -63,10 +63,15 @@ export const INITIAL: SessionState = {
   problem: null,
 };
 
-function fromMeta(meta: SyncMeta | null) {
+/**
+ * Without a token the page shows a cache as basic even if a token filled it.
+ * The next sync strips it, and the page does not wait for that.
+ */
+function fromMeta(meta: SyncMeta | null, hasToken: boolean) {
+  const detail = hasToken ? meta?.detail : meta && "basic";
   return {
     syncedAt: meta?.syncedAt ? meta.syncedAt : null,
-    detail: meta?.detail ?? null,
+    detail: detail ?? null,
     incomplete: meta?.resume
       ? { fetched: meta.resume.fetched, total: meta.resume.total }
       : null,
@@ -225,7 +230,10 @@ export class StarredSession {
     }
 
     if (result.status === "synced" && result.removed > 0) await this.read();
-    else this.set(fromMeta(await (await this.open()).loadMeta(this.key)));
+    else {
+      const meta = await (await this.open()).loadMeta(this.key);
+      this.set(fromMeta(meta, this.options.client.hasToken));
+    }
 
     this.set({ syncing: false, progress: null, problem: problemOf(result) });
     if (result.status === "synced") this.announce("synced");
@@ -238,7 +246,12 @@ export class StarredSession {
       store.loadMeta(this.key),
     ]);
     if (this.controller.signal.aborted) return;
-    this.set({ repos, loaded: true, ...fromMeta(meta) });
+    const { hasToken } = this.options.client;
+    this.set({
+      repos: hasToken ? repos : repos.map(withoutTokenData),
+      loaded: true,
+      ...fromMeta(meta, hasToken),
+    });
   }
 
   /** `read` for callers with nobody above them to report a failure to. */
@@ -252,8 +265,7 @@ export class StarredSession {
 
   private onAnnouncement(message: Announcement): void {
     if (message?.key !== this.key || this.running) return;
-    // Whoever filled the cache has made auto syncs useful again. Whoever
-    // emptied it has made them unwelcome.
+    // A filled cache enables automatic syncs. A cleared cache disables them.
     this.cleared = message.event === "cleared";
     void this.load();
   }

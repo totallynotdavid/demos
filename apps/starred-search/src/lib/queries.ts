@@ -44,9 +44,10 @@ query Starred($login: String!, $first: Int!, $after: String) {
 }`;
 
 export const LISTS_QUERY = `
-query Lists($login: String!) {
+query Lists($login: String!, $after: String) {
   user(login: $login) {
-    lists(first: 32) {
+    lists(first: 100, after: $after) {
+      pageInfo { hasNextPage endCursor }
       nodes {
         id
         name
@@ -102,6 +103,7 @@ interface StarredNode {
 export interface ListsData {
   user: {
     lists: {
+      pageInfo: { hasNextPage: boolean; endCursor: string | null };
       nodes: { id: string; name: string; items: ListItems }[];
     };
   } | null;

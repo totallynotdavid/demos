@@ -26,7 +26,6 @@ export interface Probe {
   total: number;
 }
 
-/** Repo ID to the names of the lists that hold it. */
 export type ListMembership = Map<string, string[]>;
 
 export interface StarredSource {
@@ -134,34 +133,50 @@ class GraphqlSource extends BaseSource implements StarredSource {
   }
 
   async lists(signal?: AbortSignal): Promise<ListMembership> {
-    const data = await this.client.graphql<ListsData>(
-      LISTS_QUERY,
-      { login: this.login },
-      signal,
-    );
     const membership: ListMembership = new Map();
+    let after: string | null = null;
 
-    for (const list of data.user?.lists.nodes ?? []) {
-      let items: ListItems = list.items;
-      for (;;) {
-        for (const item of items.nodes) {
-          if (!item?.id) continue;
-          membership.set(item.id, [
-            ...(membership.get(item.id) ?? []),
-            list.name,
-          ]);
-        }
-        if (!items.pageInfo.hasNextPage) break;
+    do {
+      const data: ListsData = await this.client.graphql<ListsData>(
+        LISTS_QUERY,
+        { login: this.login, after },
+        signal,
+      );
+      if (!data.user) break;
 
-        const more = await this.client.graphql<ListItemsData>(
-          LIST_ITEMS_QUERY,
-          { id: list.id, after: items.pageInfo.endCursor },
-          signal,
-        );
-        if (!more.node?.items) break;
-        items = more.node.items;
+      for (const list of data.user.lists.nodes) {
+        await this.addList(membership, list, signal);
       }
-    }
+      const { pageInfo } = data.user.lists;
+      after = pageInfo.hasNextPage ? pageInfo.endCursor : null;
+    } while (after);
+
     return membership;
+  }
+
+  private async addList(
+    membership: ListMembership,
+    list: { id: string; name: string; items: ListItems },
+    signal?: AbortSignal,
+  ): Promise<void> {
+    let items = list.items;
+    for (;;) {
+      for (const item of items.nodes) {
+        if (!item?.id) continue;
+        membership.set(item.id, [
+          ...(membership.get(item.id) ?? []),
+          list.name,
+        ]);
+      }
+      if (!items.pageInfo.hasNextPage) return;
+
+      const more = await this.client.graphql<ListItemsData>(
+        LIST_ITEMS_QUERY,
+        { id: list.id, after: items.pageInfo.endCursor },
+        signal,
+      );
+      if (!more.node?.items) return;
+      items = more.node.items;
+    }
   }
 }

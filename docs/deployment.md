@@ -15,15 +15,18 @@ project. Each app's `vercel.json` sets an `ignoreCommand` that overrides the
 dashboard's Ignored Build Step:
 
 ```sh
-git diff --quiet HEAD^ HEAD -- . ../../bun.lock ../../package.json ../../tsconfig.base.json
+git diff --quiet "${VERCEL_GIT_PREVIOUS_SHA:-HEAD^}" HEAD -- . ../../bun.lock ../../package.json ../../tsconfig.base.json
 ```
 
 The command runs in the app's Root Directory. Exit 0 skips the build; exit 1
 builds. An app builds only when its own folder or an install or build input
-shared by all apps changed in the latest commit. Those inputs are `bun.lock`,
-the root `package.json` and `tsconfig.base.json`. The command compares only
-`HEAD^` with `HEAD`, so a push of several commits is judged by its last commit
-alone.
+shared by all apps changed since the last deployed commit. Those inputs are
+`bun.lock`, the root `package.json` and `tsconfig.base.json`.
+
+Vercel sets `VERCEL_GIT_PREVIOUS_SHA` to the last commit it deployed on the
+branch, so a push of several commits is judged as a whole. Without it, the
+command falls back to `HEAD^`, the commit before the latest one. If the base
+commit is not in the clone, `git diff` exits 128 and Vercel builds.
 
 | Apps                                                        | `build` writes | Served as                          |
 | ----------------------------------------------------------- | -------------- | ---------------------------------- |

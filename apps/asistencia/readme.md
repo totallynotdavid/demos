@@ -42,9 +42,10 @@ their latest answer counts, ignoring case and accents.
 | Message                                      | Fix                                                   |
 | -------------------------------------------- | ----------------------------------------------------- |
 | No se pudo abrir el Sheet                    | Share the Sheet with "Anyone with the link" as Viewer |
-| Falta la variable `SHEET_URL` / `FORM_URL`   | Set the variable, then redeploy                       |
+| Falta la variable `SHEET_URL`                | Set the variable, then redeploy                       |
 | El Sheet necesita una columna con el nombre… | Keep a name column and an attendance column           |
-| No pudimos abrir el formulario               | Check `FORM_URL`, and that the Form accepts responses |
+| El formulario aún no está listo              | Set a valid `FORM_URL`, then redeploy                 |
+| No pudimos conectar con el formulario        | Google or the network failed. Visitors can retry      |
 | La pregunta de asistencia debe tener…        | Give the choice question the options "Sí" and "No"    |
 | Todavía no hay respuestas                    | Nothing is wrong. Nobody has answered yet             |
 

@@ -81,8 +81,8 @@ keeps the specifier as written, so a `.ts` specifier fails at runtime with
 as JSON (`/spreadsheets/d/<id>/gviz/tq?tqx=out:json`). It needs no API key, no
 Google Cloud project and no script in the Sheet, only the "Anyone with the link"
 share. Dates arrive as typed values, so day/month order never depends on the
-Sheet's locale. The result is cached for 20 seconds and shared between visitors,
-so a crowded panel makes one request to Google per 20 seconds.
+Sheet's locale. Visitors that reach the same function instance share one cached
+read instead of each sending a request to Google.
 
 **Writing answers.** `/api/form` reads the question ids and the exact option
 text ("Sí", "No") from the Form page, and `/api/register` posts to the Form's
@@ -95,5 +95,5 @@ break `/api/form` and `/api/register` until the parser is updated. The panel
 depends on the Sheet staying shared. A Sheet or Form that is private, deleted or
 not accepting responses shows a message instead of a blank page.
 
-The decision record behind the reading method is in
-[docs/architecture.md](../../docs/architecture.md#asistencia-google-forms-ingestion).
+How the two caches behave is in
+[docs/architecture.md](../../docs/architecture.md#asistencia-shared-caches).

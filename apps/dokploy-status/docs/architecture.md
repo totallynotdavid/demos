@@ -48,7 +48,9 @@ Owns the history. `startMonitor` polls once, then every 5 seconds
 ### `src/stats.ts`
 
 Reads one raw snapshot directly from `/proc`, `/sys` and the filesystem. A
-failed CPU, memory or disk read throws, and the poll that called it is skipped.
+failed CPU, memory, disk, block or `/proc/net/dev` read throws, and the poll
+that called it is skipped. A failed read of `/sys/class/net` does not throw: the
+snapshot reports the network as unavailable, with the error as `reason`.
 
 Sysfs marks hardware with a `device` entry. Bridges, `veth` pairs, loop and
 device-mapper devices, and partitions have none, so counting only entries that
@@ -73,6 +75,4 @@ A single file with inline CSS and JavaScript, no build step. It fetches
 
 ## Dependencies
 
-There are no runtime dependencies. In `apps/dokploy-status`, `bun run typecheck`
-runs `tsc` against [`tsconfig.json`](../tsconfig.json), `bun run lint` runs
-Biome, `bun run test` runs `bun test`, and `bun run check` runs all three.
+There are no runtime dependencies.

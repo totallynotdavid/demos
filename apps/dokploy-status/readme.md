@@ -26,30 +26,9 @@ JSON:
 curl -s localhost:3000/api/stats | jq .latest
 ```
 
-```json
-{
-  "timestamp": 1791399978062,
-  "cpuUsagePercent": 1.75,
-  "memory": { "usedGB": 2.39, "totalGB": 7.43, "usedPercent": 32.22 },
-  "disk": {
-    "usedGB": 142.52,
-    "totalGB": 1006.85,
-    "freeGB": 813.12,
-    "usedPercent": 14.15
-  },
-  "network": {
-    "available": true,
-    "rxBytesPerSec": 5141316,
-    "txBytesPerSec": 178971
-  },
-  "blockReadBytesPerSec": 2527859,
-  "blockWriteBytesPerSec": 3513781
-}
-```
-
-The server returns unrounded numbers. `bun run dev` does the same as `start` and
-restarts on file changes. `bun run test` runs the tests, and `bun run check`
-runs the type check, lint and tests.
+The fields are in the [API](docs/api.md#sample). `bun run dev` does the same as
+`start` and restarts on file changes. `bun run test` runs the tests, and
+`bun run check` runs the type check, lint and tests.
 
 ## Features
 

@@ -11,6 +11,7 @@ const heading = byId("event-heading");
 const meta = byId("event-meta");
 const loadError = byId("load-error");
 const loadErrorText = byId("load-error-text");
+const retryButton = byId<HTMLButtonElement>("retry-btn");
 const form = byId<HTMLFormElement>("attendance-form");
 const nameInput = byId<HTMLInputElement>("field-name");
 const nameError = byId("name-error");
@@ -44,19 +45,32 @@ async function loadEvent() {
   } catch (error) {
     header.hidden = true;
     form.hidden = true;
-    loadErrorText.textContent = describeLoadFailure(error);
+    const failure = describeLoadFailure(error);
+    loadErrorText.textContent = failure.text;
+    retryButton.hidden = !failure.retry;
     loadError.hidden = false;
-    byId("retry-btn").focus();
+    if (failure.retry) retryButton.focus();
   } finally {
     header.removeAttribute("aria-busy");
   }
 }
 
+// Configuration errors cannot be fixed by retrying. Keep the retry control
+// hidden until the organiser supplies a valid FORM_URL.
 function describeLoadFailure(error: unknown) {
-  if (error instanceof ApiFailure && error.code !== "network") {
-    return error.message;
+  if (
+    error instanceof ApiFailure &&
+    (error.code === "not_configured" || error.code === "bad_config")
+  ) {
+    return {
+      text: "El formulario aún no está listo. Avisa a quien organiza el evento.",
+      retry: false,
+    };
   }
-  return "Revisa tu conexión e inténtalo de nuevo.";
+  return {
+    text: "No pudimos conectar con el formulario. Inténtalo de nuevo.",
+    retry: true,
+  };
 }
 
 function describeSubmitFailure(error: unknown) {
@@ -121,7 +135,7 @@ form.addEventListener("change", (event) => {
   }
 });
 
-byId("retry-btn").addEventListener("click", loadEvent);
+retryButton.addEventListener("click", loadEvent);
 byId("again-btn").addEventListener("click", () => {
   form.reset();
   success.hidden = true;

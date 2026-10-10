@@ -44,8 +44,8 @@ reads the same names from `apps/asistencia/.env`.
 | `FORM_URL`      | yes      | The Form's link (`viewform` or `forms.gle`)          |
 | `DASHBOARD_KEY` | no       | When set, `/panel/` asks for it before showing names |
 
-The Sheet must be shared as "Anyone with the link" with Viewer access. Setup for
-the Form and Sheet is in the [app readme](../apps/asistencia/readme.md).
+Setting up the Form and the Sheet is in the
+[app readme](../apps/asistencia/readme.md#set-it-up).
 
 ### SvelteKit on Vercel
 

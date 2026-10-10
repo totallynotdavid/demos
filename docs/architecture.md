@@ -40,12 +40,12 @@ Each app's readme describes what it does and how its code is organised.
 that has one and skips the rest. An app opts in by defining the script in its
 `package.json`:
 
-| Script      | Defined by                                                |
-| ----------- | --------------------------------------------------------- |
-| `lint`      | every app (`biome check .`)                               |
-| `typecheck` | every app                                                 |
-| `test`      | `asistencia` and `calendario` (`bun test`)                |
-| `build`     | every app except `dokploy-status`, which runs from source |
+| Script      | Defined by                                                                                 |
+| ----------- | ------------------------------------------------------------------------------------------ |
+| `lint`      | every app (`biome check .`)                                                                |
+| `typecheck` | every app                                                                                  |
+| `test`      | `asistencia`, `calendario`, `dokploy-status` (`bun test`), `starred-search` (`vitest run`) |
+| `build`     | every app except `dokploy-status`, which runs from source                                  |
 
 `mise run check` runs all four tasks. `mise run fix` runs
 `biome check --write .` over the repository.
@@ -61,30 +61,10 @@ that has one and skips the rest. An app opts in by defining the script in its
   SvelteKit apps also extend `$app/tsconfig` and typecheck with `svelte-check`.
 - **Tools**: `mise.toml` pins `bun`, `biome` and `node`.
 
-## asistencia: Google Forms ingestion
+## asistencia: shared caches
 
-`asistencia` collects attendance through a Google Form and reads it back from
-the Form's linked Sheet. The Sheet is read on the server with the query endpoint
-behind Sheets' own charts, `/spreadsheets/d/<id>/gviz/tq?tqx=out:json`. It was
-chosen over the alternatives for a teacher who sets this up alone:
-
-| Path                | Setup for the owner                       | Why not                                                        |
-| ------------------- | ----------------------------------------- | -------------------------------------------------------------- |
-| gviz JSON (chosen)  | Share the Sheet as "Anyone with link"     | Undocumented but stable for years; no key, no quota to manage  |
-| Sheets API v4       | Cloud project, API key or service account | More steps for the same data; 300 reads per minute per project |
-| Published CSV       | "Publish to web" and copy a CSV link      | Refreshes minutes late, and dates are locale-formatted strings |
-| Apps Script webhook | Paste a script, deploy it, authorise it   | Most setup, and the owner maintains code in their Sheet        |
-
-The response types its columns and sends dates as `Date(y,m,d,h,mi,s)` literals,
-so parsing does not depend on the Sheet's locale.
-
-Registration reads the Form page, takes the question ids and option text from
-the data Google embeds in it, and posts to the Form's `formResponse` address.
-That removes hard-coded field ids, at the cost of depending on that embedded
-data keeping its shape; `test/fixtures/form.html` is a captured copy that the
-tests parse.
-
-### Shared caches
+The routes, and how the functions read the Sheet and the Form, are in the
+[app readme](../apps/asistencia/readme.md#how-it-works).
 
 Two module-level caches are shared by every request a function instance serves.
 Both are `promiseCache` instances (`api/_lib/cache.ts`) that store the promise
@@ -95,8 +75,8 @@ of a load, so concurrent requests join one request to Google.
 | Sheet | origin, Sheet id and gid | 20 seconds | `loadTable` (`api/_lib/sheet.ts`) | `GET /api/attendance`                    |
 | Form  | the `FORM_URL` address   | 5 minutes  | `loadForm` (`api/_lib/form.ts`)   | `GET /api/form` and `POST /api/register` |
 
-An entry is in one of four states, and `promiseCache.get` and the entry's own
-rejection handler are the only code that moves it:
+An entry is in one of four states. `promiseCache.get`, the entry's own rejection
+handler and `clear` are the only code that moves it:
 
 | From              | To      | Moved by                                                                                |
 | ----------------- | ------- | --------------------------------------------------------------------------------------- |
@@ -107,13 +87,9 @@ rejection handler are the only code that moves it:
 | any               | absent  | `clear`, called by `clearSheetCache` and `clearFormCache` (tests only)                  |
 
 The TTL runs from the moment the load starts, not from when it settles. A failed
-load is never served twice: the next request after the failure starts a new one.
-The rejection handler compares entries rather than keys because a failure can
-arrive after the key has been refilled (the entry expired or was cleared while
-the load was in flight). Deleting by key would then evict the newer, good entry
-and cost one extra request to Google. Nothing is shared between function
-instances or survives a cold start, so each instance makes its own request per
-TTL.
+load is not kept: requests that joined it receive the failure, and the next
+request starts a new load. Nothing is shared between function instances or
+survives a cold start, so each instance makes its own request per TTL.
 
 ## Shared state in starred-search
 

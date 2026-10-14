@@ -8,7 +8,7 @@ be imported.
 
 ## Run a demo
 
-Install [Bun](https://bun.sh) (the workspace pins 1.4.2 in `mise.toml`), then:
+Install [Bun](https://bun.sh) (the workspace pins 1.4.3 in `mise.toml`), then:
 
 ```sh
 bun install

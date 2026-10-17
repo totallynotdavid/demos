@@ -16,15 +16,10 @@ const artwork = (w: number, h: number, color = "4A90E2", text = "") => ({
   bgColor: `#${color}`,
 });
 
-// Basketball player image
 const nbaImage = artwork(800, 1200, "E94B3C", "NBA+2K26");
-// Golf course image
 const golfImage = artwork(1600, 900, "2D5016", "PGA+TOUR");
-// Subway Surfers
 const subwayImage = artwork(800, 1200, "FF6B35", "Subway+Surfers");
-// Apple Pencil article
 const pencilImage = artwork(800, 1200, "F0F0F0", "Apple+Pencil");
-// Notion icon
 const notionIcon = artwork(200, 200, "FFFFFF", "N");
 
 export const mockData = {
@@ -41,7 +36,6 @@ export const mockData = {
     title: "Today",
     shelves: [
       {
-        id: "featured",
         contentType: "todayCard",
         items: [
           {
@@ -73,7 +67,6 @@ export const mockData = {
         ],
       },
       {
-        id: "more-featured",
         title: "The Biggest Apps and Games",
         contentType: "todayCard",
         items: [
@@ -102,7 +95,6 @@ export const mockData = {
         ],
       },
       {
-        id: "must-haves",
         title: "Social media must-haves",
         seeAllUrl: "/collection/social",
         heading: "ESSENTIALS",
@@ -129,7 +121,6 @@ export const mockData = {
         ],
       },
       {
-        id: "streaming",
         title: "Stream solo or with company",
         seeAllUrl: "/collection/streaming",
         heading: "THE LIST",

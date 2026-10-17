@@ -29,5 +29,5 @@ echoes the query.
 
 Components live in [`src/lib/components`](src/lib/components), grouped as
 `items` (cards, badges, media), `layout` (navigation, footer) and `shared`
-(grid, shelf, artwork, rating). Styles are Sass under
+(shelf, artwork, rating). Styles are Sass under
 [`src/lib/styles`](src/lib/styles).

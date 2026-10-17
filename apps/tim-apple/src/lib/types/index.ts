@@ -41,18 +41,6 @@ export interface ArticleImageItem {
   artwork: Artwork;
 }
 
-export interface SearchLink {
-  title: string;
-  url: string;
-}
-
-export interface BrickItem {
-  url: string;
-  media: Artwork;
-  heading?: string;
-  title: string;
-}
-
 export interface LockupItem {
   url: string;
   icon: Artwork;
@@ -70,10 +58,7 @@ export interface TodayCard {
   lockup?: LockupItem;
 }
 
-export type GridItem = unknown;
-
 export interface Shelf {
-  id?: string;
   title?: string;
   contentType?: string;
   seeAllUrl?: string;

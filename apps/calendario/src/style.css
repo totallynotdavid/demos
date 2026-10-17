@@ -13,19 +13,14 @@
   --accent-hover: #7380e6;
 
   --day-work: #27c978;
-  /* Greenish */
   --day-rest: #e5484d;
-  /* Reddish */
   --day-ordering: #f5d90a;
-  /* Yellowish */
   --day-holiday: #9168f5;
-  /* Purpleish */
   --day-empty: #232529;
 
   --font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* Reset & Base */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -41,7 +36,6 @@ body {
   overflow: hidden;
 }
 
-/* Layout */
 .app-container {
   display: flex;
   height: 100vh;
@@ -65,7 +59,6 @@ body {
   overflow: hidden;
 }
 
-/* Brand */
 .brand {
   display: flex;
   align-items: center;
@@ -86,7 +79,6 @@ body {
   border-radius: 6px;
 }
 
-/* Controls */
 .controls {
   flex: 1;
   display: flex;
@@ -172,7 +164,6 @@ body {
   flex: 1;
 }
 
-/* Buttons */
 .primary-btn,
 .secondary-btn {
   width: 100%;
@@ -220,7 +211,6 @@ body {
   margin-bottom: 20px;
 }
 
-/* Sidebar Footer */
 .sidebar-footer {
   padding-top: 20px;
   border-top: 1px solid var(--border-subtle);
@@ -245,7 +235,6 @@ body {
   box-shadow: 0 0 5px rgba(39, 201, 120, 0.4);
 }
 
-/* Main Area */
 .top-bar {
   height: 56px;
   border-bottom: 1px solid var(--border-subtle);
@@ -293,7 +282,6 @@ body {
   background: var(--bg-app);
 }
 
-/* Empty State */
 .empty-state {
   display: flex;
   flex-direction: column;
@@ -322,7 +310,6 @@ body {
   max-width: 300px;
 }
 
-/* Calendar Grid */
 .calendar-wrapper {
   margin-bottom: 48px;
   animation: fadeIn 0.4s ease-out;
@@ -435,7 +422,6 @@ body {
   border: 1px solid var(--border-subtle);
 }
 
-/* Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;

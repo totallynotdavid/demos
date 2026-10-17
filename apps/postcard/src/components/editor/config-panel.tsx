@@ -36,7 +36,6 @@ export function ConfigPanel({
 }: ConfigPanelProps) {
   return (
     <div className="space-y-8 pb-12">
-      {/* reset button */}
       <button
         type="button"
         onClick={onReset}
@@ -48,7 +47,6 @@ export function ConfigPanel({
       </button>
 
       <hr className="border-neutral-800" />
-      {/* type of layout */}
       <section className="space-y-4">
         <Select
           label="Design Layout"
@@ -60,7 +58,6 @@ export function ConfigPanel({
 
       <hr className="border-neutral-800" />
 
-      {/* typography */}
       <section className="space-y-4">
         <h3 className="text-sm font-semibold text-white">Typography</h3>
         <Select
@@ -79,7 +76,6 @@ export function ConfigPanel({
 
       <hr className="border-neutral-800" />
 
-      {/* palette */}
       <section className="space-y-4">
         <h3 className="text-sm font-semibold text-white">Palette</h3>
         <ColorPicker
@@ -101,7 +97,6 @@ export function ConfigPanel({
 
       <hr className="border-neutral-800" />
 
-      {/* dimensions */}
       <section className="space-y-6">
         <h3 className="text-sm font-semibold text-white">Dimensions</h3>
         <Slider
@@ -124,7 +119,6 @@ export function ConfigPanel({
 
       <hr className="border-neutral-800" />
 
-      {/* texture */}
       <section className="space-y-6">
         <h3 className="text-sm font-semibold text-white">Finishing</h3>
         <Slider

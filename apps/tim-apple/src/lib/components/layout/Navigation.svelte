@@ -94,7 +94,6 @@ $: currentPath = page.url.pathname;
         fill: var(--keyColor);
     }
 
-    /* Mobile */
     @media (max-width: 767px) {
         .navigation {
             position: sticky;
@@ -130,7 +129,6 @@ $: currentPath = page.url.pathname;
         }
     }
 
-    /* Desktop */
     @media (min-width: 768px) {
         .navigation {
             height: 100vh;
@@ -158,7 +156,6 @@ $: currentPath = page.url.pathname;
         }
     }
 
-    /* Menu Button */
     $shared-transition-duration: 0.1806s;
     $amp-nav-ease-blue: cubic-bezier(0.04, 0.04, 0.12, 0.96);
 

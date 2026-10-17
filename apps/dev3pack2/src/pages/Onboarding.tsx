@@ -91,7 +91,6 @@ export default function Onboarding() {
   return (
     <div className="min-h-[calc(100vh-48px)] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
-        {/* Title */}
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-bold tracking-tight text-neon mb-2">
             DevProof
@@ -101,9 +100,7 @@ export default function Onboarding() {
           </p>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Name */}
           <div className="space-y-2">
             <label
               htmlFor="name"
@@ -123,7 +120,6 @@ export default function Onboarding() {
             />
           </div>
 
-          {/* Goal */}
           <div className="space-y-2">
             <div className="text-xs text-muted-foreground block">
               <span className="text-neon">$</span> goal
@@ -151,7 +147,6 @@ export default function Onboarding() {
             </div>
           </div>
 
-          {/* Level */}
           <div className="space-y-2">
             <div className="text-xs text-muted-foreground block">
               <span className="text-neon">$</span> level
@@ -174,10 +169,8 @@ export default function Onboarding() {
             </div>
           </div>
 
-          {/* Error */}
           {error && <p className="text-xs text-destructive">{error}</p>}
 
-          {/* Submit */}
           <button
             type="submit"
             disabled={!isValid}

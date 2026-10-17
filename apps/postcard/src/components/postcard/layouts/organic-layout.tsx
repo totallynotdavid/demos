@@ -8,13 +8,11 @@ interface OrganicLayoutProps {
 export function OrganicLayout({ content }: OrganicLayoutProps) {
   return (
     <div className="relative h-full w-full p-(--p-padding) text-(--p-ink) bg-(--p-bg) font-(family-name:--p-font-body) overflow-hidden flex flex-col justify-between">
-      {/* background shape */}
       <div
         className="absolute -top-20 -right-20 w-96 h-96 rounded-full blur-3xl opacity-10 pointer-events-none mix-blend-multiply"
         style={{ backgroundColor: "var(--p-accent)" }}
       />
 
-      {/* header */}
       <header className="relative z-10 flex flex-col items-start gap-4">
         <h1
           className="text-8xl leading-[0.85] font-(family-name:--p-font-head) tracking-tight"
@@ -30,7 +28,6 @@ export function OrganicLayout({ content }: OrganicLayoutProps) {
         </span>
       </header>
 
-      {/* middle: service list */}
       <main className="relative z-10 max-w-[70%] self-end text-right mt-auto mb-12">
         <ServiceCluster
           services={content.services}
@@ -39,7 +36,6 @@ export function OrganicLayout({ content }: OrganicLayoutProps) {
         />
       </main>
 
-      {/* footer */}
       <footer
         className="relative z-10 flex items-end justify-between text-xs opacity-75 border-t pt-4"
         style={{ borderColor: "var(--p-accent)" }}

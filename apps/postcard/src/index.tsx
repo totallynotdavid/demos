@@ -24,7 +24,6 @@ function App() {
   return (
     <div className="h-screen w-screen bg-[#1c1c1c] text-white flex overflow-hidden">
       <div className="flex-1 flex flex-col relative">
-        {/* header */}
         <header className="absolute top-0 left-0 right-0 p-6 flex justify-between items-start pointer-events-none z-10">
           <div className="pointer-events-auto flex items-center gap-2">
             <span className="text-xs font-bold tracking-widest text-neutral-500 uppercase">
@@ -45,7 +44,6 @@ function App() {
           </div>
         </header>
 
-        {/* workspace */}
         <main className="flex-1 flex items-center justify-center overflow-hidden relative">
           <div
             style={{ transform: `scale(${zoom * BASE_SCALE})` }}
@@ -58,7 +56,6 @@ function App() {
             />
           </div>
 
-          {/* toolbar */}
           <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
             <ViewToolbar
               zoom={zoom}
@@ -71,7 +68,6 @@ function App() {
         </main>
       </div>
 
-      {/* config sidebar */}
       <aside className="w-80 bg-neutral-900 border-l border-neutral-800 h-screen flex flex-col z-20 shadow-2xl">
         <div className="p-6 overflow-y-auto custom-scrollbar">
           <ConfigPanel

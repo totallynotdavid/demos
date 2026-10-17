@@ -8,10 +8,8 @@ interface SwissLayoutProps {
 export function SwissLayout({ content }: SwissLayoutProps) {
   return (
     <div className="relative h-full w-full bg-(--p-bg) text-(--p-ink) font-(family-name:--p-font-body) overflow-hidden flex flex-col">
-      {/* background grid */}
       <GridLines opacity={0.15} />
 
-      {/* title */}
       <header className="relative z-10 flex-1 flex flex-col justify-between p-(--p-padding) border-b-2 border-current">
         <div className="flex justify-between items-start">
           <span className="text-4xl font-bold opacity-20">01</span>
@@ -26,7 +24,6 @@ export function SwissLayout({ content }: SwissLayoutProps) {
       </header>
 
       <main className="relative z-10 flex h-[45%]">
-        {/* left: list of services */}
         <div className="flex-1 p-(--p-padding) border-r border-current flex flex-col justify-center">
           <h3 className="text-xs font-bold uppercase mb-4 opacity-50">
             Treatment menu
@@ -44,7 +41,6 @@ export function SwissLayout({ content }: SwissLayoutProps) {
           </ul>
         </div>
 
-        {/* contact */}
         <div className="w-[40%] flex flex-col">
           <div className="flex-1 p-(--p-padding) border-b border-current flex flex-col justify-center bg-(--p-ink) text-(--p-bg)">
             <div className="text-xs leading-relaxed font-mono">

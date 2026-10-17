@@ -58,15 +58,11 @@ export default function Achievement() {
   return (
     <div className="min-h-[calc(100vh-48px)] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
-        {/* SBT Card */}
         <div className="animate-mint-reveal">
           <div className="bg-card border border-neon/30 rounded-xl overflow-hidden glow-green-strong">
-            {/* Card top accent */}
             <div className="h-1 bg-gradient-to-r from-neon via-blue to-neon" />
 
-            {/* Card content */}
             <div className="p-6 md:p-8">
-              {/* Icon and title */}
               <div className="flex items-center justify-center mb-6">
                 <div className="w-16 h-16 rounded-full bg-neon/10 border border-neon/30 flex items-center justify-center animate-pulse-glow">
                   <Shield className="w-8 h-8 text-neon" />
@@ -85,10 +81,8 @@ export default function Achievement() {
                 </p>
               </div>
 
-              {/* Divider */}
               <div className="border-t border-surface-border my-5" />
 
-              {/* Fields */}
               <div className="space-y-3">
                 <CopyableField
                   label="Token ID"
@@ -104,7 +98,6 @@ export default function Achievement() {
                 />
               </div>
 
-              {/* Properties */}
               <div className="mt-5 grid grid-cols-2 gap-2">
                 <div className="bg-background rounded px-3 py-2 border border-surface-border">
                   <div className="text-[10px] text-muted-foreground">Type</div>
@@ -127,7 +120,6 @@ export default function Achievement() {
           </div>
         </div>
 
-        {/* Back button */}
         <button
           type="button"
           onClick={() => setScreen("roadmap")}

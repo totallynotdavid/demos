@@ -12,7 +12,6 @@ export interface Sample {
   cpuUsagePercent: number;
   memory: Snapshot["memory"];
   disk: Snapshot["disk"];
-  // Expose rates for charting instead of cumulative counters.
   network: NetworkSample;
   blockReadBytesPerSec: number;
   blockWriteBytesPerSec: number;

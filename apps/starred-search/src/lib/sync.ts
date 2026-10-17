@@ -84,12 +84,6 @@ export function clearCache(options: SyncOptions): Promise<SyncResult> {
   });
 }
 
-/**
- * A cache written by one kind of source is not valid for the other. A token
- * that arrives needs READMEs and lists the cache lacks. A token that goes away
- * must not leave behind READMEs and lists that incremental syncs would no
- * longer keep current. Either way the whole cache is rewritten.
- */
 function needsFull(meta: SyncMeta, run: Run): boolean {
   if (meta.resume) return true;
   if (meta.detail !== run.source.detail) return true;
@@ -198,12 +192,6 @@ async function fullSync(run: Run, meta: SyncMeta | null): Promise<SyncResult> {
   return { status: "synced", fetched, removed };
 }
 
-/**
- * Without a token the cache must not keep what a token fetched. A full sync
- * overwrites repos page by page, so one that stops early would leave the repos
- * it has not reached with their READMEs and lists. They go first, before any
- * request, and the meta says `basic` from then on.
- */
 async function dropTokenData(run: Run, meta: SyncMeta): Promise<SyncMeta> {
   if (run.source.detail !== "basic") return meta;
 

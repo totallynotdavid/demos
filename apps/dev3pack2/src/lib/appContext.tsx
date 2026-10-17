@@ -67,7 +67,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           return skill;
         });
 
-        // Unlock next locked skill
         const completedIndex = skills.findIndex((s) => s.id === skillId);
         const nextLocked = skills.find(
           (s, i) => i > completedIndex && s.status === "locked",

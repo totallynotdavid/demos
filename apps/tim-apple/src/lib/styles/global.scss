@@ -1,4 +1,3 @@
-// Colors
 :root {
     --keyColor: #007aff;
     --keyColor-rgb: 0, 122, 255;
@@ -14,20 +13,16 @@
 
     --navSidebarSelectedState: #e8e8ed;
 
-    // Spacing
     --bodyGutter: 20px;
 
-    // Borders
     --border-radius-small: 6px;
     --border-radius-medium: 12px;
     --border-radius-large: 18px;
     --border-radius-xlarge: 28px;
 
-    // Shadows
     --shadow-small: 0 1px 3px rgba(0, 0, 0, 0.08);
     --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.12);
 
-    // Typography
     --large-title-emphasized: 700 40px/1.05 -apple-system, sans-serif;
     --large-title: 400 40px/1.05 -apple-system, sans-serif;
 
@@ -69,7 +64,6 @@
     }
 }
 
-// Button styles
 .get-button {
     font: var(--get-button-font, var(--subhead-bold));
     padding: 6px 16px;
@@ -102,7 +96,6 @@
     backdrop-filter: blur(10px);
 }
 
-// Reset
 *,
 *::before,
 *::after {

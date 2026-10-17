@@ -3,7 +3,6 @@ import type { Challenge, EvaluationResult, Goal, Level, Skill } from "./types";
 // Simulated delay for realistic UX
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// Roadmap skill banks per goal
 const skillBanks: Record<Goal, Array<{ name: string; description: string }>> = {
   "get-a-job": [
     {
@@ -229,7 +228,6 @@ const challengeBanks: Record<string, Record<Level, string>> = {
     senior:
       "Design and implement a text autocomplete system that handles: prefix matching, ranking by frequency, fuzzy matching for typos, and efficient memory usage for a dictionary of 1M words.",
   },
-  // Learn a new stack
   "Rust Fundamentals": {
     junior:
       "Explain ownership and borrowing in Rust with a code example. Show what happens when you try to use a moved value and how to fix it with references.",
@@ -300,7 +298,6 @@ const challengeBanks: Record<string, Record<Level, string>> = {
     senior:
       "Design a zero-downtime upgrade strategy for a live DeFi protocol. Address: state migration, backward compatibility, user communication, and emergency procedures.",
   },
-  // Specialize
   "Advanced TypeScript": {
     junior:
       "Explain the difference between `type` and `interface` in TypeScript. When would you prefer one over the other? Give examples of features unique to each.",

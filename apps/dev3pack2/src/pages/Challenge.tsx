@@ -59,7 +59,6 @@ export default function Challenge() {
 
       if (evalResult.passed && skill) {
         const achievement = createAchievement();
-        // Small delay before transitioning
         setTimeout(() => {
           completeSkill(skill.id, {
             ...achievement,
@@ -88,7 +87,6 @@ export default function Challenge() {
     return null;
   }
 
-  // Loading state
   if (loadingChallenge) {
     return (
       <div className="min-h-[calc(100vh-48px)] flex items-center justify-center px-4">
@@ -115,7 +113,6 @@ export default function Challenge() {
   return (
     <div className="min-h-[calc(100vh-48px)] px-4 py-8 md:py-12">
       <div className="max-w-2xl mx-auto">
-        {/* Back */}
         <button
           type="button"
           onClick={handleBack}
@@ -125,7 +122,6 @@ export default function Challenge() {
           back to roadmap
         </button>
 
-        {/* Skill header */}
         <div className="mb-6">
           <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
             <span className="text-neon">$</span>
@@ -140,7 +136,6 @@ export default function Challenge() {
           </p>
         </div>
 
-        {/* Challenge prompt */}
         <div className="bg-card border border-surface-border rounded-lg p-4 md:p-5 mb-6 animate-fade-up">
           <div className="text-[10px] uppercase tracking-wider text-blue font-semibold mb-3">
             Challenge
@@ -150,7 +145,6 @@ export default function Challenge() {
           </p>
         </div>
 
-        {/* Answer area */}
         {!result && (
           <div className="space-y-4 animate-fade-up animate-delay-200">
             <div>
@@ -201,7 +195,6 @@ export default function Challenge() {
           </div>
         )}
 
-        {/* Result */}
         {result && (
           <div
             className={`rounded-lg border p-5 animate-fade-up ${

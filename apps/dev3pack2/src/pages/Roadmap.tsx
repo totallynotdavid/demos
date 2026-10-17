@@ -33,7 +33,6 @@ function SkillCard({ skill, index }: { skill: Skill; index: number }) {
       }}
     >
       <div className="flex items-start gap-3">
-        {/* Status icon */}
         <div className="mt-0.5 flex-shrink-0">
           {isCompleted ? (
             <CheckCircle2 className="w-4 h-4 text-neon" />
@@ -44,7 +43,6 @@ function SkillCard({ skill, index }: { skill: Skill; index: number }) {
           )}
         </div>
 
-        {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-2">
             <h3
@@ -70,7 +68,6 @@ function SkillCard({ skill, index }: { skill: Skill; index: number }) {
             {skill.description}
           </p>
 
-          {/* Status badge */}
           <div className="mt-2">
             {isCompleted && (
               <span className="inline-flex items-center text-[10px] uppercase tracking-wider font-semibold text-neon bg-neon/10 px-2 py-0.5 rounded">
@@ -103,7 +100,6 @@ export default function Roadmap() {
   return (
     <div className="min-h-[calc(100vh-48px)] px-4 py-8 md:py-12">
       <div className="max-w-2xl mx-auto">
-        {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-2 text-xs text-muted-foreground mb-3">
             <span className="text-neon">$</span>
@@ -122,7 +118,6 @@ export default function Roadmap() {
           </p>
         </div>
 
-        {/* Progress bar */}
         <div className="mb-6 p-4 bg-card border border-surface-border rounded-lg">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs text-muted-foreground">Progress</span>
@@ -145,14 +140,12 @@ export default function Roadmap() {
           )}
         </div>
 
-        {/* Skill cards */}
         <div className="space-y-2">
           {skills.map((skill, index) => (
             <SkillCard key={skill.id} skill={skill} index={index} />
           ))}
         </div>
 
-        {/* All complete */}
         {completed === total && total > 0 && (
           <div className="mt-8 p-6 bg-neon/5 border border-neon/20 rounded-lg text-center animate-fade-up">
             <div className="text-neon text-lg font-bold mb-1">

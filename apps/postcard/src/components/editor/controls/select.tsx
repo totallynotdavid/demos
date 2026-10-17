@@ -32,7 +32,6 @@ export function Select({ label, value, options, onChange }: SelectProps) {
           ))}
         </select>
 
-        {/* arrow indicator */}
         <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
           <svg
             aria-hidden="true"

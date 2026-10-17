@@ -28,5 +28,5 @@ export const DEFAULT_CONFIG: PostcardConfig = {
     width: 600,
     height: 400,
   },
-  style: LAYOUT_PRESETS["classic"],
+  style: LAYOUT_PRESETS.classic,
 };

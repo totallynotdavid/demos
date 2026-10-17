@@ -61,7 +61,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     .transition-preview {
-      transition: none !important;
+      transition: none;
     }
   }
 
@@ -136,7 +136,7 @@
     position: fixed;
     left: 50%;
     top: 50%;
-    transform: translate(-50%, -50%) !important;
+    transform: translate(-50%, -50%);
     margin: 0;
     box-shadow: none;
     border: 1px solid #ddd;
@@ -149,6 +149,6 @@
   body,
   #root,
   main {
-    background: white !important;
+    background: white;
   }
 }

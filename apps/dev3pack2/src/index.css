@@ -230,30 +230,3 @@
     animation-delay: 900ms;
   }
 }
-
-/* Override Solana wallet button */
-.wallet-adapter-button {
-  font-family: "JetBrains Mono", monospace !important;
-  background-color: hsl(var(--surface)) !important;
-  border: 1px solid hsl(var(--surface-border)) !important;
-  border-radius: var(--radius) !important;
-  color: hsl(var(--foreground)) !important;
-  font-size: 0.75rem !important;
-  height: 36px !important;
-  padding: 0 12px !important;
-  transition: all 0.2s ease !important;
-}
-.wallet-adapter-button:hover {
-  background-color: hsl(var(--surface-hover)) !important;
-  border-color: hsl(var(--neon) / 0.4) !important;
-}
-.wallet-adapter-button-trigger {
-  background-color: hsl(var(--surface)) !important;
-}
-.wallet-adapter-modal-wrapper {
-  font-family: "JetBrains Mono", monospace !important;
-  background-color: hsl(var(--card)) !important;
-}
-.wallet-adapter-modal-button-close {
-  background-color: hsl(var(--muted)) !important;
-}

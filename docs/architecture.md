@@ -87,7 +87,7 @@ handler and `clear` are the only code that moves it:
 | pending           | fresh   | the load resolving; nothing is written, the stored promise just settles                 |
 | pending           | absent  | the entry's own rejection handler, only if the key still holds that same entry          |
 | fresh             | expired | time: `get` treats an entry older than the TTL as absent and replaces it                |
-| any               | absent  | `clear`, called by `clearSheetCache` and `clearFormCache` (tests only)                  |
+| any               | absent  | `clear`, called by `clearFormCache` (tests only)                                        |
 
 The TTL runs from the moment the load starts, not from when it settles. A failed
 load is not kept: requests that joined it receive the failure, and the next

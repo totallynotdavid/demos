@@ -54,8 +54,6 @@ export function loadTable(ref: SheetRef): Promise<Table> {
   );
 }
 
-export const clearSheetCache = tables.clear;
-
 async function fetchTable({ origin, id, gid }: SheetRef) {
   const query = new URLSearchParams({ tqx: "out:json" });
   if (gid) query.set("gid", gid);

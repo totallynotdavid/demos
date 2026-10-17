@@ -1,4 +1,4 @@
-export interface PostMetadata {
+interface PostMetadata {
   title: string;
   slug: string;
   date: string;

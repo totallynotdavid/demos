@@ -14,7 +14,7 @@ export const RANGES = [
 
 export type RangeId = (typeof RANGES)[number]["id"];
 
-export const EVENTS_PER_PAGE = 100;
+const EVENTS_PER_PAGE = 100;
 /** GitHub serves at most 300 events, so three pages of 100 is everything. */
 const MAX_EVENT_PAGES = 3;
 const EVENTS_MAX_AGE_MS = 60_000;

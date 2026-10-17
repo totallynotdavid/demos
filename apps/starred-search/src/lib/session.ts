@@ -63,10 +63,6 @@ export const INITIAL: SessionState = {
   problem: null,
 };
 
-/**
- * Without a token the page shows a cache as basic even if a token filled it.
- * The next sync strips it, and the page does not wait for that.
- */
 function fromMeta(meta: SyncMeta | null, hasToken: boolean) {
   const detail = hasToken ? meta?.detail : meta && "basic";
   return {
@@ -78,7 +74,7 @@ function fromMeta(meta: SyncMeta | null, hasToken: boolean) {
   };
 }
 
-export function problemOf(result: SyncResult): Problem | null {
+function problemOf(result: SyncResult): Problem | null {
   if (result.status === "rate-limited") {
     return { kind: "rate-limited", resetAt: result.resetAt };
   }
@@ -100,12 +96,6 @@ function mergeById(current: Repo[], incoming: Repo[]): Repo[] {
   return [...byId.values()];
 }
 
-/**
- * What one page shows of one account's cache, and the only place that decides
- * when to sync it. Cache writes go through `refresh`, `fullResync` and
- * `clearCache`, which hold the sync lock. Other tabs are told through a
- * BroadcastChannel when a sync finishes or the cache is deleted.
- */
 export class StarredSession {
   private state: SessionState = INITIAL;
   private readonly listeners = new Set<() => void>();

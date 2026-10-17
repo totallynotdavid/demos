@@ -25,12 +25,11 @@ function toIso(ms: number): IsoDate {
   return new Date(ms).toISOString().slice(0, 10);
 }
 
-/** Throws unless `date` is a real `YYYY-MM-DD` date. */
 export function assertIsoDate(date: string): void {
   parse(date);
 }
 
-export function isoDate(year: number, month: number, day: number): IsoDate {
+function isoDate(year: number, month: number, day: number): IsoDate {
   return toIso(toUtc(year, month, day));
 }
 
@@ -55,7 +54,7 @@ export function daysBetween(from: IsoDate, to: IsoDate): number {
   return Math.round((parse(to) - parse(from)) / MS_PER_DAY);
 }
 
-export function isLeapYear(year: number): boolean {
+function isLeapYear(year: number): boolean {
   return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
 }
 
@@ -95,7 +94,6 @@ export function allIsoWeeks(year: number): number[] {
   return Array.from({ length: last - first + 1 }, (_, i) => first + i);
 }
 
-/** The dates of an ISO week that fall inside `year`. */
 export function weekDatesInYear(year: number, week: number): IsoDate[] {
   const [monday] = isoWeekDates(year, week);
   return Array.from({ length: 7 }, (_, i) => addDays(monday, i)).filter(

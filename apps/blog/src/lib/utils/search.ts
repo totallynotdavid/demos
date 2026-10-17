@@ -1,10 +1,10 @@
 import type { Post, SearchResult } from "../types";
 
-export function escapeRegex(str: string): string {
+function escapeRegex(str: string): string {
   return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-export function countMatches(text: string | undefined, query: string): number {
+function countMatches(text: string | undefined, query: string): number {
   if (!text || !query) return 0;
   const regex = new RegExp(escapeRegex(query), "gi");
   const matches = text.match(regex);

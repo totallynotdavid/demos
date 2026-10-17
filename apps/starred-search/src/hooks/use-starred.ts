@@ -1,13 +1,6 @@
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import type { GitHubClient } from "@/lib/github";
-import {
-  INITIAL,
-  type Problem,
-  type SessionState,
-  StarredSession,
-} from "@/lib/session";
-
-export type { Problem };
+import { INITIAL, type SessionState, StarredSession } from "@/lib/session";
 
 export interface Starred extends SessionState {
   sync(): void;

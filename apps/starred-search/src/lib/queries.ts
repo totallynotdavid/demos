@@ -119,7 +119,7 @@ export interface ListItems {
 }
 
 /** Keeps the search index and the cache bounded for pathological READMEs. */
-export const MAX_README_CHARS = 100_000;
+const MAX_README_CHARS = 100_000;
 
 function readmeOf(node: StarredNode): string | null {
   for (let index = 0; index < README_FILES.length; index++) {

@@ -4,7 +4,6 @@ import { ApiError, fetchGoogle } from "./http.js";
 
 export interface FormInfo {
   title: string;
-  // First line of the form description, then the remaining lines.
   heading: string;
   details: string[];
   action: string;
@@ -40,7 +39,7 @@ function loadData(html: string): Json {
   }
 }
 
-export function parseFormPage(html: string, finalUrl: string): FormInfo {
+function parseFormPage(html: string, finalUrl: string): FormInfo {
   const base =
     /^(https?:\/\/[^/]+\/forms\/(?:u\/\d+\/)?d\/(?:e\/)?[\w-]+)/.exec(
       finalUrl,

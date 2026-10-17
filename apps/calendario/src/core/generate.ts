@@ -1,7 +1,6 @@
 import { assertIsoDate, type IsoDate, yearOf } from "./dates.ts";
 import { Calendar } from "./domain.ts";
 import { processHolidays } from "./holidays.ts";
-import { getEcuadorHolidays } from "./presets.ts";
 import { type Rng, seededRng } from "./random.ts";
 import { buildSchedule } from "./schedule.ts";
 import { validateCalendar } from "./validation.ts";
@@ -39,25 +38,4 @@ export function generateCalendar(
   const calendar = new Calendar(year, days);
   validateCalendar(calendar);
   return calendar;
-}
-
-export function generateEcuadorCalendar(year: number, seed?: number): Calendar {
-  return generateCalendar(year, { holidays: getEcuadorHolidays(year), seed });
-}
-
-/** One calendar per worker. Worker `i` uses seed `baseSeed + i`. */
-export function generateMultipleCalendars(
-  year: number,
-  workers: number,
-  {
-    holidays,
-    baseSeed,
-  }: { holidays?: readonly IsoDate[]; baseSeed?: number } = {},
-): Calendar[] {
-  return Array.from({ length: workers }, (_, i) =>
-    generateCalendar(year, {
-      holidays,
-      seed: baseSeed === undefined ? undefined : baseSeed + i,
-    }),
-  );
 }

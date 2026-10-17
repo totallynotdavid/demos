@@ -50,8 +50,6 @@ const calendar = generateCalendar(2026, {
 per date. A day's `dayType` is `WORK`, `REST`, `ORDERING`, `HOLIDAY` or
 `WORKING_HOLIDAY`. Holidays are `YYYY-MM-DD` strings in the target year. With a
 `seed` the result repeats; without one every call differs.
-`generateMultipleCalendars(year, workers, { holidays, baseSeed })` builds one
-calendar per worker, using seed `baseSeed + i` for worker `i`.
 
 Invalid input throws an `Error`: a year outside 1 to 9999, a malformed or
 duplicate holiday, a holiday outside the year, and the holiday patterns rule 1

@@ -35,20 +35,21 @@ Each app's readme describes what it does and how its code is organised.
 
 ## What the tooling expects of an app
 
-`mise.toml` defines the tasks `lint`, `typecheck`, `test` and `build`. Each runs
+`mise.toml` defines the tasks `typecheck`, `test` and `build`. Each runs
 `bun run --filter '*' <script>`, so it runs the script of that name in every app
 that has one and skips the rest. An app opts in by defining the script in its
 `package.json`:
 
 | Script      | Defined by                                                                                 |
 | ----------- | ------------------------------------------------------------------------------------------ |
-| `lint`      | every app (`biome check .`)                                                                |
 | `typecheck` | every app                                                                                  |
 | `test`      | `asistencia`, `calendario`, `dokploy-status` (`bun test`), `starred-search` (`vitest run`) |
 | `build`     | every app except `dokploy-status`, which runs from source                                  |
 
-`mise run check` runs all four tasks. `mise run fix` runs
-`biome check --write .` over the repository.
+`lint` and `fix` run once over the whole repository, not per app. `lint` runs
+`biome check --error-on-warnings .` and checks Markdown and YAML with `oxfmt`.
+`fix` applies Biome's safe fixes and formats Markdown and YAML. `mise run check`
+runs `lint`, `typecheck`, `test` and `build`. Only `fix` changes tracked files.
 
 ## Shared configuration
 
@@ -59,7 +60,9 @@ that has one and skips the rest. An app opts in by defining the script in its
   fixtures; read their files for what they change.
 - **TypeScript**: each app's `tsconfig.json` extends `tsconfig.base.json`. The
   SvelteKit apps also extend `$app/tsconfig` and typecheck with `svelte-check`.
-- **Tools**: `mise.toml` pins `bun`, `biome` and `node`.
+- **Markdown and YAML**: `.oxfmtrc.json` sets the width and skips `.agents` and
+  `.claude`.
+- **Tools**: `mise.toml` pins `bun` and `node`. `bun.lock` pins Biome and oxfmt.
 
 ## asistencia: shared caches
 

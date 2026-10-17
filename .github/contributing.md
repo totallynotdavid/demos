@@ -5,12 +5,12 @@ holds what and what the tooling expects of an app.
 
 ## Set up
 
-[mise](https://mise.jdx.dev) installs the pinned tools (`bun`, `biome`, `node`
-in `mise.toml`):
+[mise](https://mise.jdx.dev) installs the pinned tools (`bun` and `node` in
+`mise.toml`) and runs the project's tasks:
 
 ```sh
 mise install
-bun install
+mise run install
 ```
 
 ## Check a change
@@ -20,21 +20,16 @@ mise run check
 mise run fix
 ```
 
-`mise run lint`, `typecheck`, `test` and `build` run one step each. To work on a
-single app, run its scripts from its folder, for example
-`cd apps/calendario && bun run test`. From the root,
+`mise run lint`, `typecheck`, `test` and `build` run one step each. The
+[architecture](../docs/architecture.md#what-the-tooling-expects-of-an-app) says
+what each task does. To work on a single app, run its scripts from its folder,
+for example `cd apps/calendario && bun run test`. From the root,
 `bun run --filter calendario test` does the same by package name.
 
-CI (`.github/workflows/ci.yml`) runs `bun install --frozen-lockfile` and
-`mise run check` on every pull request and on pushes to `master`. Commit
-`bun.lock` with any dependency change, or the frozen install fails. Dependabot
-opens grouped weekly updates for dependencies and workflow actions.
-
-Format Markdown with:
-
-```sh
-bunx prettier --print-width 80 --prose-wrap always --write path/to/file.md
-```
+CI (`.github/workflows/ci.yml`) runs `mise run install` and `mise run check` on
+every pull request and on pushes to `master`. Commit `bun.lock` with any
+dependency change, or the frozen install fails. Dependabot opens grouped weekly
+updates for dependencies and workflow actions.
 
 ## Add a demo
 

@@ -8,10 +8,12 @@ be imported.
 
 ## Run a demo
 
-Install [Bun](https://bun.sh) (the workspace pins 1.4.3 in `mise.toml`), then:
+Install [mise](https://mise.jdx.dev), which provides the pinned Bun and Node
+versions from `mise.toml`, then:
 
 ```sh
-bun install
+mise install
+mise run install
 cd apps/calendario
 bun run dev
 ```

@@ -28,7 +28,7 @@ curl -s localhost:3000/api/stats | jq .latest
 
 The fields are in the [API](docs/api.md#sample). `bun run dev` does the same as
 `start` and restarts on file changes. `bun run test` runs the tests, and
-`bun run check` runs the type check, lint and tests.
+`bun run typecheck` runs the type check.
 
 ## Features
 

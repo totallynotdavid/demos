@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "tw-animate-css";
 @config "../tailwind.config.js";
 
 @layer base {
@@ -34,14 +33,12 @@
 
     --radius: 0.375rem;
 
-    /* Custom tokens */
     --neon: 135 55% 49%;
     --blue: 212 100% 67%;
     --surface: 0 0% 7%;
     --surface-hover: 0 0% 10%;
     --surface-border: 0 0% 16%;
 
-    /* Glow effects */
     --glow-green: 0 0 20px hsla(135, 55%, 49%, 0.3);
     --glow-blue: 0 0 20px hsla(212, 100%, 67%, 0.3);
     --glow-green-strong:
@@ -67,7 +64,6 @@
     color: hsl(var(--primary));
   }
 
-  /* Scrollbar */
   ::-webkit-scrollbar {
     width: 6px;
   }
@@ -118,7 +114,6 @@
     background-color: hsl(var(--neon));
   }
 
-  /* Terminal cursor blink */
   .cursor-blink::after {
     content: "█";
     animation: blink 1s step-end infinite;

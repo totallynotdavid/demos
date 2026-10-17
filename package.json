@@ -5,6 +5,8 @@
     "apps/*"
   ],
   "devDependencies": {
+    "@biomejs/biome": "2.5.15",
+    "oxfmt": "0.73.0",
     "typescript": "~6"
   }
 }

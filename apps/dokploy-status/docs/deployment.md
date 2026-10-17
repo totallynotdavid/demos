@@ -20,9 +20,11 @@ container's own `eth0`. The app detects this and shows a message in the network
 card instead of numbers. Host networking publishes the port on the host
 directly, so `-p` has no effect. To change the port, add `-e PORT=8080`.
 
-The image is based on `oven/bun:1.4-alpine`. It installs only this app's
-production dependencies from the frozen lockfile, runs as the unprivileged `bun`
-user, and needs no volumes, database or environment beyond the port.
+The image is based on `oven/bun:<version>-alpine`, where `<version>` is the Bun
+version pinned in the root `mise.toml`. Change both together. The image installs
+only this app's production dependencies from the frozen lockfile, runs as the
+unprivileged `bun` user, and needs no volumes, database or environment beyond
+the port.
 
 In Dokploy, create an application on the host it monitors. Set the Dockerfile
 path to `apps/dokploy-status/Dockerfile` and the build context to the repository

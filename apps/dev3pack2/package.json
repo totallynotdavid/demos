@@ -8,7 +8,6 @@
     "build": "vite build",
     "preview": "vite preview",
     "watch": "vite build --watch",
-    "lint": "biome check .",
     "typecheck": "tsc"
   },
   "dependencies": {

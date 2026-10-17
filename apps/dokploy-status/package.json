@@ -7,10 +7,8 @@
   "scripts": {
     "dev": "bun --watch src/index.ts",
     "start": "bun run src/index.ts",
-    "lint": "biome check .",
     "typecheck": "tsc",
-    "test": "bun test",
-    "check": "bun run typecheck && bun run lint && bun run test"
+    "test": "bun test"
   },
   "devDependencies": {
     "@types/bun": "1.4.3"

@@ -1,28 +1,42 @@
 [tools]
 bun = "1.4.3"
-biome = "2.5.15"
-node = "24"
+node = "24.22.0"
+
+[env]
+_.path = ["{{config_root}}/node_modules/.bin"]
+
+[tasks.install]
+description = "Install dependencies from the lockfile"
+run = "bun install --frozen-lockfile"
 
 [tasks.lint]
-description = "Lint and format-check every app"
-run = "bun run --filter '*' lint"
+description = "Check lint and formatting"
+depends = ["lint:*"]
+
+[tasks."lint:code"]
+description = "Biome lint and format check"
+run = "biome check --error-on-warnings ."
+
+[tasks."lint:docs"]
+description = "Check Markdown and YAML formatting"
+run = "oxfmt --check '**/*.{md,yml,yaml}'"
+
+[tasks.fix]
+description = "Apply safe lint fixes and format code, Markdown and YAML"
+run = ["biome check --write .", "oxfmt '**/*.{md,yml,yaml}'"]
 
 [tasks.typecheck]
 description = "Typecheck every app"
 run = "bun run --filter '*' typecheck"
 
-[tasks.build]
-description = "Build every app"
-run = "bun run --filter '*' build"
-
 [tasks.test]
 description = "Run every app's tests"
 run = "bun run --filter '*' test"
 
+[tasks.build]
+description = "Build every app"
+run = "bun run --filter '*' build"
+
 [tasks.check]
 description = "Lint, typecheck, test and build every app"
 depends = ["lint", "typecheck", "test", "build"]
-
-[tasks.fix]
-description = "Format and apply safe lint fixes"
-run = "biome check --write ."

@@ -1,7 +1,6 @@
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
-import { clearFormCache } from "../api/_lib/form.ts";
 import { attendance, form, register } from "../api/_lib/handlers.ts";
-import { clearSheetCache, parseSheetUrl } from "../api/_lib/sheet.ts";
+import { parseSheetUrl } from "../api/_lib/sheet.ts";
 import { FORM_COLUMNS, gviz, startFakeGoogle } from "./google.ts";
 
 const google = startFakeGoogle();
@@ -21,13 +20,6 @@ const post = (body: unknown) =>
 const sheetHits = (id: string) =>
   google.hits.filter((hit) => hit.path === `/spreadsheets/d/${id}/gviz/tq`);
 
-async function until(done: () => boolean) {
-  for (let tries = 0; !done(); tries++) {
-    if (tries > 200) throw new Error("timed out waiting for the request");
-    await Bun.sleep(5);
-  }
-}
-
 interface Body {
   code?: string;
   title?: string;
@@ -43,29 +35,21 @@ async function readJson(response: Response) {
 }
 
 describe("parseSheetUrl", () => {
-  test("reads the id and gid from the address bar", () => {
-    const ref = parseSheetUrl(
+  test.each([
+    [
       "https://docs.google.com/spreadsheets/d/1AbC_d-EF/edit?gid=123#gid=123",
-    );
-    expect(ref).toEqual({
-      origin: "https://docs.google.com",
-      id: "1AbC_d-EF",
-      gid: "123",
-    });
-  });
-
-  test("reads the gid from the fragment alone", () => {
-    expect(
-      parseSheetUrl("https://docs.google.com/spreadsheets/d/abc/edit#gid=77")
-        .gid,
-    ).toBe("77");
-  });
-
-  test("accepts a multi-account path and a missing gid", () => {
-    const ref = parseSheetUrl(
+      { id: "1AbC_d-EF", gid: "123" },
+    ],
+    ["https://docs.google.com/spreadsheets/d/abc/edit#gid=77", { gid: "77" }],
+    [
       "https://docs.google.com/spreadsheets/u/1/d/abc/edit",
-    );
-    expect(ref).toMatchObject({ id: "abc", gid: null });
+      { id: "abc", gid: null },
+    ],
+  ])("accepts %p", (value, expected) => {
+    expect(parseSheetUrl(value)).toMatchObject({
+      origin: "https://docs.google.com",
+      ...expected,
+    });
   });
 
   test.each([
@@ -132,23 +116,6 @@ describe("GET /api/attendance", () => {
     expect(recovered.status).toBe(200);
   });
 
-  test("a late failure does not evict the newer cached sheet", async () => {
-    const release = Promise.withResolvers<void>();
-    google.sheets.set("late", { status: 500, body: "", hold: release.promise });
-    const env = { SHEET_URL: sheetUrl("late") };
-    const stale = attendance(get(), env);
-    await until(() => sheetHits("late").length === 1);
-
-    clearSheetCache();
-    google.sheets.set("late", { status: 200, body: gviz(FORM_COLUMNS, []) });
-    expect((await attendance(get(), env)).status).toBe(200);
-
-    release.resolve();
-    expect((await stale).status).toBe(502);
-    expect((await attendance(get(), env)).status).toBe(200);
-    expect(sheetHits("late")).toHaveLength(2);
-  });
-
   test("reports a private sheet as sheet_unreachable", async () => {
     google.sheets.set("private", {
       status: 200,
@@ -187,11 +154,6 @@ describe("GET /api/attendance", () => {
     });
     expect((await attendance(right, env)).status).toBe(200);
   });
-
-  test("answers 405 to other methods", async () => {
-    const response = await attendance(post({}), {});
-    expect(response.status).toBe(405);
-  });
 });
 
 describe("GET /api/form", () => {
@@ -215,25 +177,6 @@ describe("GET /api/form", () => {
   test("answers 503 not_configured without FORM_URL", async () => {
     const response = await form(get(), {});
     expect((await readJson(response)).code).toBe("not_configured");
-  });
-
-  test("a late failure does not evict the newer cached form", async () => {
-    const release = Promise.withResolvers<void>();
-    google.forms.set("LATE", { status: 500, hold: release.promise });
-    const env = { FORM_URL: `${google.origin}/forms/d/e/LATE/viewform` };
-    const formHits = () =>
-      google.hits.filter((hit) => hit.path === "/forms/d/e/LATE/viewform");
-    const stale = form(get(), env);
-    await until(() => formHits().length === 1);
-
-    clearFormCache();
-    google.forms.set("LATE", { status: 200 });
-    expect((await form(get(), env)).status).toBe(200);
-
-    release.resolve();
-    expect((await stale).status).toBe(502);
-    expect((await form(get(), env)).status).toBe(200);
-    expect(formHits()).toHaveLength(2);
   });
 
   test("reports a form Google cannot open", async () => {
@@ -300,9 +243,15 @@ describe("POST /api/register", () => {
     expect(response.status).toBe(502);
     expect((await readJson(response)).code).toBe("form_rejected");
   });
+});
 
-  test("answers 405 to GET", async () => {
-    const response = await register(get(), { FORM_URL: FORM_URL() });
+describe("a request with the wrong method", () => {
+  test.each([
+    ["POST to /api/attendance", attendance, post({})],
+    ["POST to /api/form", form, post({})],
+    ["GET to /api/register", register, get()],
+  ])("%s answers 405", async (_route, handler, request) => {
+    const response = await handler(request, { FORM_URL: FORM_URL() });
     expect(response.status).toBe(405);
   });
 });

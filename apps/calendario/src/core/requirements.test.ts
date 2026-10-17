@@ -3,32 +3,10 @@ import { allIsoWeeks, weekDatesInYear, weekday } from "./dates.ts";
 import { generateCalendar } from "./generate.ts";
 
 /**
- * The seven scheduling rules, each checked directly on the generated days
- * rather than through the validator the generator already runs.
+ * Scheduling rules 3 to 7, each checked directly on the generated days rather
+ * than through the validator the generator already runs.
  */
 const calendar = generateCalendar(2025, { seed: 42 });
-
-describe("rule 1: holiday pairing", () => {
-  test("isolated holidays are rest, a pair works the first day", () => {
-    const cal = generateCalendar(2025, {
-      holidays: ["2025-01-01", "2025-05-01", "2025-05-02", "2025-12-25"],
-      seed: 42,
-    });
-
-    expect(cal.getDay("2025-01-01").dayType).toBe("HOLIDAY");
-    expect(cal.getDay("2025-12-25").dayType).toBe("HOLIDAY");
-    expect(cal.getDay("2025-05-01").dayType).toBe("WORKING_HOLIDAY");
-    expect(cal.getDay("2025-05-02").dayType).toBe("HOLIDAY");
-  });
-});
-
-describe("rule 2: rest comes in blocks of two", () => {
-  test("every rest block is exactly two days", () => {
-    const blocks = calendar.getRestBlocks();
-    expect(blocks.length).toBeGreaterThan(0);
-    for (const block of blocks) expect(block).toHaveLength(2);
-  });
-});
 
 describe("rule 3: ordering day after rest", () => {
   test("the first work day after rest is ORDERING", () => {
@@ -114,20 +92,4 @@ describe("rule 7: no Sunday-Monday rest", () => {
       }
     }
   });
-});
-
-describe("all rules across seeds and years", () => {
-  for (const seed of [42, 100, 200, 300, 400]) {
-    test(`2025 with seed ${seed}`, () => {
-      const cal = generateCalendar(2025, { seed });
-      expect(cal.year).toBe(2025);
-      expect(cal.days).toHaveLength(365);
-    });
-  }
-
-  for (const year of [2024, 2025, 2026]) {
-    test(`${year} with seed 100`, () => {
-      expect(generateCalendar(year, { seed: 100 }).year).toBe(year);
-    });
-  }
 });

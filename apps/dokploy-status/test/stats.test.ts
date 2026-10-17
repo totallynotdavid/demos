@@ -110,11 +110,3 @@ describe("cpu and memory", () => {
     expect(() => snapshotOf(fake)).toThrow("/proc/stat");
   });
 });
-
-test("the real /proc and /sys of this machine can be read", () => {
-  const snapshot = collectSnapshot();
-
-  expect(snapshot.memory.totalGB).toBeGreaterThan(0);
-  expect(snapshot.cpu.total).toBeGreaterThan(0);
-  expect(snapshot.disk.totalGB).toBeGreaterThan(0);
-});

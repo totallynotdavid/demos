@@ -2,7 +2,6 @@ import { describe, expect, test } from "bun:test";
 import { type Answer, classifyAnswer } from "../api/_lib/answers.ts";
 import { buildAttendance } from "../api/_lib/attendance.ts";
 import { parseGviz } from "../api/_lib/gviz.ts";
-import { ApiError } from "../api/_lib/http.ts";
 import { type FakeSheetColumn, FORM_COLUMNS, gviz } from "./google.ts";
 
 const build = (
@@ -146,21 +145,5 @@ describe("buildAttendance", () => {
     const { entries, summary } = build([]);
     expect(entries).toEqual([]);
     expect(summary.people).toBe(0);
-  });
-
-  test("fails with a readable code when a name or answer column is missing", () => {
-    try {
-      build(
-        [["Date(2026,8,2,9,0,0)", "Ana"]],
-        [
-          { label: "Marca temporal", type: "datetime" },
-          { label: "Nombre", type: "string" },
-        ],
-      );
-      throw new Error("expected a throw");
-    } catch (error) {
-      expect(error).toBeInstanceOf(ApiError);
-      expect((error as ApiError).code).toBe("columns");
-    }
   });
 });

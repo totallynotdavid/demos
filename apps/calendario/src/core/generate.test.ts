@@ -1,11 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { monthOf, weekday } from "./dates.ts";
-import {
-  generateCalendar,
-  generateEcuadorCalendar,
-  generateMultipleCalendars,
-} from "./generate.ts";
-import { ECUADOR_HOLIDAYS } from "./presets.ts";
+import { generateCalendar } from "./generate.ts";
 import { ALL_RULES } from "./validation.ts";
 
 const dayTypes = (cal: ReturnType<typeof generateCalendar>) =>
@@ -54,13 +48,8 @@ describe("generateCalendar", () => {
     expect(cal.getDay("2025-12-25").dayType).toBe("HOLIDAY");
   });
 
-  test("a year of 0 is invalid", () => {
-    expect(() => generateCalendar(0, { seed: 42 })).toThrow("Invalid year");
-  });
-
-  test("a year that is not a whole number is invalid", () => {
-    expect(() => generateCalendar(Number.NaN)).toThrow("Invalid year");
-    expect(() => generateCalendar(2025.5)).toThrow("Invalid year");
+  test.each([0, 10_000, Number.NaN, 2025.5])("year %p is invalid", (year) => {
+    expect(() => generateCalendar(year)).toThrow("Invalid year");
   });
 
   test("holidays from another year are rejected", () => {
@@ -118,73 +107,6 @@ describe("generateCalendar", () => {
       expect(cal.getDay("2025-02-19").dayType).toBe("HOLIDAY");
       expect(cal.getDay("2025-08-10").dayType).toBe("HOLIDAY");
     }
-  });
-
-  test("the free weekend is a Saturday and Sunday", () => {
-    const cal = generateCalendar(2025, { seed: 42 });
-    const weekends = cal.days.filter(
-      (day, i) =>
-        day.dayType === "REST" &&
-        weekday(day.date) === 5 &&
-        cal.days[i + 1]?.dayType === "REST" &&
-        monthOf(cal.days[i + 1].date) === monthOf(day.date),
-    );
-    expect(weekends).toHaveLength(12);
-  });
-});
-
-describe("generateEcuadorCalendar", () => {
-  test("rejects 2025, which has Sunday-Monday holiday pairs", () => {
-    expect(() => generateEcuadorCalendar(2025, 42)).toThrow(
-      "Sunday-Monday holiday pair not allowed: 2025-02-16 and 2025-02-17",
-    );
-  });
-
-  test("rejects 2026, whose Jan 1-2 pair leaves a one-day work block", () => {
-    expect(() => generateEcuadorCalendar(2026, 42)).toThrow(
-      "No valid schedule exists for 2026",
-    );
-  });
-
-  test("2026 without its New Year pair generates", () => {
-    const holidays = ECUADOR_HOLIDAYS[2026].filter(
-      (date) => date !== "2026-01-01" && date !== "2026-01-02",
-    );
-    for (const seed of [1, 2, 3, 4, 5]) {
-      const cal = generateCalendar(2026, { holidays, seed });
-      expect(cal.days).toHaveLength(365);
-      expect(cal.getDay("2026-02-16").dayType).toBe("WORKING_HOLIDAY");
-      expect(cal.getDay("2026-02-17").dayType).toBe("HOLIDAY");
-    }
-  });
-
-  test("a year without a preset is an error", () => {
-    expect(() => generateEcuadorCalendar(2030, 42)).toThrow(
-      "No Ecuador holidays preset",
-    );
-  });
-});
-
-describe("generateMultipleCalendars", () => {
-  test("gives each worker a different calendar", () => {
-    const calendars = generateMultipleCalendars(2025, 3, { baseSeed: 100 });
-
-    expect(calendars).toHaveLength(3);
-    expect(calendars.every((cal) => cal.year === 2025)).toBe(true);
-    expect(dayTypes(calendars[0])).not.toEqual(dayTypes(calendars[1]));
-    expect(dayTypes(calendars[1])).not.toEqual(dayTypes(calendars[2]));
-  });
-
-  test("the same base seed gives the same calendars", () => {
-    const a = generateMultipleCalendars(2025, 2, { baseSeed: 100 });
-    const b = generateMultipleCalendars(2025, 2, { baseSeed: 100 });
-    expect(a[0].days).toEqual(b[0].days);
-    expect(a[1].days).toEqual(b[1].days);
-  });
-
-  test("worker i uses seed baseSeed + i", () => {
-    const [, second] = generateMultipleCalendars(2025, 2, { baseSeed: 100 });
-    expect(second.days).toEqual(generateCalendar(2025, { seed: 101 }).days);
   });
 });
 

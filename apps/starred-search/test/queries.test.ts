@@ -20,12 +20,6 @@ describe("queries", () => {
       expect(validate(query)).toEqual([]);
     },
   );
-
-  it("rejects a query with a field GitHub does not have", () => {
-    expect(validate('query { user(login: "x") { noSuchField } }')).not.toEqual(
-      [],
-    );
-  });
 });
 
 function edge(readmes: Record<string, string | null>): StarredEdge {

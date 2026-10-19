@@ -1,25 +1,38 @@
 version: 2
 updates:
   - package-ecosystem: bun
-    directory: /
+    directories:
+      - /
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 7
     groups:
       minor-and-patch:
         update-types:
           - minor
           - patch
-    ignore:
-      - dependency-name: typescript
-        update-types:
-          - version-update:semver-major
+
+  - package-ecosystem: docker
+    directories:
+      - /apps/dokploy-status
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      all:
+        patterns:
+          - "*"
 
   - package-ecosystem: github-actions
-    directory: /
+    directories:
+      - /
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 7
     groups:
-      minor-and-patch:
-        update-types:
-          - minor
-          - patch
+      all:
+        patterns:
+          - "*"

@@ -13,7 +13,7 @@ versions from `mise.toml`, then:
 
 ```sh
 mise install
-mise run install
+bun install
 cd apps/calendario
 bun run dev
 ```

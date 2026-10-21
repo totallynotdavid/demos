@@ -6,9 +6,10 @@ nothing else: no app imports from another, and there is no shared package.
 
 ```text
 apps/<name>/          one demo: its own package.json, scripts and readme
+package.json          the Bun workspace and the repository's scripts
 biome.json            lint and format rules for every app
 tsconfig.base.json    compiler options the TypeScript apps extend
-mise.toml             pinned tools and the tasks CI runs
+mise.toml             pinned tool versions
 bun.lock              the one lockfile
 .github/              CI workflow, dependabot, contributing guide
 docs/                 this manual
@@ -35,10 +36,10 @@ Each app's readme describes what it does and how its code is organised.
 
 ## What the tooling expects of an app
 
-`mise.toml` defines the tasks `typecheck`, `test` and `build`. Each runs
-`bun run --filter '*' <script>`, so it runs the script of that name in every app
-that has one and skips the rest. An app opts in by defining the script in its
-`package.json`:
+The repository's scripts live in the root `package.json`. The `check` script
+runs `bun run --filter '*' <script>` for `typecheck`, `test` and `build`, so it
+runs the script of that name in every app that has one and skips the rest. An
+app opts in by defining the script in its `package.json`:
 
 | Script      | Defined by                                                                                 |
 | ----------- | ------------------------------------------------------------------------------------------ |
@@ -48,16 +49,16 @@ that has one and skips the rest. An app opts in by defining the script in its
 
 `lint` and `fix` run once over the whole repository, not per app. `lint` runs
 `biome check --error-on-warnings .` and checks Markdown and YAML with `oxfmt`.
-`fix` applies Biome's safe fixes and formats Markdown and YAML. `mise run check`
-runs `lint`, `typecheck`, `test` and `build`. Only `fix` changes tracked files.
+`fix` applies Biome's safe fixes and formats Markdown and YAML. `check` runs
+`lint`, `typecheck`, `test` and `build`. Only `fix` changes tracked files.
 
 ## Shared configuration
 
 - **Lint and format**: the root `biome.json` applies to every app. It reads
-  `.gitignore` and skips `.agents`, `.claude`, `skills-lock.json` and SVG files.
-  An app can relax rules in its own `biome.json` with `"extends": "//"`. `blog`,
-  `dev3pack2` and `tim-apple` do, and `asistencia` skips its captured test
-  fixtures; read their files for what they change.
+  `.gitignore` and skips `.agents`, `.claude`, `.devin`, `skills-lock.json` and
+  SVG files. An app can relax rules in its own `biome.json` with
+  `"extends": "//"`. `blog`, `dev3pack2` and `tim-apple` do, and `asistencia`
+  skips its captured test fixtures; read their files for what they change.
 - **TypeScript**: each app's `tsconfig.json` extends `tsconfig.base.json`. The
   SvelteKit apps also extend `$app/tsconfig` and typecheck with `svelte-check`.
 - **Markdown and YAML**: `.oxfmtrc.json` sets the width and skips `.agents` and

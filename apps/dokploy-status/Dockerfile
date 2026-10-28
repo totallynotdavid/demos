@@ -3,7 +3,7 @@
 # Host networking is required to expose the host's interfaces. Bridge networking
 # exposes only the container's network namespace.
 # The Bun version must equal the one in mise.toml.
-FROM oven/bun:1.4.3-alpine
+FROM oven/bun:1.4.4-alpine
 
 WORKDIR /app
 

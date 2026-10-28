@@ -55,12 +55,16 @@ app opts in by defining the script in its `package.json`:
 ## Shared configuration
 
 - **Lint and format**: the root `biome.json` applies to every app. It reads
-  `.gitignore` and skips `.agents`, `.claude`, `.devin`, `skills-lock.json` and
-  SVG files. An app can relax rules in its own `biome.json` with
-  `"extends": "//"`. `blog`, `dev3pack2` and `tim-apple` do, and `asistencia`
-  skips its captured test fixtures; read their files for what they change.
+  `.gitignore` and skips `.agents`, `.claude`, `.devin`, `skills-lock.json`,
+  Markdown, SCSS and SVG files. An app can relax rules in its own `biome.json`
+  with `"extends": "//"`. `blog`, `dev3pack2` and `tim-apple` do, and
+  `asistencia` skips its captured test fixtures; read their files for what they
+  change.
 - **TypeScript**: each app's `tsconfig.json` extends `tsconfig.base.json`. The
   SvelteKit apps also extend `$app/tsconfig` and typecheck with `svelte-check`.
+  The other apps typecheck with TypeScript 7. `svelte-check` and SvelteKit need
+  the TypeScript 6 API, so `blog` and `tim-apple` install `typescript@~6`, and
+  `blog` adds TypeScript 7 as `@typescript/native` for `svelte-check --tsgo`.
 - **Markdown and YAML**: `.oxfmtrc.json` sets the width and skips `.agents` and
   `.claude`.
 - **Tools**: `mise.toml` pins `bun` and `node`. `bun.lock` pins Biome and oxfmt.

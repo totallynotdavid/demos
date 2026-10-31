@@ -1,0 +1,26 @@
+{
+  "name": "caserita",
+  "private": true,
+  "workspaces": [
+    "server",
+    "web"
+  ],
+  "type": "module",
+  "scripts": {
+    "lint": "biome check --error-on-warnings . && oxfmt --check '**/*.{md,yml,yaml}'",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p web",
+    "test": "vitest run",
+    "check": "bun run lint && bun run typecheck && bun run test",
+    "fix": "biome check --write . && oxfmt '**/*.{md,yml,yaml}'",
+    "web:dev": "cd web && bunx wrangler dev -c wrangler.dev.jsonc -c dev/wrangler.jsonc --port 8799",
+    "web:deploy": "cd web && sed \"s/VPC_SERVICE_ID/$VPC_SERVICE_ID/\" wrangler.jsonc > wrangler.deploy.jsonc && bunx wrangler deploy -c wrangler.deploy.jsonc",
+    "eval": "node server/bin/eval.ts",
+    "deploy:server": "docker compose --env-file \"${CASERITA_ENV_FILE:-../../../caserita.env}\" up -d --build",
+    "deploy:web": "cd web && bunx wrangler deploy"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.5",
+    "typescript": "7.0.2",
+    "vitest": "5.0.5"
+  }
+}

@@ -1,10 +1,10 @@
 # demos
 
-Eight small web demos in one Bun workspace. Each lives in `apps/<name>`, builds
-on its own, and shares one lockfile, one lint config and one CI run. Most are
-static front ends. `asistencia` adds serverless functions and `dokploy-status`
-is a Bun server. Every package is private: nothing here is published or meant to
-be imported.
+Ten small demos in one workspace. Each lives in `apps/<name>`, builds on its
+own, and shares one lockfile, one lint config and one CI run. Most are static
+front ends. `asistencia` adds serverless functions and `dokploy-status` is a Bun
+server; `cronbach-lab` is a Python and R analysis lab. Every package is private:
+nothing here is published or meant to be imported.
 
 ## Run a demo
 
@@ -28,6 +28,8 @@ Bun server on port 3000 rather than a Vite app.
 | [asistencia](apps/asistencia)         | Attendance on a Google Form, with a live list from its Sheet.   | https://asistencia-vert.vercel.app      |
 | [blog](apps/blog)                     | Static SvelteKit blog with search.                              | https://demos-blog.vercel.app           |
 | [calendario](apps/calendario)         | Work and rest calendar generator under seven rules.             | https://demos-calendario.vercel.app     |
+| [caserita](apps/caserita)             | WhatsApp bookkeeping agent for a small shop.                    |                                         |
+| [cronbach-lab](apps/cronbach-lab)     | Python and R lab for simulated survey reliability.              |                                         |
 | [dev3pack2](apps/dev3pack2)           | DevProof, a skills roadmap with challenges (React, no backend). | https://demos-dev3pack2.vercel.app      |
 | [dokploy-status](apps/dokploy-status) | Public server monitoring page (Bun, Docker).                    |                                         |
 | [postcard](apps/postcard)             | Postcard design editor with live preview (React).               | https://demos-postcard.vercel.app       |

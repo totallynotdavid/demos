@@ -15,7 +15,10 @@
       "!**/skills-lock.json",
       "!**/*.md",
       "!**/*.scss",
-      "!**/*.svg"
+      "!**/*.svg",
+      "!apps/cronbach-lab/results",
+      "!apps/cronbach-lab/r",
+      "!apps/cronbach-lab/src"
     ]
   },
   "formatter": {

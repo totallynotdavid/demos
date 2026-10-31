@@ -67,3 +67,11 @@ ls .vercel/output
 
 `dokploy-status` is a Docker image built from the repository root, not a Vercel
 project. See its [deployment guide](../apps/dokploy-status/docs/deployment.md).
+
+## caserita
+
+`caserita` is not a Vercel project. Its Node server and Cloudflare Worker use
+Docker Compose and Wrangler from `apps/caserita`. See its
+[deployment guide](../apps/caserita/docs/deploy.md).
+
+`cronbach-lab` produces local analysis outputs and has no deployment target.

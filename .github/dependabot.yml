@@ -27,6 +27,19 @@ updates:
           - minor
           - patch
 
+  - package-ecosystem: uv
+    directories:
+      - /apps/cronbach-lab
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
+
   - package-ecosystem: github-actions
     directories:
       - /

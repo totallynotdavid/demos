@@ -2,7 +2,9 @@
   "name": "demos",
   "private": true,
   "workspaces": [
-    "apps/*"
+    "apps/*",
+    "apps/caserita/server",
+    "apps/caserita/web"
   ],
   "scripts": {
     "lint": "bun run lint:code && bun run lint:docs",

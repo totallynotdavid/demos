@@ -1,11 +1,14 @@
 # Architecture
 
-The repository is a Bun workspace (`workspaces: ["apps/*"]` in `package.json`).
-Each folder in `apps/` is an independent demo. The apps share tooling and
-nothing else: no app imports from another, and there is no shared package.
+The repository is a Bun workspace. It includes `apps/*` plus the two nested
+caserita packages listed in `package.json`. Each folder in `apps/` is an
+independent demo. The apps share tooling and nothing else: no app imports from
+another, and there is no shared package.
 
 ```text
 apps/<name>/          one demo: its own package.json, scripts and readme
+apps/caserita/server  caserita's Bun server package
+apps/caserita/web     caserita's Cloudflare Worker package
 package.json          the Bun workspace and the repository's scripts
 biome.json            lint and format rules for every app
 tsconfig.base.json    compiler options the TypeScript apps extend
@@ -25,6 +28,8 @@ takes the package name.
 | asistencia     | `asistencia-site`         | Vite, TypeScript            | `index.html`, `panel/index.html`, `api/*.ts` |
 | blog           | `another-blog`            | SvelteKit, Svelte 5, mdsvex | `src/routes`                                 |
 | calendario     | `calendario`              | Vite, TypeScript            | `src/main.ts` (page), `src/core` (generator) |
+| caserita       | `caserita`                | Bun workspace, Hono, Worker | `server/src`, `web/src`                      |
+| cronbach-lab   | —                         | Python, uv, pytest, R       | `src/cronbach_lab`, `r/crosscheck.R`         |
 | dev3pack2      | `plena-react-starter-app` | Vite, React, Tailwind       | `src/main.tsx`                               |
 | dokploy-status | `dokploy-status`          | Bun, no dependencies        | `src/index.ts`                               |
 | postcard       | `a-nice-postcard`         | Vite, React, Tailwind       | `src/index.tsx` (the Vite root is `src`)     |

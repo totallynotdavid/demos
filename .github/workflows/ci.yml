@@ -26,3 +26,21 @@ jobs:
       - run: bun install --frozen-lockfile
 
       - run: bun run check
+
+  cronbach-lab:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/cronbach-lab
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: jdx/mise-action@6be3c7ed4c21d4f76b208d351d95aac273ebb76d # v5.2.4
+        with:
+          working_directory: apps/cronbach-lab
+
+      - run: uv sync --locked
+
+      - run: mise run check

@@ -5,8 +5,8 @@
   "dependencies": {
     "@hono/node-server": "2.1.5",
     "baileys": "7.0.0-rc14",
-    "hono": "4.13.13",
-    "openai": "7.39.0",
+    "hono": "4.13.16",
+    "openai": "7.47.0",
     "pino": "10.4.0",
     "zod": "4.6.7"
   }

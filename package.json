@@ -14,8 +14,8 @@
     "check": "bun run lint && bun run --filter '*' typecheck && bun run --filter '*' test && bun run --filter '*' build"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.6.3",
-    "oxfmt": "0.75.0",
+    "@biomejs/biome": "2.6.7",
+    "oxfmt": "0.78.0",
     "typescript": "^7.0.2"
   }
 }

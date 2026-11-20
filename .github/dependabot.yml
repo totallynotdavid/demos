@@ -12,20 +12,8 @@ updates:
         update-types:
           - minor
           - patch
-
-  - package-ecosystem: docker
-    directories:
-      - /apps/dokploy-status
-    schedule:
-      interval: weekly
-    cooldown:
-      default-days: 7
-    groups:
-      all:
-        update-types:
-          - major
-          - minor
-          - patch
+    ignore:
+      - dependency-name: typescript
 
   - package-ecosystem: uv
     directories:
@@ -39,6 +27,25 @@ updates:
         update-types:
           - minor
           - patch
+    ignore:
+      - dependency-name: typescript
+
+  - package-ecosystem: docker
+    directories:
+      - /apps/caserita
+      - /apps/dokploy-status
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      all:
+        update-types:
+          - major
+          - minor
+          - patch
+    ignore:
+      - dependency-name: typescript
 
   - package-ecosystem: github-actions
     directories:
@@ -53,3 +60,5 @@ updates:
           - major
           - minor
           - patch
+    ignore:
+      - dependency-name: typescript
